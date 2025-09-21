@@ -2,52 +2,93 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.model.service;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Rate;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IRateCalculator;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IRateService;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.RateRepository;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.StandardRateCalculator;
 
 /**
- * Servicio para el cálculo de tarifas
+ * Servicio para el cálculo de tarifas.
+ * Delega los cálculos a un IRateCalculator y gestiona las tarifas.
  */
-public class RateService {
-    private final Rate rate;
+public class RateService implements Service<Rate, RateRepository> {
+    private final RateRepository repository;
+    private final IRateCalculator calculator;
+    private final ShipmentService shipmentService;
     
-    // Constructor privado para Singleton
-    private RateService() {
-        this.rate = Rate.builder()
-            .baseRate(5000.0)
-            .costPerKm(1000.0)
-            .costPerKg(2000.0)
-            .costPerM3(10000.0)
-            .insuranceSurcharge(0.1)
-            .fragileSurcharge(0.15)
-            .build();
+    public RateService(
+            RateRepository repository, 
+            IRateCalculator calculator,
+            ShipmentService shipmentService) {
+        this.repository = repository;
+        this.calculator = calculator;
+        this.shipmentService = shipmentService;
     }
     
-    // Holder estático para instancia única
-    private static class SingletonHolder {
-        private static final RateService INSTANCE = new RateService();
+    @Override
+    public RateRepository getRepository() {
+        return repository;
     }
     
     /**
-     * Obtiene la instancia única del servicio
-     * @return instancia del servicio
+     * Calcula el costo base de un envío usando el calculador
+     * @param weight peso del paquete en kg
+     * @param volume volumen del paquete en m³
+     * @param distance distancia del envío en km
+     * @return costo base calculado
      */
-    public static RateService getInstance() {
-        return SingletonHolder.INSTANCE;
+    public double calculateBaseRate(double weight, double volume, double distance) {
+        return calculator.calculateBaseRate(weight, volume, distance);
+    }
+
+    /**
+     * Calcula los recargos adicionales usando el calculador
+     * @param baseRate costo base del envío
+     * @param hasInsurance si incluye seguro
+     * @param isFragile si es un paquete frágil
+     * @param priorityMultiplier multiplicador de prioridad
+     * @return costo total con recargos
+     */
+    public double calculateSurcharges(double baseRate, boolean hasInsurance, boolean isFragile, double priorityMultiplier) {
+        return calculator.calculateSurcharges(baseRate, hasInsurance, isFragile, priorityMultiplier);
     }
     
     /**
-     * Calcula el costo de un envío
+     * Calcula el costo total de un envío
      * @param shipment envío a calcular
-     * @return costo calculado
+     * @return costo total calculado
      */
     public double calculateShipmentCost(Shipment shipment) {
-        return rate.calculateTotalCost(shipment);
+        double distance = shipmentService.calculateShipmentDistance(shipment);
+        
+        double baseRate = calculator.calculateBaseRate(
+            shipment.getWeight(),
+            shipment.getVolume(),
+            distance
+        );
+        
+        return calculator.calculateSurcharges(
+            baseRate,
+            shipment.isHasInsurance(),
+            shipment.isFragile(),
+            shipment.getPriority().getRateMultiplier()
+        );
     }
     
     /**
-     * Obtiene la tarifa actual
-     * @return tarifa actual
+     * Actualiza la tarifa actual en el sistema
+     * @param rate nueva tarifa a establecer
      */
-    public Rate getRate() {
-        return rate;
+    public void updateCurrentRate(Rate rate) {
+        repository.setCurrentRate(rate);
+        create(rate);
+    }
+    
+    /**
+     * Obtiene la tarifa actual del sistema
+     * @return tarifa actual vigente
+     */
+    public Rate getCurrentRate() {
+        return repository.getCurrentRate();
     }
 }

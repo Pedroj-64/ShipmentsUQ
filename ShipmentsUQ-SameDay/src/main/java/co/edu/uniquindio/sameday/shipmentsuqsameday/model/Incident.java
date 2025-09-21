@@ -25,23 +25,4 @@ public class Incident {
     private boolean resolved;
     private LocalDateTime resolutionDate;
     private String solution;
-    
-    /**
-     * Marca la incidencia como resuelta
-     * @param solution descripción de cómo se resolvió la incidencia
-     */
-    public void resolve(String solution) {
-        this.resolved = true;
-        this.resolutionDate = LocalDateTime.now();
-        this.solution = solution;
-    }
-    
-    /**
-     * Verifica si la incidencia requiere reasignación del envío
-     * @return true si es necesario reasignar el envío
-     */
-    public boolean requiresReassignment() {
-        return type == IncidentType.INACCESSIBLE_ZONE ||
-               type == IncidentType.DELIVERER_UNAVAILABLE;
-    }
 }

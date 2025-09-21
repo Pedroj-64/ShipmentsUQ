@@ -47,6 +47,25 @@ public class IncidentRepository extends BaseRepository<Incident> {
     }
     
     /**
+     * Busca incidencias por ID de envío
+     * @param shipmentId ID del envío
+     * @return lista de incidencias asociadas al envío
+     */
+    public List<Incident> findByShipmentId(UUID shipmentId) {
+        return entities.values().stream()
+                .filter(i -> i.getShipment().getId().equals(shipmentId))
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Busca todas las incidencias no resueltas
+     * @return lista de incidencias pendientes de resolución
+     */
+    public List<Incident> findUnresolved() {
+        return findByResolutionStatus(false);
+    }
+    
+    /**
      * Busca incidencias por estado de resolución
      * @param resolved true para buscar resueltas, false para pendientes
      * @return lista de incidencias según estado de resolución
@@ -78,5 +97,17 @@ public class IncidentRepository extends BaseRepository<Incident> {
         return entities.values().stream()
                 .filter(i -> !i.isResolved())
                 .count();
+    }
+    
+    /**
+     * Busca incidencias que requieren reasignación
+     * @return lista de incidencias que necesitan reasignación de repartidor
+     */
+    public List<Incident> findRequiringReassignment() {
+        return entities.values().stream()
+                .filter(i -> !i.isResolved() && 
+                           (i.getType() == IncidentType.INACCESSIBLE_ZONE ||
+                            i.getType() == IncidentType.DELIVERER_UNAVAILABLE))
+                .collect(Collectors.toList());
     }
 }

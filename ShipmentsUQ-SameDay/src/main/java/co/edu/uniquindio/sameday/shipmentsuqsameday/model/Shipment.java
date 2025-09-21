@@ -40,49 +40,13 @@ public class Shipment implements Observable {
     private boolean hasInsurance;
     private boolean isFragile;
     private String specialInstructions;
+    private ShipmentDetails details;
     
     @Builder.Default
     private List<Incident> incidents = new ArrayList<>();
     
     @Builder.Default
     private List<Observer> observers = new ArrayList<>();
-    
-    /**
-     * Calcula el tiempo estimado de entrega en minutos
-     * @return tiempo estimado en minutos
-     */
-    public int calculateEstimatedTime() {
-        double distance = origin.calculateDistance(destination);
-        int baseTime = (int) (distance * 3); // 3 minutos por kilómetro
-        
-        // Ajustes por prioridad
-        switch (priority) {
-            case URGENT:
-                return (int) (baseTime * 0.7); // 30% más rápido
-            case PRIORITY:
-                return (int) (baseTime * 0.85); // 15% más rápido
-            default:
-                return baseTime;
-        }
-    }
-    
-    /**
-     * Registra una nueva incidencia en el envío
-     * @param incident incidencia a registrar
-     */
-    public void addIncident(Incident incident) {
-        incidents.add(incident);
-        status = ShipmentStatus.INCIDENT;
-        notifyObservers("INCIDENT_REGISTERED", incident);
-    }
-
-    /**
-     * Gets the distance between origin and destination
-     * @return distance in kilometers
-     */
-    public double getDistance() {
-        return origin.calculateDistance(destination);
-    }
     
     @Override
     public void registerObserver(Observer observer) {
@@ -99,33 +63,5 @@ public class Shipment implements Observable {
         for (Observer observer : observers) {
             observer.update(event, data);
         }
-    }
-    
-    /**
-     * Actualiza el estado del envío y notifica a los observadores
-     * @param newStatus nuevo estado del envío
-     */
-    public void updateStatus(ShipmentStatus newStatus) {
-        ShipmentStatus previousStatus = this.status;
-        this.status = newStatus;
-        
-        switch (newStatus) {
-            case ASSIGNED:
-                this.assignmentDate = LocalDateTime.now();
-                break;
-            case DELIVERED:
-                this.deliveryDate = LocalDateTime.now();
-                break;
-            case PENDING:
-            case IN_TRANSIT:
-            case INCIDENT:
-            case CANCELLED:
-            case PENDING_REASSIGNMENT:
-                // No special action needed for these states
-                break;
-        }
-        
-        notifyObservers("STATUS_CHANGED", 
-            new Object[]{previousStatus, newStatus});
     }
 }

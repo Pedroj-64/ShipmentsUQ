@@ -11,30 +11,22 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Servicio para la gestión de pagos
  */
 public class PaymentService implements Service<Payment, PaymentRepository> {
     private final PaymentRepository repository;
+    private final PaymentProcessingService processingService;
+    private final PaymentAnalyticsService analyticsService;
     
-    // Constructor privado para Singleton
-    private PaymentService() {
-        this.repository = new PaymentRepository();
-    }
-    
-    // Holder estático para instancia única
-    private static class SingletonHolder {
-        private static final PaymentService INSTANCE = new PaymentService();
-    }
-    
-    /**
-     * Obtiene la instancia única del servicio
-     * @return instancia del servicio
-     */
-    public static PaymentService getInstance() {
-        return SingletonHolder.INSTANCE;
+    public PaymentService(
+            PaymentRepository repository,
+            PaymentProcessingService processingService,
+            PaymentAnalyticsService analyticsService) {
+        this.repository = repository;
+        this.processingService = processingService;
+        this.analyticsService = analyticsService;
     }
     
     @Override
@@ -47,8 +39,10 @@ public class PaymentService implements Service<Payment, PaymentRepository> {
      * @param shipment envío asociado
      * @param paymentMethod método de pago
      * @return pago procesado
+     * @throws RuntimeException si el pago falla
      */
     public Payment processPayment(Shipment shipment, PaymentMethod paymentMethod) {
+        // Crear el nuevo pago en estado pendiente
         Payment payment = Payment.builder()
             .shipment(shipment)
             .user(shipment.getUser())
@@ -56,16 +50,20 @@ public class PaymentService implements Service<Payment, PaymentRepository> {
             .paymentMethod(paymentMethod)
             .status(PaymentStatus.PENDING)
             .creationDate(LocalDateTime.now())
+            .processingDate(LocalDateTime.now())
             .build();
         
+        // Guardar el pago inicial
         create(payment);
         
-        if (payment.processPayment()) {
-            update(payment);
-            return payment;
-        } else {
-            throw new RuntimeException("Error processing payment");
+        // Procesar el pago usando el servicio especializado
+        boolean success = processingService.processPayment(payment);
+        
+        if (!success) {
+            throw new RuntimeException("Error al procesar el pago");
         }
+        
+        return payment;
     }
     
     /**
@@ -111,7 +109,7 @@ public class PaymentService implements Service<Payment, PaymentRepository> {
      * @return total de ingresos
      */
     public double calculateIncomeForPeriod(LocalDateTime startDate, LocalDateTime endDate) {
-        return repository.calculateIncomeForPeriod(startDate, endDate);
+        return analyticsService.calculateIncomeForPeriod(startDate, endDate);
     }
     
     /**
@@ -119,7 +117,7 @@ public class PaymentService implements Service<Payment, PaymentRepository> {
      * @return mapa con estadísticas
      */
     public Map<PaymentMethod, Long> getPaymentMethodStatistics() {
-        return repository.getPaymentMethodStatistics();
+        return analyticsService.getPaymentMethodStatistics();
     }
     
     /**
@@ -142,10 +140,6 @@ public class PaymentService implements Service<Payment, PaymentRepository> {
             return false;
         }
         
-        boolean refunded = payment.processRefund(reason);
-        if (refunded) {
-            update(payment);
-        }
-        return refunded;
+        return processingService.processRefund(payment, reason);
     }
 }
