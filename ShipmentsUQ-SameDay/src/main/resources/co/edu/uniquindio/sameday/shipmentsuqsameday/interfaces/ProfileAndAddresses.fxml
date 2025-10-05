@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/profile.css"
+            prefHeight="600.0" prefWidth="900.0">
+
+    <!-- Zona superior (top) -->
+    <top>
+        <HBox alignment="CENTER">
+            <Label text="Gestión de Perfil y Direcciones" styleClass="title-label" />
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20" />
+            </padding>
+        </HBox>
+    </top>
+    
+    <!-- Zona izquierda (left) - Sección Perfil -->
+    <left>
+        <VBox styleClass="profile-section">
+            <Label text="Información Personal" styleClass="section-title" />
+            
+            <GridPane hgap="10" vgap="10">
+                <padding>
+                    <Insets top="20" right="20" bottom="20" left="20" />
+                </padding>
+                
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="120" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="200" />
+                </columnConstraints>
+                
+                <!-- Nombre completo -->
+                <Label text="Nombre completo:" styleClass="form-label" 
+                       GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="txt_name" promptText="Ingrese su nombre completo" 
+                           GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                
+                <!-- Correo electrónico -->
+                <Label text="Correo electrónico:" styleClass="form-label" 
+                       GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <TextField fx:id="txt_email" promptText="ejemplo@correo.com" 
+                           GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                
+                <!-- Teléfono -->
+                <Label text="Teléfono:" styleClass="form-label" 
+                       GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <TextField fx:id="txt_phone" promptText="Ingrese su número telefónico" 
+                           GridPane.rowIndex="2" GridPane.columnIndex="1" />
+            </GridPane>
+            
+            <!-- Botones de acción para perfil -->
+            <HBox spacing="10" alignment="CENTER_RIGHT">
+                <Button fx:id="btn_saveProfile" text="Guardar cambios" styleClass="save-button" />
+                <Button fx:id="btn_cancelProfile" text="Cancelar" styleClass="cancel-button" />
+                <padding>
+                    <Insets top="10" right="20" bottom="20" left="20" />
+                </padding>
+            </HBox>
+        </VBox>
+    </left>
+    
+    <!-- Zona central (center) - Sección Direcciones -->
+    <center>
+        <VBox spacing="15" styleClass="addresses-section">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20" />
+            </padding>
+            
+            <Label text="Mis direcciones frecuentes" styleClass="section-title" />
+            
+            <!-- Tabla de direcciones -->
+            <TableView fx:id="tbl_address" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="col_alias" text="Alias" prefWidth="100" />
+                    <TableColumn fx:id="col_street" text="Calle" prefWidth="200" />
+                    <TableColumn fx:id="col_city" text="Ciudad" prefWidth="100" />
+                    <TableColumn fx:id="col_coordinates" text="Coordenadas" prefWidth="150" />
+                </columns>
+            </TableView>
+            
+            <!-- Botones CRUD para direcciones -->
+            <HBox spacing="10" alignment="CENTER">
+                <Button fx:id="btn_addAddress" text="Agregar" styleClass="add-button" />
+                <Button fx:id="btn_editAddress" text="Editar" styleClass="edit-button" />
+                <Button fx:id="btn_deleteAddress" text="Eliminar" styleClass="delete-button" />
+            </HBox>
+        </VBox>
+    </center>
+    
+    <!-- Zona inferior (bottom) -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT">
+            <Label fx:id="lbl_status" styleClass="status-label" />
+            <padding>
+                <Insets top="10" right="20" bottom="10" left="20" />
+            </padding>
+        </HBox>
+    </bottom>
+    
+</BorderPane>

@@ -1,0 +1,97 @@
+/* 
+   Login.css - Estilo para la pantalla de inicio de sesión
+   Plataforma de logística ShipmentsUQ
+*/
+
+/* Estilo para la raíz (VBox principal) */
+.root {
+    -fx-background-color: linear-gradient(to bottom, #e6f2ff, #ffffff);
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Estilo para el título principal */
+.title-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a56a7;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 4, 0, 0, 1);
+    -fx-padding: 10 0 20 0;
+}
+
+/* Estilo para los labels */
+.form-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: normal;
+    -fx-text-fill: #444444;
+}
+
+/* Estilo para campos de texto */
+.text-field {
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
+    -fx-font-size: 14px;
+}
+
+.text-field:focused {
+    -fx-border-color: #4a90e2;
+    -fx-effect: dropshadow(three-pass-box, rgba(74, 144, 226, 0.5), 5, 0, 0, 0);
+}
+
+/* Estilo para campos de contraseña */
+.password-field {
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-padding: 8px;
+    -fx-font-size: 14px;
+}
+
+.password-field:focused {
+    -fx-border-color: #4a90e2;
+    -fx-effect: dropshadow(three-pass-box, rgba(74, 144, 226, 0.5), 5, 0, 0, 0);
+}
+
+/* Estilo para botones */
+.button {
+    -fx-background-color: #1a56a7;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #3873c4;
+}
+
+.button:pressed {
+    -fx-background-color: #0e3b7a;
+}
+
+/* Estilo para mensajes de error */
+.error-label {
+    -fx-text-fill: #e74c3c;
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+/* Estilo para mensajes de éxito */
+.success-label {
+    -fx-text-fill: #27ae60;
+    -fx-font-size: 12px;
+    -fx-font-style: italic;
+}
+
+/* Estilo para el contenedor de formulario */
+.form-container {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 2);
+    -fx-padding: 30px;
+}

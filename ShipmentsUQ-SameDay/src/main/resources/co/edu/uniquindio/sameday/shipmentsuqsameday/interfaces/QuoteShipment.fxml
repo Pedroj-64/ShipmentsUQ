@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      stylesheets="@../css/quote.css"
+      alignment="CENTER" 
+      spacing="20" 
+      prefWidth="600" 
+      prefHeight="500">
+
+    <!-- Encabezado -->
+    <HBox alignment="CENTER">
+        <Label text="Cotizar Envío" styleClass="title-label" />
+        <padding>
+            <Insets top="10" right="20" bottom="10" left="20" />
+        </padding>
+    </HBox>
+    
+    <!-- Formulario de datos del envío -->
+    <GridPane hgap="15" vgap="10" styleClass="form-container">
+        <padding>
+            <Insets top="10" right="20" bottom="10" left="20" />
+        </padding>
+        
+        <columnConstraints>
+            <ColumnConstraints hgrow="NEVER" minWidth="120" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="200" />
+        </columnConstraints>
+        
+        <!-- Origen -->
+        <Label text="Origen:" styleClass="form-label" 
+               GridPane.rowIndex="0" GridPane.columnIndex="0" />
+        <ComboBox fx:id="cmb_origin" promptText="Seleccione ciudad de origen" 
+                 GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity" />
+        
+        <!-- Destino -->
+        <Label text="Destino:" styleClass="form-label" 
+               GridPane.rowIndex="1" GridPane.columnIndex="0" />
+        <ComboBox fx:id="cmb_destination" promptText="Seleccione ciudad de destino" 
+                 GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity" />
+        
+        <!-- Peso -->
+        <Label text="Peso (kg):" styleClass="form-label" 
+               GridPane.rowIndex="2" GridPane.columnIndex="0" />
+        <TextField fx:id="txt_weight" promptText="Ej: 2.5" 
+                  GridPane.rowIndex="2" GridPane.columnIndex="1" />
+        
+        <!-- Dimensiones -->
+        <Label text="Dimensiones (cm):" styleClass="form-label" 
+               GridPane.rowIndex="3" GridPane.columnIndex="0" />
+        <TextField fx:id="txt_dimensions" promptText="Largo x Ancho x Alto" 
+                  GridPane.rowIndex="3" GridPane.columnIndex="1" />
+        
+        <!-- Prioridad -->
+        <Label text="Prioridad:" styleClass="form-label" 
+               GridPane.rowIndex="4" GridPane.columnIndex="0" />
+        <ChoiceBox fx:id="chb_priority" 
+                  GridPane.rowIndex="4" GridPane.columnIndex="1" maxWidth="Infinity" />
+    </GridPane>
+    
+    <!-- Separador -->
+    <Separator prefWidth="500" />
+    
+    <!-- Resultado de la cotización -->
+    <VBox alignment="CENTER" styleClass="quote-result-container">
+        <Label text="Complete el formulario y presione Calcular" fx:id="lbl_quoteResult" styleClass="quote-result" />
+    </VBox>
+    
+    <!-- Botones de acción -->
+    <HBox alignment="CENTER" spacing="15">
+        <Button fx:id="btn_calculate" text="Calcular" styleClass="calculate-button" />
+        <Button fx:id="btn_confirm" text="Confirmar Envío" styleClass="confirm-button" disable="true" />
+    </HBox>
+    
+    <!-- Zona inferior - mensajes del sistema -->
+    <Label fx:id="lbl_status" styleClass="status-label" />
+    
+</VBox>

@@ -1,0 +1,300 @@
+/* 
+   shipments.css - Estilo para la pantalla de gestión de envíos
+   Plataforma de logística ShipmentsUQ
+*/
+
+/* Estilo general para la raíz (BorderPane) */
+.root {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Estilo para el contenedor del encabezado */
+.header-container {
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-width: 0 0 1px 0;
+    border-width: 0 0 1px 0;
+}
+
+/* Estilo para el título principal */
+.title-label {
+    -fx-font-size: 28px;
+    font-size: 28px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1a56a7;
+    color: #1a56a7;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 4, 0, 0, 1);
+}
+
+/* Contenedor principal de contenido */
+.content-container {
+    -fx-background-color: white;
+    background-color: white;
+}
+
+/* Estilos para los controles de filtro */
+.filter-label {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #555555;
+    color: #555555;
+}
+
+.filter-choice {
+    -fx-min-width: 120px;
+    min-width: 120px;
+}
+
+.filter-button {
+    -fx-background-color: #1a56a7;
+    background-color: #1a56a7;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 6px 15px;
+    padding: 6px 15px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.filter-button:hover {
+    -fx-background-color: #3873c4;
+    background-color: #3873c4;
+}
+
+.clear-button {
+    -fx-background-color: #f0f0f0;
+    background-color: #f0f0f0;
+    -fx-text-fill: #555555;
+    color: #555555;
+    -fx-padding: 6px 15px;
+    padding: 6px 15px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.clear-button:hover {
+    -fx-background-color: #e0e0e0;
+    background-color: #e0e0e0;
+}
+
+/* Estilos para la tabla de envíos */
+.table-view {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #e0e0e0;
+    border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f0f0f0;
+    background-color: #f0f0f0;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #f9f9f9;
+    background-color: #f9f9f9;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #d1e6ff;
+    background-color: #d1e6ff;
+}
+
+/* Estilos para las celdas de estado según el valor */
+.status-requested {
+    -fx-text-fill: #777777;
+    color: #777777;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.status-assigned {
+    -fx-text-fill: #2980b9;
+    color: #2980b9;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.status-in-transit {
+    -fx-text-fill: #f39c12;
+    color: #f39c12;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.status-delivered {
+    -fx-text-fill: #27ae60;
+    color: #27ae60;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.status-incident {
+    -fx-text-fill: #e74c3c;
+    color: #e74c3c;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+/* Estilo para el contenedor de detalles */
+.detail-container {
+    -fx-background-color: #f8f8f8;
+    background-color: #f8f8f8;
+    -fx-border-color: #e0e0e0;
+    border-color: #e0e0e0;
+    -fx-border-width: 0 0 0 1px;
+    border-width: 0 0 0 1px;
+    -fx-effect: innershadow(gaussian, rgba(0,0,0,0.1), 5, 0, -3, 0);
+}
+
+/* Estilo para el título de la sección de detalles */
+.section-title {
+    -fx-font-size: 18px;
+    font-size: 18px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #333333;
+    color: #333333;
+    -fx-padding: 0 0 10px 0;
+    padding: 0 0 10px 0;
+}
+
+/* Estilos para las etiquetas de detalle */
+.detail-label {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #555555;
+    color: #555555;
+}
+
+.detail-value {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-text-fill: #333333;
+    color: #333333;
+}
+
+/* Estilo para el botón de rastreo */
+.track-button {
+    -fx-background-color: #1a56a7;
+    background-color: #1a56a7;
+    -fx-text-fill: white;
+    color: white;
+    -fx-padding: 10px;
+    padding: 10px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.track-button:hover {
+    -fx-background-color: #3873c4;
+    background-color: #3873c4;
+}
+
+/* Contenedor de botones de acción */
+.actions-container {
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-width: 1px 0 0 0;
+    border-width: 1px 0 0 0;
+}
+
+/* Botones de acción con colores distintivos */
+.new-button {
+    -fx-background-color: #27ae60;
+    background-color: #27ae60;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.new-button:hover {
+    -fx-background-color: #2ecc71;
+    background-color: #2ecc71;
+}
+
+.edit-button {
+    -fx-background-color: #3498db;
+    background-color: #3498db;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    -fx-background-color: #2980b9;
+    background-color: #2980b9;
+}
+
+.cancel-button {
+    -fx-background-color: #e74c3c;
+    background-color: #e74c3c;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.cancel-button:hover {
+    -fx-background-color: #c0392b;
+    background-color: #c0392b;
+}
+
+.refresh-button {
+    -fx-background-color: #95a5a6;
+    background-color: #95a5a6;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.refresh-button:hover {
+    -fx-background-color: #7f8c8d;
+    background-color: #7f8c8d;
+}

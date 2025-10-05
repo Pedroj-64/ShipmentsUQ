@@ -1,0 +1,187 @@
+/* 
+   quote.css - Estilo para la pantalla de cotización de envíos
+   Plataforma de logística ShipmentsUQ
+*/
+
+/* Estilo general para la raíz (VBox) */
+.root {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Estilo para el título principal */
+.title-label {
+    -fx-font-size: 28px;
+    font-size: 28px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1a56a7;
+    color: #1a56a7;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 4, 0, 0, 1);
+}
+
+/* Estilos para el contenedor del formulario */
+.form-container {
+    -fx-background-color: #f8f8f8;
+    background-color: #f8f8f8;
+    -fx-background-radius: 5px;
+    -fx-border-color: #e0e0e0;
+    border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 15px;
+    padding: 15px;
+}
+
+/* Etiquetas de formulario */
+.form-label {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-text-fill: #333333;
+    color: #333333;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+/* Campos de texto */
+.text-field {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-background-radius: 5px;
+    -fx-border-color: #cccccc;
+    border-color: #cccccc;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 8px;
+    padding: 8px;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+/* Estilo para ComboBox y ChoiceBox */
+.combo-box, .choice-box {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-background-radius: 5px;
+    -fx-border-color: #cccccc;
+    border-color: #cccccc;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 3px;
+    padding: 3px;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+/* Efecto al enfocar campos de formulario */
+.text-field:focused, .combo-box:focused, .choice-box:focused {
+    -fx-border-color: #4a90e2;
+    border-color: #4a90e2;
+    -fx-effect: dropshadow(three-pass-box, rgba(74, 144, 226, 0.5), 3, 0, 0, 0);
+}
+
+/* Contenedor del resultado de cotización */
+.quote-result-container {
+    -fx-padding: 15px;
+    padding: 15px;
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-background-radius: 5px;
+    -fx-border-color: #cee0ff;
+    border-color: #cee0ff;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-min-width: 350px;
+    min-width: 350px;
+    -fx-min-height: 60px;
+    min-height: 60px;
+    -fx-alignment: center;
+    align-items: center;
+}
+
+/* Estilo para el label del resultado */
+.quote-result {
+    -fx-font-size: 18px;
+    font-size: 18px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #186a3b;
+    color: #186a3b;
+}
+
+/* Botón Calcular */
+.calculate-button {
+    -fx-background-color: #1a56a7;
+    background-color: #1a56a7;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.calculate-button:hover {
+    -fx-background-color: #3873c4;
+    background-color: #3873c4;
+}
+
+/* Botón Confirmar */
+.confirm-button {
+    -fx-background-color: #27ae60;
+    background-color: #27ae60;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.confirm-button:hover {
+    -fx-background-color: #2ecc71;
+    background-color: #2ecc71;
+}
+
+/* Estilo para el label de estado */
+.status-label {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-font-style: italic;
+    font-style: italic;
+    -fx-padding: 5px 0 0 0;
+    padding: 5px 0 0 0;
+}
+
+/* Clases para mensajes de estado específicos */
+.success-message {
+    -fx-text-fill: #27ae60;
+    color: #27ae60;
+}
+
+.error-message {
+    -fx-text-fill: #e74c3c;
+    color: #e74c3c;
+}
+
+/* Separador */
+.separator {
+    -fx-opacity: 0.5;
+    opacity: 0.5;
+}

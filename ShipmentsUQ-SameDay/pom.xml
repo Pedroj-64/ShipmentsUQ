@@ -161,7 +161,7 @@
                         <id>default-cli</id>
                         <configuration>
                             <mainClass>
-                                co.edu.uniquindio.sameday.shipmentsuqsameday/co.edu.uniquindio.sameday.shipmentsuqsameday.HelloApplication
+                                co.edu.uniquindio.sameday.shipmentsuqsameday/co.edu.uniquindio.sameday.shipmentsuqsameday.App
                             </mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>

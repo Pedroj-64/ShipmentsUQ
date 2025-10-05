@@ -5,7 +5,7 @@ import lombok.Data;
 
 /**
  * Clase que contiene los detalles calculados de un envío.
- * Simple POJO para almacenar datos calculados.
+ * para almacenar datos calculados.
  */
 @Data
 @Builder
