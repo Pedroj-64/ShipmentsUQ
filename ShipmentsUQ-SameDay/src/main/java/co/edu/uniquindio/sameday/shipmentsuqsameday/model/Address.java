@@ -9,6 +9,7 @@ import java.util.UUID;
 
 /**
  * Clase que representa una dirección en el sistema
+ * Utiliza coordenadas cartesianas (X, Y) en lugar de coordenadas geográficas
  */
 @Data
 @NoArgsConstructor
@@ -22,7 +23,7 @@ public class Address {
     private String city;
     private String zipCode;
     private String complement;
-    private double latitude;
-    private double longitude;
+    private double coordX;  // Coordenada X en el mapa de cuadrícula
+    private double coordY;  // Coordenada Y en el mapa de cuadrícula
     private boolean isDefault;
 }

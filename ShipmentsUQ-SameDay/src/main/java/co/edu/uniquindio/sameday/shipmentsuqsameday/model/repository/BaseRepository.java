@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <T> tipo de entidad que maneja el repositorio
  */
 public abstract class BaseRepository<T> implements Repository<T> {
-    protected final Map<UUID, T> entities = new ConcurrentHashMap<>();
+    protected Map<UUID, T> entities = new ConcurrentHashMap<>();
     
     @Override
     public T save(T entity) {
@@ -77,4 +77,28 @@ public abstract class BaseRepository<T> implements Repository<T> {
      * @param id ID a establecer
      */
     protected abstract void setEntityId(T entity, UUID id);
+    
+    /**
+     * Carga una lista de entidades en el repositorio
+     * @param entities Lista de entidades a cargar
+     */
+    public void loadEntities(List<T> entities) {
+        if (entities == null) return;
+        
+        this.entities.clear();
+        for (T entity : entities) {
+            UUID id = getEntityId(entity);
+            if (id != null) {
+                this.entities.put(id, entity);
+            }
+        }
+    }
+    
+    /**
+     * Obtiene todas las entidades como una lista para serialización
+     * @return Lista de todas las entidades
+     */
+    public List<T> getEntitiesAsList() {
+        return new ArrayList<>(entities.values());
+    }
 }

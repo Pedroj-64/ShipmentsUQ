@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="15" styleClass="root" stylesheets="@../css/login.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox alignment="CENTER" spacing="15" styleClass="root" stylesheets="@../css/login.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.LoginViewController">
       
    <padding>
       <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
@@ -60,6 +60,9 @@
                   <Insets bottom="10.0" top="15.0" />
                </padding>
             </HBox>
+            
+            <!-- Enlace para recuperar contraseña -->
+            <Label fx:id="lbl_forgotPassword" styleClass="link-label" text="¿Olvidaste tu contraseña?" textAlignment="CENTER" />
             
             <!-- Etiqueta para mensajes (errores o éxito) -->
             <Label fx:id="lbl_message" styleClass="error-label" text="" textAlignment="CENTER" />

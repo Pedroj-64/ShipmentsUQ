@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
@@ -76,7 +77,11 @@
                   <Insets bottom="10.0" />
                </VBox.margin>
             </Label>
-            <WebView fx:id="wv_map" prefHeight="-1.0" prefWidth="-1.0" styleClass="map-view" VBox.vgrow="ALWAYS" />
+                        <StackPane fx:id="mapContainer" minHeight="300.0" minWidth="400.0" prefHeight="350.0" prefWidth="450.0" styleClass="grid-map-container" VBox.vgrow="ALWAYS">
+               <children>
+                  <WebView fx:id="wv_map" visible="false" managed="false" />
+               </children>
+            </StackPane>
             <Label fx:id="lbl_coordinates" styleClass="coordinates-label" text="Coordenadas: --" />
          </children>
          <BorderPane.margin>

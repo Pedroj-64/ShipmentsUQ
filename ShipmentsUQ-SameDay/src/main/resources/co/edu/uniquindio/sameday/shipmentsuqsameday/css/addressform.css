@@ -154,6 +154,18 @@
     padding: 8px 0 0 0;
 }
 
+/* Contenedor del mapa de cuadrícula */
+.grid-map-container {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #e0e0e0;
+    border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+}
+
 /* Contenedor de botones */
 .buttons-container {
     -fx-background-color: #f8f9fa;

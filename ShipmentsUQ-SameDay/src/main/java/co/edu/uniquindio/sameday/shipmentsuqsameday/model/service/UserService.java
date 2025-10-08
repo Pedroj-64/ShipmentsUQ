@@ -4,6 +4,7 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.UserPaymentMethod;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.UserRole;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.UserRepository;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,6 +32,28 @@ public class UserService implements Service<User, UserRepository> {
      */
     public static UserService getInstance() {
         return SingletonHolder.INSTANCE;
+    }
+    
+    /**
+     * Registra un nuevo usuario en el sistema
+     * @param name nombre completo del usuario
+     * @param password contraseña
+     * @param email correo electrónico
+     * @param phone teléfono
+     * @param role rol del usuario (ADMIN, CLIENT, DELIVERER)
+     * @return el usuario creado
+     */
+    public User registerUser(String name, String password, String email, String phone, UserRole role) {
+        
+        User newUser = User.builder()
+            .name(name)
+            .password(password)
+            .email(email)
+            .phone(phone)
+            .role(role)
+            .build();
+            
+        return repository.save(newUser);
     }
 
     @Override
@@ -184,5 +207,16 @@ public class UserService implements Service<User, UserRepository> {
      */
     public Optional<User> findByPhone(String phone) {
         return repository.findByPhone(phone);
+    }
+    
+    /**
+     * Autentica un usuario con su email y contraseña
+     * @param email email del usuario
+     * @param password contraseña del usuario
+     * @return usuario autenticado o vacío si las credenciales son inválidas
+     */
+    public Optional<User> authenticate(String email, String password) {
+        return findByEmail(email)
+            .filter(user -> user.getPassword().equals(password));
     }
 }

@@ -6,8 +6,9 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.IncidentType;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.DelivererStatus;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IDistanceCalculator;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.ShipmentRepository;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.HaversineDistanceCalculator;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.EuclideanDistanceCalculator;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -19,7 +20,7 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
     private final ShipmentRepository repository;
     private final RateService rateService;
     private final DelivererService delivererService;
-    private final HaversineDistanceCalculator distanceCalculator;
+    private final IDistanceCalculator distanceCalculator;
     private final IncidentService incidentService;
 
     public ShipmentService(
@@ -30,7 +31,7 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         this.repository = repository;
         this.rateService = rateService;
         this.delivererService = delivererService;
-        this.distanceCalculator = new HaversineDistanceCalculator();
+        this.distanceCalculator = new EuclideanDistanceCalculator();
         this.incidentService = incidentService;
     }
 
@@ -144,10 +145,10 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
     }
 
     /**
-     * Calcula la distancia total del envío
+     * Calcula la distancia total del envío utilizando coordenadas cartesianas (X,Y)
      * 
      * @param shipment envío del cual calcular la distancia
-     * @return distancia en kilómetros
+     * @return distancia en unidades de la cuadrícula
      */
     public double calculateShipmentDistance(Shipment shipment) {
         if (shipment.getOrigin() == null || shipment.getDestination() == null) {

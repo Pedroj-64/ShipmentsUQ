@@ -2,13 +2,14 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.model.service;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IDistanceCalculator;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.HaversineDistanceCalculator;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.EuclideanDistanceCalculator;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.AddressRepository;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * Servicio para gestionar operaciones relacionadas con direcciones
+ * Utiliza coordenadas cartesianas (X, Y) para el cálculo de distancias
  */
 public class AddressService implements Service<Address, AddressRepository> {
     private final AddressRepository repository;
@@ -17,7 +18,7 @@ public class AddressService implements Service<Address, AddressRepository> {
     // Constructor privado para Singleton
     private AddressService() {
         this.repository = new AddressRepository();
-        this.distanceCalculator = new HaversineDistanceCalculator();
+        this.distanceCalculator = new EuclideanDistanceCalculator();
     }
     
     // Holder estático para instancia única
@@ -50,19 +51,19 @@ public class AddressService implements Service<Address, AddressRepository> {
 
     /**
      * Busca direcciones cercanas a unas coordenadas dadas
-     * @param latitude latitud de referencia
-     * @param longitude longitud de referencia
-     * @param radiusKm radio en kilómetros
+     * @param coordX coordenada X de referencia
+     * @param coordY coordenada Y de referencia
+     * @param radius radio en unidades de la cuadrícula
      * @return lista de direcciones dentro del radio especificado
      */
-    public List<Address> findNearbyAddresses(double latitude, double longitude, double radiusKm) {
+    public List<Address> findNearbyAddresses(double coordX, double coordY, double radius) {
         Address referencePoint = Address.builder()
-            .latitude(latitude)
-            .longitude(longitude)
+            .coordX(coordX)
+            .coordY(coordY)
             .build();
             
         return repository.findAll().stream()
-                .filter(a -> distanceCalculator.calculateDistance(referencePoint, a) <= radiusKm)
+                .filter(a -> distanceCalculator.calculateDistance(referencePoint, a) <= radius)
                 .toList();
     }
 

@@ -1,6 +1,6 @@
 module co.edu.uniquindio.sameday.shipmentsuqsameday {
     requires static lombok;
-    requires javafx.controls;
+    requires transitive javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
     requires transitive javafx.graphics;
@@ -20,13 +20,16 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model to javafx.base;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums to javafx.base;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces to javafx.base;
-    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.utilWeb to javafx.web;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.util to javafx.web;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.internalController to javafx.fxml;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.viewController;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.controller;
-    exports co.edu.uniquindio.sameday.shipmentsuqsameday.util;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.internalController;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.util;
+
     
 }
