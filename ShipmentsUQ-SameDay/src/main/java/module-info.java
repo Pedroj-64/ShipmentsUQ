@@ -20,16 +20,22 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model to javafx.base;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums to javafx.base;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces to javafx.base;
-    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.util to javafx.web;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto to javafx.base;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping to javafx.base;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.util to javafx.base;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.internalController to javafx.fxml;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository to javafx.base;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.service to javafx.base;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.viewController;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.controller;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.internalController;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.util;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping;
 
     
 }

@@ -1,11 +1,12 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.model.util;
 
 import java.io.IOException;
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.UserRole;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.UserPaymentMethod;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.*;
 
 /**
@@ -69,7 +70,15 @@ public class DataManager {
         rateRepository = new RateRepository();
         incidentRepository = new IncidentRepository();
         
-        // No necesitamos inicializar servicios aquí porque trabajamos directamente con los repositorios
+        // Inicializar servicios con los repositorios correctos
+        try {
+            // Inicializar UserService con nuestro repositorio de usuarios
+            co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService.getInstance(userRepository);
+            System.out.println("Servicios inicializados correctamente con los repositorios");
+        } catch (Exception e) {
+            System.err.println("Error al inicializar servicios: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
     
     /**
@@ -82,14 +91,28 @@ public class DataManager {
                 appState = (AppState) Serializer.cargarEstado(APP_STATE_FILE);
                 System.out.println("Estado de la aplicación cargado exitosamente.");
                 
-                // Cargar datos en los repositorios
-                loadRepositories();
+                // Verificar si los datos se cargaron correctamente
+                if (appState.getUsers() == null || appState.getUsers().isEmpty()) {
+                    System.out.println("ADVERTENCIA: No se encontraron usuarios en el estado cargado. Inicializando datos nuevos.");
+                    // Eliminar el archivo corrupto
+                    Serializer.eliminarArchivo(APP_STATE_FILE);
+                    
+                    // Crear un nuevo estado
+                    appState = new AppState();
+                    
+                    // Inicializar datos de prueba
+                    initializeTestData();
+                } else {
+                    System.out.println("Usuarios encontrados en el estado cargado: " + appState.getUsers().size());
+                    // Cargar datos en los repositorios
+                    loadRepositories();
+                }
             } else {
                 // Crear un nuevo estado
                 appState = new AppState();
                 System.out.println("Se ha creado un nuevo estado para la aplicación.");
                 
-                // Aquí podrías inicializar datos de prueba
+                // Inicializar datos de prueba
                 initializeTestData();
             }
         } catch (Exception e) {
@@ -97,6 +120,9 @@ public class DataManager {
             appState = new AppState();
             System.err.println("Error al cargar el estado de la aplicación: " + e.getMessage());
             e.printStackTrace();
+            
+            // Eliminar archivo corrupto si existe
+            Serializer.eliminarArchivo(APP_STATE_FILE);
             
             // Inicializar datos de prueba
             initializeTestData();
@@ -107,6 +133,16 @@ public class DataManager {
      * Carga los datos desde AppState a los repositorios.
      */
     private void loadRepositories() {
+        System.out.println("Cargando datos desde AppState a los repositorios...");
+        System.out.println("Usuarios en AppState: " + (appState.getUsers() != null ? appState.getUsers().size() : "null"));
+        
+        if (appState.getUsers() != null && !appState.getUsers().isEmpty()) {
+            System.out.println("Detalle de usuarios a cargar:");
+            appState.getUsers().forEach(user -> {
+                System.out.println("  - ID: " + user.getId() + ", Nombre: " + user.getName() + ", Email: " + user.getEmail());
+            });
+        }
+        
         userRepository.loadEntities(appState.getUsers());
         delivererRepository.loadEntities(appState.getDeliverers());
         shipmentRepository.loadEntities(appState.getShipments());
@@ -114,6 +150,8 @@ public class DataManager {
         paymentRepository.loadEntities(appState.getPayments());
         rateRepository.loadEntities(appState.getRates());
         incidentRepository.loadEntities(appState.getIncidents());
+        
+        System.out.println("Después de cargar - Usuarios en repositorio: " + userRepository.findAll().size());
     }
     
     /**
@@ -124,40 +162,25 @@ public class DataManager {
         System.out.println("Inicializando datos de prueba...");
         
         try {
-            // Crear usuarios de prueba
-            User adminUser = User.builder()
-                .id(UUID.randomUUID())
-                .name("Administrador Principal")
-                .email("admin@shipmentsuq.com")
-                .phone("1234567890")
-                .password("admin")
-                .role(UserRole.ADMIN)
-                .build();
+            // Usar el DataInitializer para crear datos de prueba
+            co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping.DataInitializer.initializeAllTestData(
+                userRepository, 
+                addressRepository
+            );
             
-            User clienteUser = User.builder()
-                .id(UUID.randomUUID())
-                .name("Cliente Ejemplo")
-                .email("cliente@correo.com")
-                .phone("3001234567")
-                .password("cliente")
-                .role(UserRole.CLIENT)
-                .build();
-                    
-            User repartidorUser = User.builder()
-                .id(UUID.randomUUID())
-                .name("Repartidor Ejemplo")
-                .email("repartidor@correo.com")
-                .phone("3007654321")
-                .password("repartidor")
-                .role(UserRole.DELIVERER)
-                .build();
+            // Actualizar el estado con los datos recién creados
+            updateState();
             
-            // Guardar los usuarios en el repositorio
-            userRepository.save(adminUser);
-            userRepository.save(clienteUser);
-            userRepository.save(repartidorUser);
+            // Guardar los datos inmediatamente después de crearlos
+            saveState();
             
-            System.out.println("Datos de prueba creados exitosamente.");
+            System.out.println("Datos de prueba creados y guardados exitosamente.");
+            
+            // Imprimir usuarios para depuración
+            System.out.println("Usuarios disponibles:");
+            userRepository.findAll().forEach(user -> {
+                System.out.println("Usuario: " + user.getName() + ", Email: " + user.getEmail() + ", Rol: " + user.getRole());
+            });
         } catch (Exception e) {
             System.err.println("Error al crear datos de prueba: " + e.getMessage());
             e.printStackTrace();
@@ -172,9 +195,22 @@ public class DataManager {
             // Actualizar el estado con los datos actuales de los repositorios
             updateState();
             
+            // Verificar que hay datos para guardar
+            if (appState.getUsers() == null || appState.getUsers().isEmpty()) {
+                System.err.println("ADVERTENCIA: No hay usuarios para guardar en el estado. No se guardará un estado vacío.");
+                return;
+            }
+            
             // Guardar el estado en el archivo
             Serializer.guardarEstado(appState, APP_STATE_FILE);
             System.out.println("Estado de la aplicación guardado exitosamente.");
+            
+            // Verificar que el archivo se guardó correctamente
+            if (Serializer.existeArchivo(APP_STATE_FILE)) {
+                System.out.println("Archivo de estado verificado: existe en disco.");
+            } else {
+                System.err.println("ERROR: El archivo de estado no se guardó correctamente.");
+            }
         } catch (IOException e) {
             AppUtils.showError("Error al guardar", "No se pudo guardar el estado de la aplicación: " + e.getMessage());
             System.err.println("Error al guardar el estado de la aplicación: " + e.getMessage());
@@ -186,12 +222,28 @@ public class DataManager {
      * Actualiza el estado de la aplicación con los datos de los repositorios.
      */
     private void updateState() {
-        appState.setUsers(userRepository.getEntitiesAsList());
+        // Guardar todos los datos en el estado
+        List<User> userList = userRepository.getEntitiesAsList();
+        System.out.println("Actualizando estado - Total de usuarios a guardar: " + userList.size());
+        
+        appState.setUsers(userList);
         appState.setDeliverers(delivererRepository.getEntitiesAsList());
         appState.setShipments(shipmentRepository.getEntitiesAsList());
         appState.setAddresses(addressRepository.getEntitiesAsList());
         appState.setPayments(paymentRepository.getEntitiesAsList());
         appState.setRates(rateRepository.getEntitiesAsList());
         appState.setIncidents(incidentRepository.getEntitiesAsList());
+        
+        // Extraer los métodos de pago de todos los usuarios
+        List<UserPaymentMethod> allPaymentMethods = new ArrayList<>();
+        for (User user : userList) {
+            allPaymentMethods.addAll(user.getPaymentMethods());
+        }
+        appState.setPaymentMethods(allPaymentMethods);
+        
+        // Verificación final
+        if (appState.getUsers().isEmpty()) {
+            System.err.println("ADVERTENCIA: La lista de usuarios está vacía después de updateState()");
+        }
     }
 }

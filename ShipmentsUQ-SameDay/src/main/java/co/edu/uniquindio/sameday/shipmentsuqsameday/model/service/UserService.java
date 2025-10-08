@@ -16,22 +16,37 @@ import java.util.List;
 public class UserService implements Service<User, UserRepository> {
     private final UserRepository repository;
 
+    private static UserService instance;
+    
     // Constructor privado para Singleton
-    private UserService() {
-        this.repository = new UserRepository();
+    private UserService(UserRepository repository) {
+        this.repository = repository;
     }
     
-    // Holder estático para instancia única
-    private static class SingletonHolder {
-        private static final UserService INSTANCE = new UserService();
+    /**
+     * Obtiene la instancia única del servicio con el repositorio proporcionado
+     * @param repository El repositorio de usuarios a utilizar
+     * @return instancia del servicio
+     */
+    public static synchronized UserService getInstance(UserRepository repository) {
+        if (instance == null) {
+            instance = new UserService(repository);
+        }
+        return instance;
     }
     
     /**
      * Obtiene la instancia única del servicio
+     * Este método es para compatibilidad con código existente.
+     * Debería llamarse primero getInstance(UserRepository) para inicializar el servicio.
      * @return instancia del servicio
      */
     public static UserService getInstance() {
-        return SingletonHolder.INSTANCE;
+        if (instance == null) {
+            System.err.println("ERROR: UserService no ha sido inicializado con un repositorio");
+            throw new IllegalStateException("UserService no ha sido inicializado con un repositorio");
+        }
+        return instance;
     }
     
     /**
@@ -216,7 +231,43 @@ public class UserService implements Service<User, UserRepository> {
      * @return usuario autenticado o vacío si las credenciales son inválidas
      */
     public Optional<User> authenticate(String email, String password) {
-        return findByEmail(email)
-            .filter(user -> user.getPassword().equals(password));
+        System.out.println("Intentando autenticar usuario con email: " + email);
+        System.out.println("Estado del repositorio de usuarios: " + (repository != null ? "disponible" : "null"));
+        
+        if (repository == null) {
+            System.err.println("ERROR: El repositorio de usuarios es nulo. No se puede autenticar.");
+            return Optional.empty();
+        }
+        
+        System.out.println("Usuarios totales en repositorio: " + repository.findAll().size());
+        
+        Optional<User> userOpt = findByEmail(email);
+        
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            System.out.println("Usuario encontrado: " + user.getName() + ", verificando contraseña...");
+            
+            if (user.getPassword().equals(password)) {
+                System.out.println("Autenticación exitosa para: " + email);
+                return userOpt;
+            } else {
+                System.out.println("Contraseña incorrecta para: " + email);
+            }
+        } else {
+            System.out.println("No se encontró usuario con email: " + email);
+            // Listar todos los usuarios disponibles para depuración
+            System.out.println("Usuarios disponibles:");
+            List<User> allUsers = repository.findAll();
+            
+            if (allUsers.isEmpty()) {
+                System.out.println("- No hay usuarios en el repositorio");
+            } else {
+                allUsers.forEach(u -> {
+                    System.out.println("- " + u.getEmail() + " (ID: " + u.getId() + ")");
+                });
+            }
+        }
+        
+        return Optional.empty();
     }
 }

@@ -175,6 +175,21 @@ public class AppUtils {
     public static void showWarning(String title, String message) {
         showAlert(title, message, AlertType.WARNING);
     }
+    
+    /**
+     * Muestra un diálogo de confirmación.
+     *
+     * @param title   El título de la alerta
+     * @param message El mensaje de confirmación
+     * @return true si el usuario confirma, false en caso contrario
+     */
+    public static boolean showConfirmation(String title, String message) {
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        return alert.showAndWait().filter(response -> response == javafx.scene.control.ButtonType.OK).isPresent();
+    }
 
     /**
      * Agrega una escena al historial de navegación.

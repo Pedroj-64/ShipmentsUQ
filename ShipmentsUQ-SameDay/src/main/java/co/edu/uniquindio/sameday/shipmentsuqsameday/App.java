@@ -38,7 +38,7 @@ public class App extends Application {
         // Obtener la instancia del DataManager para cargar los datos
         dataManager = DataManager.getInstance();
     }
-
+    
     @Override
     public void start(Stage stage) throws IOException {
         // Configurar la escena inicial con la pantalla de login

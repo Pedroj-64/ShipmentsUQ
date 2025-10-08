@@ -27,10 +27,17 @@ public class Serializer {
      * @throws IOException Si ocurre un error durante la escritura del archivo.
      */
     public static void guardarEstado(Object objeto, String nombreArchivo) throws IOException {
+        if (objeto == null) {
+            throw new IllegalArgumentException("No se puede serializar un objeto nulo");
+        }
+        
         // Asegurar que existe el directorio de datos
         File dataDir = new File(DATA_DIR);
         if (!dataDir.exists()) {
-            dataDir.mkdir();
+            boolean creado = dataDir.mkdir();
+            if (!creado) {
+                throw new IOException("No se pudo crear el directorio de datos: " + dataDir.getAbsolutePath());
+            }
         }
         
         // Crear la ruta completa del archivo
@@ -40,6 +47,14 @@ public class Serializer {
         // Serializar el objeto
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(archivo))) {
             oos.writeObject(objeto);
+            System.out.println("Objeto serializado correctamente: " + objeto.getClass().getName());
+            
+            // Verificar que el archivo se creó y tiene tamaño
+            if (archivo.exists() && archivo.length() > 0) {
+                System.out.println("Archivo creado exitosamente con tamaño: " + archivo.length() + " bytes");
+            } else {
+                throw new IOException("El archivo no se creó correctamente");
+            }
         }
     }
 
@@ -61,9 +76,24 @@ public class Serializer {
             throw new IOException("El archivo no existe: " + archivo.getAbsolutePath());
         }
         
+        // Verificar que el archivo tiene tamaño
+        if (archivo.length() == 0) {
+            throw new IOException("El archivo está vacío: " + archivo.getAbsolutePath());
+        }
+        
+        System.out.println("Tamaño del archivo a cargar: " + archivo.length() + " bytes");
+        
         // Deserializar el objeto
+        Object objeto = null;
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
-            return ois.readObject();
+            objeto = ois.readObject();
+            System.out.println("Objeto deserializado correctamente: " + 
+                (objeto != null ? objeto.getClass().getName() : "null"));
+            return objeto;
+        } catch (Exception e) {
+            System.err.println("Error al deserializar el objeto: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
     

@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Shipment implements Observable {
+public class Shipment implements Observable, Serializable {
+    
+    /** Constante para la serialización */
+    private static final long serialVersionUID = 1L;
     private UUID id;
     private User user;
     private Deliverer deliverer;

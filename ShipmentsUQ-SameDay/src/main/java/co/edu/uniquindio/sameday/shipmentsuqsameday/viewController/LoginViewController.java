@@ -66,7 +66,13 @@ public class LoginViewController implements Initializable {
 
         // Configuración inicial de la interfaz
         clearMessage();
-        Platform.runLater(() -> txt_email.requestFocus());
+        Platform.runLater(() -> {
+            txt_email.requestFocus();
+            
+            // DEBUG: Verificar usuarios disponibles al iniciar
+            System.out.println("=== USUARIOS DISPONIBLES EN LOGIN ===");
+            controller.showAllUsersForDebug();
+        });
     }
 
     /**
@@ -148,6 +154,9 @@ public class LoginViewController implements Initializable {
      */
     private void redirectUserBasedOnRole(User user) {
         try {
+            // Establecer el usuario actual en el controlador del dashboard
+            co.edu.uniquindio.sameday.shipmentsuqsameday.controller.UserDashboardController.setCurrentUser(user);
+            
             // Según el rol, navegamos a diferentes vistas
             if (user.getRole() == UserRole.ADMIN) {
                 AppUtils.navigateTo("AdminDashboard.fxml", btn_login);

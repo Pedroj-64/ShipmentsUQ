@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -15,7 +16,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserPaymentMethod {
+public class UserPaymentMethod implements Serializable {
+    
+    /** Constante para la serialización */
+    private static final long serialVersionUID = 1L;
     private UUID id;
     private User user;
     private PaymentMethod paymentMethod;
