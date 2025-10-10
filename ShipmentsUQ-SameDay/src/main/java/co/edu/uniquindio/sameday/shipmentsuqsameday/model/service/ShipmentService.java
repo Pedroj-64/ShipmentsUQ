@@ -8,6 +8,7 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.IncidentType;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.DelivererStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IDistanceCalculator;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.ShipmentRepository;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.DelivererRepository;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.EuclideanDistanceCalculator;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +23,8 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
     private final DelivererService delivererService;
     private final IDistanceCalculator distanceCalculator;
     private final IncidentService incidentService;
+    
+    private static ShipmentService instance;
 
     public ShipmentService(
             ShipmentRepository repository,
@@ -33,6 +36,41 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         this.delivererService = delivererService;
         this.distanceCalculator = new EuclideanDistanceCalculator();
         this.incidentService = incidentService;
+    }
+    
+    /**
+     * Obtiene la instancia única del servicio
+     * @return instancia del servicio
+     */
+    public static synchronized ShipmentService getInstance() {
+        if (instance == null) {
+            System.err.println("ERROR: ShipmentService no ha sido inicializado. Inicializando con configuración por defecto.");
+            // Crear versión simplificada para compatibilidad
+            instance = new ShipmentService(
+                new ShipmentRepository(), 
+                null, // No inicializamos RateService 
+                null, // No inicializamos DelivererService
+                null  // No inicializamos IncidentService
+            );
+        }
+        return instance;
+    }
+    
+    /**
+     * Establece la instancia del servicio con las dependencias proporcionadas
+     * @param repository Repositorio de envíos
+     * @param rateService Servicio de tarifas
+     * @param delivererService Servicio de repartidores
+     * @param incidentService Servicio de incidencias
+     * @return instancia del servicio
+     */
+    public static synchronized ShipmentService getInstance(
+            ShipmentRepository repository,
+            RateService rateService,
+            DelivererService delivererService,
+            IncidentService incidentService) {
+        instance = new ShipmentService(repository, rateService, delivererService, incidentService);
+        return instance;
     }
 
     @Override

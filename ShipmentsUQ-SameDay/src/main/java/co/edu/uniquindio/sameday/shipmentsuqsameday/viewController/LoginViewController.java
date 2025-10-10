@@ -157,6 +157,14 @@ public class LoginViewController implements Initializable {
             // Establecer el usuario actual en el controlador del dashboard
             co.edu.uniquindio.sameday.shipmentsuqsameday.controller.UserDashboardController.setCurrentUser(user);
             
+            // Establecer el ID de usuario en la sesión
+            if (co.edu.uniquindio.sameday.shipmentsuqsameday.App.getCurrentSession() != null) {
+                co.edu.uniquindio.sameday.shipmentsuqsameday.App.getCurrentSession().setUserId(user.getId());
+                System.out.println("DEBUG: ID de usuario establecido en la sesión: " + user.getId());
+            } else {
+                System.out.println("DEBUG: No se pudo establecer la sesión del usuario porque App.getCurrentSession() es null");
+            }
+            
             // Según el rol, navegamos a diferentes vistas
             if (user.getRole() == UserRole.ADMIN) {
                 AppUtils.navigateTo("AdminDashboard.fxml", btn_login);

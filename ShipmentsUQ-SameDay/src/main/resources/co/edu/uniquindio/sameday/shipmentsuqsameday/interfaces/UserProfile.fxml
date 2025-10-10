@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.UserProfileViewController"
+            stylesheets="@../css/userprofile.css"
+            maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+            prefHeight="-1" prefWidth="-1"
+            VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+
+    <!-- Zona superior (top) - Título -->
+    <top>
+        <HBox alignment="CENTER">
+            <Label text="Mi Perfil" styleClass="title-label" />
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20" />
+            </padding>
+        </HBox>
+    </top>
+    
+    <!-- Zona central (center) - Contenido principal -->
+    <center>
+        <ScrollPane fitToWidth="true" fitToHeight="true" styleClass="content-pane">
+            <VBox spacing="20" styleClass="main-content" fillWidth="true" maxWidth="1.7976931348623157E308" maxHeight="1.7976931348623157E308">
+                <padding>
+                    <Insets top="30" right="50" bottom="30" left="50" />
+                </padding>
+                
+                <!-- Información básica -->
+                <VBox spacing="15" styleClass="section-box">
+                    <Label text="Información Personal" styleClass="section-title" />
+                    
+                    <GridPane hgap="15" vgap="15">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="NEVER" minWidth="150" prefWidth="150" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="250" />
+                        </columnConstraints>
+                        
+                        <!-- Nombre completo -->
+                        <Label text="Nombre completo:" styleClass="field-label" 
+                               GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtName" promptText="Nombre completo" 
+                                   GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                                   
+                        <!-- Email -->
+                        <Label text="Correo electrónico:" styleClass="field-label" 
+                               GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtEmail" promptText="ejemplo@correo.com" 
+                                   GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                                   
+                        <!-- Teléfono -->
+                        <Label text="Teléfono:" styleClass="field-label" 
+                               GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                        <TextField fx:id="txtPhone" promptText="Número telefónico" 
+                                   GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                    </GridPane>
+                    
+                    <Button fx:id="btnSavePersonalInfo" text="Guardar cambios" styleClass="primary-button" />
+                </VBox>
+                
+                <!-- Cambio de contraseña -->
+                <VBox spacing="15" styleClass="section-box">
+                    <Label text="Cambiar Contraseña" styleClass="section-title" />
+                    
+                    <GridPane hgap="15" vgap="15">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="NEVER" minWidth="150" prefWidth="150" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="250" />
+                        </columnConstraints>
+                        
+                        <!-- Contraseña actual -->
+                        <Label text="Contraseña actual:" styleClass="field-label" 
+                               GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                        <PasswordField fx:id="txtCurrentPassword" promptText="Ingrese su contraseña actual" 
+                                       GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                                       
+                        <!-- Nueva contraseña -->
+                        <Label text="Nueva contraseña:" styleClass="field-label" 
+                               GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                        <PasswordField fx:id="txtNewPassword" promptText="Ingrese la nueva contraseña" 
+                                       GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                                       
+                        <!-- Confirmar contraseña -->
+                        <Label text="Confirmar contraseña:" styleClass="field-label" 
+                               GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                        <PasswordField fx:id="txtConfirmPassword" promptText="Confirme la nueva contraseña" 
+                                       GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                    </GridPane>
+                    
+                    <Button fx:id="btnChangePassword" text="Actualizar contraseña" styleClass="primary-button" />
+                </VBox>
+                
+                <!-- Preferencias de notificaciones -->
+                <VBox spacing="15" styleClass="section-box">
+                    <Label text="Preferencias de Notificaciones" styleClass="section-title" />
+                    
+                    <VBox spacing="10">
+                        <CheckBox fx:id="chkEmailNotifications" text="Recibir notificaciones por correo" selected="true" />
+                        <CheckBox fx:id="chkSmsNotifications" text="Recibir notificaciones por SMS" selected="true" />
+                        <CheckBox fx:id="chkPromoNotifications" text="Recibir ofertas y promociones" selected="false" />
+                    </VBox>
+                    
+                    <Button fx:id="btnSavePreferences" text="Guardar preferencias" styleClass="primary-button" />
+                </VBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+    
+    <!-- Zona inferior (bottom) - Mensaje de estado -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" styleClass="status-bar">
+            <Label fx:id="lblStatus" styleClass="status-label" />
+            <padding>
+                <Insets top="10" right="20" bottom="10" left="20" />
+            </padding>
+        </HBox>
+    </bottom>
+</BorderPane>

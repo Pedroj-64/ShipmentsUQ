@@ -12,6 +12,7 @@ import java.util.UUID;
 @Builder
 public class AddressDTO {
     private UUID id;
+    private String alias;
     private String street;
     private String city;
     private String zone;

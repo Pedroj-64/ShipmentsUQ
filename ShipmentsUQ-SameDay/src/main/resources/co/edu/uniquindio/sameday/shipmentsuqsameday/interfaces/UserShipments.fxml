@@ -4,10 +4,25 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
+<ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
-            stylesheets="@../css/shipments.css"
-            prefWidth="1000.0" prefHeight="700.0">
+            fitToWidth="false"
+            fitToHeight="true"
+            pannable="true"
+            hbarPolicy="AS_NEEDED"
+            vbarPolicy="NEVER"
+            styleClass="main-scroll-pane-horizontal"
+            maxHeight="1.7976931348623157E308" 
+            maxWidth="1.7976931348623157E308"
+            VBox.vgrow="ALWAYS" 
+            HBox.hgrow="ALWAYS"
+            stylesheets="@../css/shipments.css">
+    <content>
+        <BorderPane
+            maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+            prefHeight="-1" prefWidth="1200"
+            minWidth="1100" 
+            VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
 
     <!-- Zona superior (top) -->
     <top>
@@ -21,7 +36,7 @@
     
     <!-- Zona central (center) - Tabla de envíos -->
     <center>
-        <VBox spacing="15" styleClass="content-container">
+        <VBox spacing="15" styleClass="content-container" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
             <padding>
                 <Insets top="20" right="20" bottom="20" left="20" />
             </padding>
@@ -44,12 +59,12 @@
             <!-- Tabla de envíos -->
             <TableView fx:id="tbl_shipments" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="col_id" text="ID de Envío" prefWidth="100" />
-                    <TableColumn fx:id="col_origin" text="Origen" prefWidth="150" />
-                    <TableColumn fx:id="col_destination" text="Destino" prefWidth="150" />
-                    <TableColumn fx:id="col_status" text="Estado" prefWidth="120" />
-                    <TableColumn fx:id="col_date" text="Fecha" prefWidth="120" />
-                    <TableColumn fx:id="col_cost" text="Costo" prefWidth="100" />
+                    <TableColumn fx:id="col_id" text="ID de Envío" prefWidth="110" />
+                    <TableColumn fx:id="col_origin" text="Origen" prefWidth="200" />
+                    <TableColumn fx:id="col_destination" text="Destino" prefWidth="200" />
+                    <TableColumn fx:id="col_status" text="Estado" prefWidth="140" />
+                    <TableColumn fx:id="col_date" text="Fecha" prefWidth="140" />
+                    <TableColumn fx:id="col_cost" text="Costo" prefWidth="120" />
                 </columns>
                 <placeholder>
                     <Label text="No hay envíos para mostrar" />
@@ -60,7 +75,7 @@
     
     <!-- Zona derecha (right) - Detalles del envío seleccionado -->
     <right>
-        <VBox styleClass="detail-container" prefWidth="250">
+        <VBox styleClass="detail-container" minWidth="300" prefWidth="350" maxWidth="450">
             <padding>
                 <Insets top="20" right="20" bottom="20" left="20" />
             </padding>
@@ -164,3 +179,5 @@
     </bottom>
     
 </BorderPane>
+    </content>
+</ScrollPane>

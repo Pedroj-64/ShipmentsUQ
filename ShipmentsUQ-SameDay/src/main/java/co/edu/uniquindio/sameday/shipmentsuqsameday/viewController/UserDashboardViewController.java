@@ -12,6 +12,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Parent;
 
@@ -81,11 +83,11 @@ public class UserDashboardViewController implements Initializable {
         btn_logout.setOnAction(event -> handleLogout());
         
         // Botones de navegación del menú
-        btn_profile.setOnAction(event -> loadModule("ProfileAndAddresses.fxml", "Perfil"));
+        btn_profile.setOnAction(event -> loadModule("UserProfile.fxml", "Perfil"));
         btn_addresses.setOnAction(event -> loadModule("ProfileAndAddresses.fxml", "Direcciones"));
         btn_shipments.setOnAction(event -> loadModule("UserShipments.fxml", "Envíos"));
         btn_payments.setOnAction(event -> loadModule("Payments.fxml", "Pagos"));
-        btn_history.setOnAction(event -> loadModule("UserShipments.fxml", "Historial de Envíos"));
+        // Removido el botón de historial ya que usa la misma interfaz que Envíos
         
         // Botones de configuración
         btn_settings.setOnAction(event -> handleSettings());
@@ -138,10 +140,33 @@ public class UserDashboardViewController implements Initializable {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/interfaces/" + fxmlFile));
             Parent moduleView = loader.load();
             
+            // Asegurarse de que el módulo cargado se ajuste correctamente al área de contenido
+            if (moduleView instanceof javafx.scene.layout.Region) {
+                javafx.scene.layout.Region region = (javafx.scene.layout.Region) moduleView;
+                
+                // Configurar propiedades de layout para una adaptación óptima
+                region.setPrefWidth(-1);  // USE_COMPUTED_SIZE
+                region.setPrefHeight(-1); // USE_COMPUTED_SIZE
+                region.setMinWidth(-1);   // USE_PREF_SIZE
+                region.setMinHeight(-1);  // USE_PREF_SIZE
+                region.setMaxWidth(Double.MAX_VALUE);
+                region.setMaxHeight(Double.MAX_VALUE);
+                
+                // Establecer restricciones de crecimiento
+                javafx.scene.layout.StackPane.setAlignment(region, javafx.geometry.Pos.CENTER);
+                javafx.scene.layout.StackPane.setMargin(region, new javafx.geometry.Insets(0));
+            }
+            
             // Si el módulo tiene un controlador que implementa initializable, podemos pasar datos
             if (loader.getController() != null) {
-                // Aquí podríamos configurar datos específicos del controlador cargado
-                // Por ejemplo: ((ProfileController)loader.getController()).setUserData(currentUser);
+                // Pasar datos específicos según el controlador
+                Object viewController = loader.getController();
+                
+                // Si es el controlador de perfil, pasarle los datos del usuario
+                if (viewController instanceof UserProfileViewController) {
+                    ((UserProfileViewController) viewController).setUserData(currentUser);
+                }
+                // Aquí se pueden agregar más casos para otros controladores si es necesario
             }
             
             // Agregar la vista al área de contenido
@@ -164,8 +189,31 @@ public class UserDashboardViewController implements Initializable {
      */
     private void handleLogout() {
         if (AppUtils.showConfirmation("Cerrar sesión", "¿Está seguro que desea cerrar sesión?")) {
-            controller.logout();
-            AppUtils.logOut();
+            try {
+                // Notificar al controlador de negocio
+                controller.logout();
+                
+                // Intentar cerrar la sesión usando AppUtils
+                boolean loggedOut = AppUtils.logOut();
+                
+                if (!loggedOut) {
+                    // Si falló el método principal, intentar alternativamente con AppUtils.restartApp()
+                    System.out.println("Método logOut falló, intentando con AppUtils.restartApp()");
+                    AppUtils.restartApp();
+                }
+            } catch (Exception e) {
+                System.err.println("Error al cerrar sesión: " + e.getMessage());
+                e.printStackTrace();
+                AppUtils.showError("Error", "Ocurrió un problema al cerrar la sesión: " + e.getMessage());
+                
+                // Último intento: tratar de navegar directamente a la pantalla de login
+                try {
+                    AppUtils.navigateTo("Login.fxml", btn_logout);
+                } catch (Exception ex) {
+                    // No podemos hacer mucho más si esto falla
+                    System.err.println("No se pudo recuperar de un error de cierre de sesión: " + ex.getMessage());
+                }
+            }
         }
     }
     
@@ -181,7 +229,7 @@ public class UserDashboardViewController implements Initializable {
      * Maneja la acción del botón de ayuda
      */
     private void handleHelp() {
-        // Por ahora, simplemente muestra un mensaje
-        AppUtils.showInfo("Ayuda", "Esta funcionalidad estará disponible próximamente.");
+        // Mostrar mensaje de contacto con administradores
+        AppUtils.showInfo("Contacto de Ayuda", "Comuníquese con un administrador de MargaDev-Society.");
     }
 }

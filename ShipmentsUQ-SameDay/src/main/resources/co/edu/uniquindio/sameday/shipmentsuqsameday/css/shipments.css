@@ -36,6 +36,16 @@
 .content-container {
     -fx-background-color: white;
     background-color: white;
+    -fx-min-width: 100;
+    min-width: 100px;
+    -fx-min-height: 100;
+    min-height: 100px;
+    -fx-pref-width: -1;  /* -1 indica que debe usar todo el espacio disponible */
+    -fx-pref-height: -1; /* -1 indica que debe usar todo el espacio disponible */
+    -fx-max-width: 10000;  /* Usar un valor muy grande para maximizar */
+    max-width: 10000px;
+    -fx-max-height: 10000; /* Usar un valor muy grande para maximizar */
+    max-height: 10000px;
 }
 
 /* Estilos para los controles de filtro */
@@ -163,6 +173,11 @@
     -fx-border-width: 0 0 0 1px;
     border-width: 0 0 0 1px;
     -fx-effect: innershadow(gaussian, rgba(0,0,0,0.1), 5, 0, -3, 0);
+    -fx-min-width: 250;
+    min-width: 250px;
+    -fx-pref-width: 250;
+    -fx-max-width: 300;
+    max-width: 300px;
 }
 
 /* Estilo para el título de la sección de detalles */
@@ -192,6 +207,9 @@
     font-size: 13px;
     -fx-text-fill: #333333;
     color: #333333;
+    -fx-wrap-text: true;
+    -fx-max-width: infinity;
+    max-width: infinity;
 }
 
 /* Estilo para el botón de rastreo */
@@ -297,4 +315,86 @@
 .refresh-button:hover {
     -fx-background-color: #7f8c8d;
     background-color: #7f8c8d;
+}
+
+/* Estilo para el ScrollPane principal */
+.main-scroll-pane {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-padding: 0;
+    padding: 0;
+    -fx-fit-to-width: true;
+    -fx-fit-to-height: false;
+    -fx-hbar-policy: never;
+    -fx-vbar-policy: as-needed;
+    -fx-min-width: 0;
+    min-width: 0;
+    -fx-min-height: 0;
+    min-height: 0;
+    -fx-pref-width: -1;
+    -fx-pref-height: -1;
+}
+
+.main-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.main-scroll-pane .scroll-bar:vertical {
+    -fx-opacity: 0.8;
+    opacity: 0.8;
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.main-scroll-pane .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    opacity: 0;
+    -fx-pref-height: 0;
+}
+
+.main-scroll-pane .corner {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+/* Estilo para el ScrollPane horizontal */
+.main-scroll-pane-horizontal {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-padding: 0;
+    padding: 0;
+    -fx-fit-to-width: false;
+    -fx-fit-to-height: true;
+    -fx-hbar-policy: as-needed;
+    -fx-vbar-policy: never;
+    -fx-min-width: 0;
+    min-width: 0;
+    -fx-min-height: 0;
+    min-height: 0;
+    -fx-pref-width: -1;
+    -fx-pref-height: -1;
+}
+
+.main-scroll-pane-horizontal > .viewport {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.main-scroll-pane-horizontal .scroll-bar:horizontal {
+    -fx-opacity: 0.8;
+    opacity: 0.8;
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.main-scroll-pane-horizontal .scroll-bar:vertical {
+    -fx-opacity: 0;
+    opacity: 0;
+    -fx-pref-width: 0;
+}
+
+.main-scroll-pane-horizontal .corner {
+    -fx-background-color: transparent;
+    background-color: transparent;
 }

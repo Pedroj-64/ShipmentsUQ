@@ -68,7 +68,7 @@ public class AppUtils {
         try {
             Parent root = loadFXML(fxml);
 
-            if (currentScene != null) {
+            if (currentScene != null && currentScene.getWindow() != null) {
                 currentScene.setRoot(root);
 
                 // Mantener el tamaño actual de la ventana
@@ -83,12 +83,84 @@ public class AppUtils {
                     pushScene(fxml);
                 }
             } else {
-                throw new IllegalStateException(
-                        "La escena actual no está inicializada. Llame a setCurrentScene primero.");
+                // Si no hay escena actual válida, intentar crear una nueva ventana
+                createNewStageWithScene(fxml, addToHistory);
             }
         } catch (IOException e) {
             showAlert("Error al cambiar la vista", "No se pudo cargar el archivo FXML: " + e.getMessage(),
                     Alert.AlertType.ERROR);
+        }
+    }
+    
+    /**
+     * Crea una nueva ventana con la escena especificada.
+     * Este método se utiliza como respaldo cuando no hay una escena actual válida.
+     * 
+     * @param fxml El nombre del archivo FXML a cargar
+     * @param addToHistory Si se debe agregar esta escena al historial de navegación
+     */
+    private static void createNewStageWithScene(String fxml, boolean addToHistory) {
+        try {
+            System.out.println("Creando nueva ventana para la escena: " + fxml);
+            
+            // Si es una pantalla de login, recopilar referencias a ventanas existentes para cerrarlas después
+            boolean isLoginScreen = fxml.contains("Login");
+            java.util.List<Stage> stagesToClose = new java.util.ArrayList<>();
+            
+            if (isLoginScreen) {
+                // Recopilar todas las ventanas abiertas para cerrarlas después
+                for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
+                    if (window instanceof Stage && window.isShowing()) {
+                        stagesToClose.add((Stage) window);
+                    }
+                }
+                System.out.println("Se cerrará(n) " + stagesToClose.size() + " ventana(s) después de abrir login");
+            }
+            
+            // Crear la nueva ventana
+            Parent root = loadFXML(fxml);
+            Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            
+            // Actualizar la referencia a la escena actual
+            currentScene = scene;
+            
+            // Establecer el título según el tipo de pantalla
+            if (fxml.contains("Login")) {
+                stage.setTitle("ShipmentsUQ - Inicio de Sesión");
+            } else if (fxml.contains("Register")) {
+                stage.setTitle("ShipmentsUQ - Registro");
+            } else if (fxml.contains("Admin")) {
+                stage.setTitle("ShipmentsUQ - Panel de Administración");
+            } else if (fxml.contains("User")) {
+                stage.setTitle("ShipmentsUQ - Panel de Usuario");
+            } else {
+                stage.setTitle("ShipmentsUQ");
+            }
+            
+            // Mostrar la nueva ventana
+            stage.show();
+            
+            // Si era una pantalla de login, cerrar todas las ventanas anteriores
+            if (isLoginScreen) {
+                for (Stage stageToClose : stagesToClose) {
+                    if (stageToClose != null && stageToClose != stage) {
+                        stageToClose.close();
+                    }
+                }
+                System.out.println("Se cerraron las ventanas anteriores al mostrar login");
+            }
+            
+            // Agregar la escena al historial si se solicita
+            if (addToHistory) {
+                pushScene(fxml);
+            }
+            
+            System.out.println("Nueva ventana creada exitosamente para: " + fxml);
+        } catch (Exception e) {
+            showError("Error al crear nueva ventana", "No se pudo crear una nueva ventana: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -258,7 +330,7 @@ public class AppUtils {
      * Navega a una nueva escena a partir de un nodo de la escena actual.
      * 
      * @param fxmlFile     La ruta al archivo FXML de la nueva escena
-     * @param sourceNode   Un nodo de la escena actual para obtener la ventana
+     * @param sourceNode   Un nodo de la escena actual para obtener la ventana (puede ser null si se usa la escena actual)
      * @param addToHistory Si debe agregarse al historial de navegación
      * @throws IOException Si hay un error al cargar el archivo FXML
      */
@@ -273,10 +345,53 @@ public class AppUtils {
             fxmlFile = "interfaces/" + fxmlFile;
         }
 
-        // Obtener dimensiones actuales de la ventana
-        Stage stage = (Stage) sourceNode.getScene().getWindow();
-        double currentWidth = stage.getWidth();
-        double currentHeight = stage.getHeight();
+        // Variables para almacenar las dimensiones actuales
+        double currentWidth = WINDOW_WIDTH;
+        double currentHeight = WINDOW_HEIGHT;
+        Stage stage = null;
+        
+        // Intentar obtener el stage de varias fuentes
+        if (sourceNode != null && sourceNode.getScene() != null) {
+            // Obtener dimensiones de la ventana actual a través del nodo
+            stage = (Stage) sourceNode.getScene().getWindow();
+            if (stage != null) {
+                currentWidth = stage.getWidth();
+                currentHeight = stage.getHeight();
+            }
+        } 
+        
+        // Si no se pudo obtener el stage del sourceNode, intentar con currentScene
+        if (stage == null && currentScene != null && currentScene.getWindow() != null) {
+            // Si no hay nodo pero hay escena actual, usar esa
+            stage = (Stage) currentScene.getWindow();
+            if (stage != null) {
+                currentWidth = stage.getWidth();
+                currentHeight = stage.getHeight();
+            }
+        } 
+        
+        // Si aún no hay stage, intentar buscar algún stage activo en la aplicación
+        if (stage == null) {
+            // Intentar obtener el stage principal a través de las ventanas abiertas
+            for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
+                if (window instanceof Stage && window.isShowing()) {
+                    stage = (Stage) window;
+                    if (stage.getWidth() > 0) {
+                        currentWidth = stage.getWidth();
+                    }
+                    if (stage.getHeight() > 0) {
+                        currentHeight = stage.getHeight();
+                    }
+                    break;
+                }
+            }
+            
+            // Si aún no hay stage, crear uno nuevo
+            if (stage == null) {
+                stage = new Stage();
+                System.out.println("Advertencia: Se ha creado un nuevo Stage porque no se pudo encontrar uno existente.");
+            }
+        }
 
         // Cargar la nueva escena
         Parent root = loadFXML(fxmlFile);
@@ -308,13 +423,178 @@ public class AppUtils {
      */
     public static boolean logOut() {
         try {
+            System.out.println("Iniciando proceso de cierre de sesión...");
+            
             // Limpiar el historial de navegación
             sceneHistory.clear();
-
-            // Usar el método de la clase App para reiniciar la aplicación
-            return App.restartApp();
+            
+            // Cerrar la sesión en la aplicación
+            if (App.getCurrentSession() != null) {
+                App.getCurrentSession().logout();
+                System.out.println("Sesión cerrada con éxito");
+            } else {
+                System.out.println("No había sesión activa para cerrar");
+            }
+            
+            // Verificar si tenemos una escena válida antes de navegar
+            boolean sceneValid = (currentScene != null && currentScene.getWindow() != null);
+            System.out.println("Estado de la escena actual: " + (sceneValid ? "Válida" : "No válida"));
+            
+            // Guardar referencias a todas las ventanas actuales antes de cerrarlas
+            java.util.List<Stage> openStages = new java.util.ArrayList<>();
+            for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
+                if (window instanceof Stage && window.isShowing()) {
+                    openStages.add((Stage) window);
+                }
+            }
+            System.out.println("Se encontraron " + openStages.size() + " ventanas abiertas");
+            
+            try {
+                // Intentar usar el método restartApp local
+                boolean appRestarted = restartApp();
+                if (appRestarted) {
+                    System.out.println("Aplicación reiniciada con éxito usando restartApp()");
+                    return true;
+                } else {
+                    System.out.println("No se pudo reiniciar la aplicación con restartApp(), intentando navegación directa");
+                }
+            } catch (Exception ex) {
+                System.out.println("Error al intentar usar restartApp(): " + ex.getMessage());
+                // Continuar con el método alternativo
+            }
+            
+            // Crear una nueva ventana de login
+            Stage loginStage = new Stage();
+            try {
+                // Cargar la pantalla de login
+                Parent root = loadFXML("interfaces/Login.fxml");
+                Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+                loginStage.setScene(scene);
+                loginStage.setTitle("ShipmentsUQ - Inicio de Sesión");
+                
+                // Actualizar la referencia a la escena actual
+                currentScene = scene;
+                
+                // Mostrar la nueva ventana de login
+                loginStage.show();
+                System.out.println("Nueva ventana de login creada con éxito");
+                
+                // Ahora cerrar todas las ventanas anteriores
+                for (Stage stage : openStages) {
+                    if (stage != null && stage != loginStage) {
+                        stage.close();
+                        System.out.println("Se cerró una ventana anterior");
+                    }
+                }
+                
+                return true;
+            } catch (Exception ex) {
+                System.out.println("Error al crear ventana de login: " + ex.getMessage());
+                
+                // Intentar estrategias alternativas si la creación directa falló
+                try {
+                    // Estrategia 1: Usar navigateTo normal
+                    navigateTo("Login.fxml", null);
+                    System.out.println("Navegación a Login.fxml completada mediante navigateTo");
+                } catch (Exception ex2) {
+                    System.out.println("Error en navegación directa: " + ex2.getMessage());
+                    
+                    try {
+                        // Estrategia 2: Crear una nueva ventana con el método existente
+                        System.out.println("Intentando crear una nueva ventana de login con createNewStageWithScene...");
+                        createNewStageWithScene("interfaces/Login.fxml", false);
+                        System.out.println("Nueva ventana de login creada con éxito");
+                    } catch (Exception ex3) {
+                        System.err.println("Error al crear nueva ventana de login: " + ex3.getMessage());
+                        ex3.printStackTrace();
+                    }
+                }
+            }
+            
+            return true;
         } catch (Exception e) {
             showError("Error al cerrar sesión", "Ocurrió un problema al cerrar la sesión: " + e.getMessage());
+            System.err.println("Error durante el cierre de sesión: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Obtiene el ID del usuario actual desde la sesión
+     * En un caso real, esto debería obtenerse de un sistema de gestión de sesiones
+     * 
+     * @return String con el ID del usuario actual o null si no hay sesión
+     */
+    public static String getCurrentUserId() {
+        // En una implementación real, esto vendría de un sistema de sesión
+        // Por ahora, simulamos un usuario logeado
+        try {
+            return App.getCurrentSession().getUserId().toString();
+        } catch (Exception e) {
+            System.err.println("Error al obtener ID de usuario: " + e.getMessage());
+            return null;
+        }
+    }
+    
+    /**
+     * Reinicia la aplicación volviendo a la pantalla de inicio de sesión.
+     * Este método cierra todas las ventanas existentes y abre una nueva ventana de login.
+     * Guarda el estado actual antes de reiniciar.
+     * 
+     * @return true si se pudo reiniciar correctamente
+     */
+    public static boolean restartApp() {
+        try {
+            System.out.println("Reiniciando aplicación desde AppUtils...");
+            
+            // Guardar el estado actual antes de reiniciar
+            try {
+                if (App.getCurrentSession() != null) {
+                    // Cerrar la sesión
+                    App.getCurrentSession().logout();
+                    System.out.println("Sesión cerrada correctamente");
+                }
+            } catch (Exception e) {
+                System.out.println("Error al cerrar sesión: " + e.getMessage());
+                // Continuar con el proceso de reinicio
+            }
+            
+            // Capturar todas las ventanas abiertas
+            java.util.List<Stage> stages = new java.util.ArrayList<>();
+            for (javafx.stage.Window window : javafx.stage.Window.getWindows()) {
+                if (window instanceof Stage && window.isShowing()) {
+                    stages.add((Stage) window);
+                }
+            }
+            System.out.println("Se encontraron " + stages.size() + " ventanas abiertas para cerrar");
+            
+            // Crear una nueva ventana de login
+            Stage newStage = new Stage();
+            Parent root = loadFXML("interfaces/Login.fxml");
+            Scene scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+            newStage.setScene(scene);
+            newStage.setTitle("ShipmentsUQ - Inicio de Sesión");
+            
+            // Actualizar la referencia de la escena actual
+            setCurrentScene(scene);
+            
+            // Mostrar la nueva ventana
+            newStage.show();
+            System.out.println("Nueva ventana de login creada");
+            
+            // Cerrar todas las ventanas anteriores
+            for (Stage stage : stages) {
+                if (stage != null && stage != newStage) {
+                    stage.close();
+                    System.out.println("Se cerró una ventana anterior");
+                }
+            }
+            
+            return true;
+        } catch (Exception e) {
+            showError("Error al reiniciar", "No se pudo volver a la pantalla de inicio: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }

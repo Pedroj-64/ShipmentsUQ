@@ -30,4 +30,38 @@ public class Address implements Serializable {
     private double coordX;  // Coordenada X en el mapa de cuadrícula
     private double coordY;  // Coordenada Y en el mapa de cuadrícula
     private boolean isDefault;
+    
+    /**
+     * Obtiene la dirección completa formateada
+     * @return String con la dirección completa
+     */
+    public String getFullAddress() {
+        StringBuilder sb = new StringBuilder();
+        
+        if (street != null && !street.isEmpty()) {
+            sb.append(street);
+        }
+        
+        if (complement != null && !complement.isEmpty()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(complement);
+        }
+        
+        if (zone != null && !zone.isEmpty()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(zone);
+        }
+        
+        if (city != null && !city.isEmpty()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(city);
+        }
+        
+        if (zipCode != null && !zipCode.isEmpty()) {
+            if (sb.length() > 0) sb.append(" - ");
+            sb.append(zipCode);
+        }
+        
+        return sb.length() > 0 ? sb.toString() : "Dirección no especificada";
+    }
 }

@@ -63,7 +63,19 @@
 /* Estilo para el área central */
 .content-area {
     -fx-background-color: #fafafa;
+    background-color: #fafafa;
     -fx-padding: 20px;
+    padding: 20px;
+    -fx-min-width: 100;
+    min-width: 100px;
+    -fx-min-height: 100;
+    min-height: 100px;
+    -fx-pref-width: -1;  /* -1 indica que debe usar todo el espacio disponible */
+    -fx-pref-height: -1; /* -1 indica que debe usar todo el espacio disponible */
+    -fx-max-width: 10000;  /* Usar un valor muy grande para maximizar */
+    max-width: 10000px;
+    -fx-max-height: 10000; /* Usar un valor muy grande para maximizar */
+    max-height: 10000px;
 }
 
 /* Estilo para la barra inferior */

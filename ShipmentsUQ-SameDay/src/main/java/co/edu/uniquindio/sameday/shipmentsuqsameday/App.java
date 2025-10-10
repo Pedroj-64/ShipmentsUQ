@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.Session;
 
 /**
  * Clase principal de la aplicación.
@@ -27,6 +28,9 @@ public class App extends Application {
 
     /** Administrador de datos para la persistencia */
     private static DataManager dataManager; // Gestor de datos para persistencia
+    
+    /** Sesión actual del usuario */
+    private static Session currentSession;
 
     /**
      * Método que se ejecuta antes de iniciar la aplicación.
@@ -37,6 +41,8 @@ public class App extends Application {
         System.out.println("Inicializando la aplicación...");
         // Obtener la instancia del DataManager para cargar los datos
         dataManager = DataManager.getInstance();
+        // Inicializar la sesión
+        currentSession = Session.getInstance();
     }
     
     @Override
@@ -87,17 +93,27 @@ public class App extends Application {
      */
     public static boolean restartApp() {
         try {
+            System.out.println("App.restartApp(): Delegando a AppUtils.restartApp()...");
+            
             // Guardar el estado actual antes de reiniciar
             if (dataManager != null) {
                 dataManager.saveState();
             }
-
-            // Cargar la pantalla de login sin añadirla al historial
-            AppUtils.loadSceneNoHistory("Login");
-            return true;
+            
+            return AppUtils.restartApp();
+            
         } catch (Exception e) {
             AppUtils.showError("Error al reiniciar", "No se pudo volver a la pantalla de inicio: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
+    }
+    
+    /**
+     * Obtiene la sesión actual del usuario
+     * @return la sesión actual
+     */
+    public static Session getCurrentSession() {
+        return currentSession;
     }
 }

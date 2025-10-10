@@ -6,6 +6,7 @@
 
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.ProfileAndAddressesViewController"
             stylesheets="@../css/profile.css"
             prefHeight="600.0" prefWidth="900.0">
 

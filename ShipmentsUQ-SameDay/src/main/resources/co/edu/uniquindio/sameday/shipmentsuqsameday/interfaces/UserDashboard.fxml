@@ -45,7 +45,6 @@
             <Button fx:id="btn_addresses" mnemonicParsing="false" styleClass="menu-button" text="Direcciones" />
             <Button fx:id="btn_shipments" mnemonicParsing="false" styleClass="menu-button" text="Envíos" />
             <Button fx:id="btn_payments" mnemonicParsing="false" styleClass="menu-button" text="Pagos" />
-            <Button fx:id="btn_history" mnemonicParsing="false" styleClass="menu-button" text="Historial" />
             
             <Separator styleClass="menu-separator" />
             <Label text="CONFIGURACIÓN" textFill="#666666">
