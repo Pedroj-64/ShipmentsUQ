@@ -371,6 +371,62 @@
     border-width: 1px 0 0 0;
 }
 
+/* Estilos para la sección de método de pago */
+.payment-method-section {
+    -fx-background-color: #f8fcff;
+    background-color: #f8fcff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 10px;
+    padding: 10px;
+    -fx-spacing: 10px;
+    margin-top: 15px;
+}
+
+/* Información del método de pago seleccionado */
+.payment-method-info {
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-padding: 8px;
+    padding: 8px;
+}
+
+.payment-method-details {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-text-fill: #333333;
+    color: #333333;
+}
+
+/* Botón para agregar nuevo método de pago */
+.add-payment-method-button {
+    -fx-background-color: #e6f0ff;
+    background-color: #e6f0ff;
+    -fx-text-fill: #1a56a7;
+    color: #1a56a7;
+    -fx-border-color: #c0d6f7;
+    border-color: #c0d6f7;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-padding: 5px 10px;
+    padding: 5px 10px;
+    -fx-font-size: 12px;
+    font-size: 12px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.add-payment-method-button:hover {
+    -fx-background-color: #d4e6ff;
+    background-color: #d4e6ff;
+}
+
 /* Estilos para los mensajes de estado */
 .status-label {
     -fx-font-size: 14px;

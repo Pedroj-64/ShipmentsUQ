@@ -1,0 +1,185 @@
+/* 
+   addpaymentmethod.css - Estilos para la interfaz de agregar método de pago
+   Plataforma de logística ShipmentsUQ
+*/
+
+/* Estilos generales */
+.root {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Encabezado */
+.header-container {
+    -fx-background-color: #f5f9ff;
+    background-color: #f5f9ff;
+    -fx-border-color: #e0e8f5;
+    border-color: #e0e8f5;
+    -fx-border-width: 0 0 1px 0;
+    border-width: 0 0 1px 0;
+}
+
+.title-label {
+    -fx-font-size: 24px;
+    font-size: 24px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1a56a7;
+    color: #1a56a7;
+}
+
+/* ScrollPane transparente */
+.scroll-pane {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-background: transparent;
+    background: transparent;
+    -fx-border-color: transparent;
+    border-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+/* Contenedor del formulario */
+.form-container {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+}
+
+/* Etiquetas de formulario */
+.form-label {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #555555;
+    color: #555555;
+}
+
+/* Campos de texto */
+.text-field, .password-field {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-background-radius: 5px;
+    -fx-border-color: #cccccc;
+    border-color: #cccccc;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 8px;
+    padding: 8px;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+/* ComboBox y ChoiceBox */
+.combo-box, .choice-box {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-background-radius: 5px;
+    -fx-border-color: #cccccc;
+    border-color: #cccccc;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 5px;
+    padding: 5px;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+/* Secciones desplegables */
+.section-pane {
+    -fx-background-color: #f8f8f8;
+    background-color: #f8f8f8;
+    -fx-border-color: #e0e0e0;
+    border-color: #e0e0e0;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.section-pane .title {
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+/* Botones */
+.button {
+    -fx-background-radius: 5px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.save-button {
+    -fx-background-color: #1a56a7;
+    background-color: #1a56a7;
+    -fx-text-fill: white;
+    color: white;
+}
+
+.save-button:hover {
+    -fx-background-color: #0d4990;
+    background-color: #0d4990;
+}
+
+.cancel-button {
+    -fx-background-color: #e6e6e6;
+    background-color: #e6e6e6;
+    -fx-text-fill: #555555;
+    color: #555555;
+}
+
+.cancel-button:hover {
+    -fx-background-color: #d9d9d9;
+    background-color: #d9d9d9;
+}
+
+/* Contenedor de botones */
+.button-container {
+    -fx-background-color: #f5f9ff;
+    background-color: #f5f9ff;
+    -fx-border-color: #e0e8f5;
+    border-color: #e0e8f5;
+    -fx-border-width: 1px 0 0 0;
+    border-width: 1px 0 0 0;
+}
+
+/* Checkbox */
+.check-box {
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+.check-box .box {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #cccccc;
+    border-color: #cccccc;
+    -fx-border-radius: 3px;
+    border-radius: 3px;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+    background-color: white;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #1a56a7;
+    background-color: #1a56a7;
+}

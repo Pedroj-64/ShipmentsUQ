@@ -74,9 +74,9 @@
                           GridPane.rowIndex="4" GridPane.columnIndex="1" />
             </GridPane>
             
-            <!-- Sección de tarjeta de crédito (visible condicional) -->
-            <VBox styleClass="card-section" fx:id="vbox_cardSection">
-                <Label text="Datos de Tarjeta" styleClass="subsection-title" />
+            <!-- Sección de selección de método de pago -->
+            <VBox styleClass="payment-method-section" fx:id="vbox_paymentMethodSection" spacing="10">
+                <Label text="Método de Pago" styleClass="subsection-title" />
                 
                 <GridPane hgap="10" vgap="10">
                     <padding>
@@ -88,24 +88,25 @@
                         <ColumnConstraints hgrow="ALWAYS" minWidth="150" />
                     </columnConstraints>
                     
-                    <!-- Número de tarjeta -->
-                    <Label text="Número:" styleClass="form-label" 
+                    <!-- Selección de método de pago guardado -->
+                    <Label text="Seleccionar:" styleClass="form-label" 
                            GridPane.rowIndex="0" GridPane.columnIndex="0" />
-                    <TextField fx:id="txt_cardNumber" promptText="XXXX-XXXX-XXXX-XXXX" 
-                              GridPane.rowIndex="0" GridPane.columnIndex="1" />
-                    
-                    <!-- Fecha de expiración -->
-                    <Label text="Expiración:" styleClass="form-label" 
-                           GridPane.rowIndex="1" GridPane.columnIndex="0" />
-                    <TextField fx:id="txt_cardExpiry" promptText="MM/AA" 
-                              GridPane.rowIndex="1" GridPane.columnIndex="1" />
-                    
-                    <!-- Código CVV -->
-                    <Label text="CVV:" styleClass="form-label" 
-                           GridPane.rowIndex="2" GridPane.columnIndex="0" />
-                    <PasswordField fx:id="txt_cardCvv" promptText="123" 
-                                  GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                    <ComboBox fx:id="cmb_savedPaymentMethods" promptText="Seleccione un método de pago" 
+                              GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity" />
                 </GridPane>
+                
+                <!-- Información del método seleccionado -->
+                <VBox fx:id="vbox_paymentMethodInfo" styleClass="payment-method-info" visible="true">
+                    <padding>
+                        <Insets top="5" right="5" bottom="5" left="5" />
+                    </padding>
+                    <Label fx:id="lbl_paymentMethodDetails" styleClass="payment-method-details" />
+                </VBox>
+                
+                <!-- Botón para agregar nuevo método de pago -->
+                <HBox alignment="CENTER_RIGHT">
+                    <Button fx:id="btn_addPaymentMethod" text="Agregar Nuevo Método" styleClass="add-payment-method-button" />
+                </HBox>
             </VBox>
             
             <!-- Botones para el formulario de pago -->
