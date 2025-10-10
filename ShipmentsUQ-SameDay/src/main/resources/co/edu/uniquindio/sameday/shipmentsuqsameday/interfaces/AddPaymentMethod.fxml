@@ -7,6 +7,7 @@
 <BorderPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/addpaymentmethod.css"
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.AddPaymentMethodViewController"
             prefWidth="600.0" prefHeight="550.0">
 
     <!-- Encabezado -->

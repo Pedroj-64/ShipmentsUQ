@@ -6,6 +6,7 @@
 
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.PaymentsViewController"
             stylesheets="@../css/payments.css"
             fitToWidth="true"
             fitToHeight="true"

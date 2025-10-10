@@ -21,6 +21,7 @@ public class PaymentDTO {
     private PaymentMethod paymentMethod;
     private PaymentStatus status;
     private LocalDateTime creationDate;
+    private LocalDateTime processingDate;
     private String paymentReference;
     // No incluye: detalles de transacción, información de tarjetas
 }

@@ -8,5 +8,7 @@ public enum PaymentStatus {
     PROCESSING,      // Pago en proceso de validación
     COMPLETED,       // Pago exitoso
     REJECTED,        // Pago rechazado por el método de pago
-    REFUNDED        // Pago reembolsado al usuario
+    REFUNDED,        // Pago reembolsado al usuario
+    FAILED,          // Pago fallido por error técnico
+    CANCELLED        // Pago cancelado por el usuario
 }

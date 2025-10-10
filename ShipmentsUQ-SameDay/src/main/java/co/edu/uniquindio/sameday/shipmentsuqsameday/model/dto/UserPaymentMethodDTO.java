@@ -19,8 +19,14 @@ public class UserPaymentMethodDTO {
     private String lastFourDigits;
     private String cardType;
     private boolean isDefault;
+    
+    // Para pagos móviles
+    private String phoneNumber;
     private String maskedPhoneNumber; // Últimos 4 dígitos del teléfono
+    
+    // Para PSE
     private String bankName;
     private String accountType;
+    
     // No incluye: números completos de tarjeta, CVV, fechas de expiración
 }

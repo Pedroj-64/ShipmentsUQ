@@ -11,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de pagos
@@ -20,6 +22,11 @@ public class PaymentService implements Service<Payment, PaymentRepository> {
     private final PaymentProcessingService processingService;
     private final PaymentAnalyticsService analyticsService;
     
+    private static PaymentService instance;
+    
+    /**
+     * Constructor del servicio
+     */
     public PaymentService(
             PaymentRepository repository,
             PaymentProcessingService processingService,
@@ -27,6 +34,37 @@ public class PaymentService implements Service<Payment, PaymentRepository> {
         this.repository = repository;
         this.processingService = processingService;
         this.analyticsService = analyticsService;
+    }
+    
+    /**
+     * Obtiene la instancia única del servicio con los repositorios proporcionados
+     * @param repository Repositorio de pagos
+     * @param processingService Servicio de procesamiento
+     * @param analyticsService Servicio de analíticas
+     * @return instancia del servicio
+     */
+    public static synchronized PaymentService getInstance(
+            PaymentRepository repository,
+            PaymentProcessingService processingService,
+            PaymentAnalyticsService analyticsService) {
+        if (instance == null) {
+            instance = new PaymentService(repository, processingService, analyticsService);
+        }
+        return instance;
+    }
+    
+    /**
+     * Obtiene la instancia única del servicio
+     * Este método es para compatibilidad con código existente.
+     * Debería llamarse primero getInstance(repository, ...) para inicializar el servicio.
+     * @return instancia del servicio
+     */
+    public static PaymentService getInstance() {
+        if (instance == null) {
+            System.err.println("ERROR: PaymentService no ha sido inicializado con repositorios");
+            throw new IllegalStateException("PaymentService no ha sido inicializado con repositorios");
+        }
+        return instance;
     }
     
     @Override
@@ -141,5 +179,19 @@ public class PaymentService implements Service<Payment, PaymentRepository> {
         }
         
         return processingService.processRefund(payment, reason);
+    }
+    
+    /**
+     * Busca todos los pagos de un usuario específico
+     * @param userId ID del usuario
+     * @return lista de pagos del usuario
+     */
+    public List<Payment> findByUser(UUID userId) {
+        // Filtrar todos los pagos para encontrar los del usuario específico
+        return repository.findAll().stream()
+                .filter(payment -> payment.getUser() != null && 
+                                   payment.getUser().getId() != null && 
+                                   payment.getUser().getId().equals(userId))
+                .collect(Collectors.toList());
     }
 }
