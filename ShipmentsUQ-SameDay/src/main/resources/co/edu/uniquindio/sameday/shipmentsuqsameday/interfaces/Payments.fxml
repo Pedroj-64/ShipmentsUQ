@@ -4,26 +4,30 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx"
+<ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             stylesheets="@../css/payments.css"
-            prefWidth="1000.0" prefHeight="700.0">
+            fitToWidth="true"
+            fitToHeight="true"
+            pannable="true">
+    <content>
+        <BorderPane prefWidth="950.0" prefHeight="600.0">
 
-    <!-- Zona superior (top) -->
-    <top>
-        <HBox alignment="CENTER" styleClass="header-container">
-            <padding>
-                <Insets top="20" right="20" bottom="20" left="20" />
-            </padding>
-            <Label text="Gestión de Pagos" styleClass="title-label" />
-        </HBox>
-    </top>
+            <!-- Zona superior (top) -->
+            <top>
+                <HBox alignment="CENTER" styleClass="header-container">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20" />
+                    </padding>
+                    <Label text="Gestión de Pagos" styleClass="title-label" />
+                </HBox>
+            </top>
     
     <!-- Zona izquierda (left) - Formulario de pago simulado -->
     <left>
-        <VBox styleClass="form-container" prefWidth="350">
+        <VBox styleClass="form-container" prefWidth="320" maxWidth="320">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20" />
+                <Insets top="15" right="15" bottom="15" left="15" />
             </padding>
             
             <Label text="Registrar Pago" styleClass="section-title" />
@@ -117,9 +121,9 @@
     
     <!-- Zona central (center) - Historial de pagos -->
     <center>
-        <VBox spacing="15" styleClass="history-container">
+        <VBox spacing="10" styleClass="history-container">
             <padding>
-                <Insets top="20" right="20" bottom="20" left="20" />
+                <Insets top="15" right="15" bottom="15" left="15" />
             </padding>
             
             <Label text="Historial de Pagos" styleClass="section-title" />
@@ -135,14 +139,14 @@
             </HBox>
             
             <!-- Tabla de pagos -->
-            <TableView fx:id="tbl_payments" VBox.vgrow="ALWAYS">
+            <TableView fx:id="tbl_payments" VBox.vgrow="ALWAYS" maxHeight="350">
                 <columns>
-                    <TableColumn fx:id="col_id" text="ID Pago" prefWidth="80" />
-                    <TableColumn fx:id="col_date" text="Fecha" prefWidth="100" />
-                    <TableColumn fx:id="col_shipmentId" text="ID Envío" prefWidth="80" />
-                    <TableColumn fx:id="col_amount" text="Monto" prefWidth="100" />
-                    <TableColumn fx:id="col_method" text="Método" prefWidth="120" />
-                    <TableColumn fx:id="col_status" text="Estado" prefWidth="100" />
+                    <TableColumn fx:id="col_id" text="ID Pago" prefWidth="70" />
+                    <TableColumn fx:id="col_date" text="Fecha" prefWidth="90" />
+                    <TableColumn fx:id="col_shipmentId" text="ID Envío" prefWidth="70" />
+                    <TableColumn fx:id="col_amount" text="Monto" prefWidth="90" />
+                    <TableColumn fx:id="col_method" text="Método" prefWidth="100" />
+                    <TableColumn fx:id="col_status" text="Estado" prefWidth="90" />
                 </columns>
                 <placeholder>
                     <Label text="No hay pagos registrados" />
@@ -167,4 +171,6 @@
         </HBox>
     </bottom>
     
-</BorderPane>
+        </BorderPane>
+    </content>
+</ScrollPane>

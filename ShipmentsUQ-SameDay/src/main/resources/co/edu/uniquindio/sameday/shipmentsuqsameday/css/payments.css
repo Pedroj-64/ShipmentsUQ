@@ -3,6 +3,36 @@
    Plataforma de logística ShipmentsUQ
 */
 
+/* Estilo para el ScrollPane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-background: transparent;
+    background: transparent;
+    -fx-border-color: transparent;
+    border-color: transparent;
+    -fx-padding: 0;
+    padding: 0;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: #f0f0f0;
+    background-color: #f0f0f0;
+}
+
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #c0c0c0;
+    background-color: #c0c0c0;
+    -fx-background-radius: 4px;
+}
+
 /* Estilo general para la raíz (BorderPane) */
 .root {
     -fx-background-color: #ffffff;

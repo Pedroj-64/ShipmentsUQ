@@ -270,4 +270,60 @@ public class UserService implements Service<User, UserRepository> {
         
         return Optional.empty();
     }
+
+    /**
+     * Valida si la contraseña proporcionada coincide con la almacenada para el usuario
+     * @param userId ID del usuario
+     * @param password contraseña a validar
+     * @return true si la contraseña es válida, false en caso contrario
+     */
+    public boolean validatePassword(UUID userId, String password) {
+        Optional<User> userOpt = repository.findById(userId);
+        
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            return user.getPassword().equals(password);
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Cambia la contraseña de un usuario
+     * @param userId ID del usuario
+     * @param newPassword nueva contraseña
+     * @return true si se cambió correctamente, false en caso contrario
+     */
+    public boolean changePassword(UUID userId, String newPassword) {
+        try {
+            Optional<User> userOpt = repository.findById(userId);
+            
+            if (userOpt.isPresent()) {
+                User user = userOpt.get();
+                user.setPassword(newPassword);
+                repository.update(user);
+                return true;
+            }
+            
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Actualiza la información de un usuario
+     * @param user usuario con la información actualizada
+     * @return true si se actualizó correctamente, false en caso contrario
+     */
+    public boolean updateUser(User user) {
+        try {
+            repository.update(user);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
