@@ -3,6 +3,7 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.model.service;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.DelivererStatus;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IGridCoordinate;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.DelivererRepository;
 
 import java.util.Comparator;
@@ -54,12 +55,25 @@ public class DelivererService implements Service<Deliverer, DelivererRepository>
     }
     
     /**
-     * Busca repartidores disponibles en una zona
+     * Busca repartidores disponibles en una zona específica
      * @param zone zona a buscar
      * @return lista de repartidores disponibles ordenados por calificación
      */
     public List<Deliverer> findAvailableDeliverersInZone(String zone) {
         return repository.findAvailableByZone(zone).stream()
+                .sorted(Comparator.comparingDouble(Deliverer::getAverageRating).reversed())
+                .toList();
+    }
+    
+    /**
+     * Busca todos los repartidores disponibles en el sistema
+     * @return lista de repartidores disponibles ordenados por calificación
+     */
+    public List<Deliverer> findAvailableDeliverers() {
+        return repository.findAll().stream()
+                .filter(deliverer -> 
+                    deliverer.getStatus() == DelivererStatus.AVAILABLE || 
+                    deliverer.getStatus() == DelivererStatus.ACTIVE)
                 .sorted(Comparator.comparingDouble(Deliverer::getAverageRating).reversed())
                 .toList();
     }
@@ -156,5 +170,76 @@ public class DelivererService implements Service<Deliverer, DelivererRepository>
             .filter(d -> d.getStatus() == DelivererStatus.AVAILABLE)
             .sorted(Comparator.comparingDouble(Deliverer::getAverageRating).reversed())
             .toList();
+    }
+    
+    /**
+     * Actualiza la posición de un repartidor en el mapa
+     * @param delivererId ID del repartidor
+     * @param x coordenada X
+     * @param y coordenada Y
+     * @return repartidor actualizado
+     * @throws IllegalArgumentException si el repartidor no existe
+     */
+    public Deliverer updateDelivererPosition(UUID delivererId, double x, double y) {
+        Deliverer deliverer = repository.findById(delivererId)
+                .orElseThrow(() -> new IllegalArgumentException("Repartidor no encontrado"));
+        
+        deliverer.updatePosition(x, y);
+        return repository.update(deliverer);
+    }
+    
+    /**
+     * Encuentra el repartidor disponible más cercano a unas coordenadas
+     * @param x coordenada X de origen
+     * @param y coordenada Y de origen
+     * @param zone zona opcional para filtrar (null para considerar todas las zonas)
+     * @return el repartidor más cercano o null si no hay disponibles
+     */
+    public Deliverer findNearestAvailableDeliverer(double x, double y, String zone) {
+        List<Deliverer> availableDeliverers;
+        
+        if (zone != null && !zone.isEmpty()) {
+            availableDeliverers = findAvailableDeliverersInZone(zone);
+        } else {
+            availableDeliverers = getAvailableDeliverers();
+        }
+        
+        if (availableDeliverers.isEmpty()) {
+            return null;
+        }
+        
+        Deliverer nearestDeliverer = null;
+        double minDistance = Double.MAX_VALUE;
+        
+        // Crear un punto de origen para calcular distancias
+        final double originX = x;
+        final double originY = y;
+        
+        // Implementación temporal de IGridCoordinate para el punto de origen
+        IGridCoordinate originPoint = new IGridCoordinate() {
+            @Override
+            public double getX() {
+                return originX;
+            }
+            
+            @Override
+            public double getY() {
+                return originY;
+            }
+        };
+        
+        // Encontrar el repartidor más cercano
+        for (Deliverer deliverer : availableDeliverers) {
+            // Calcular la distancia euclidiana entre el repartidor y el origen
+            double distance = deliverer.distanceTo(originPoint);
+            
+            // Actualizar si encontramos uno más cercano
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearestDeliverer = deliverer;
+            }
+        }
+        
+        return nearestDeliverer;
     }
 }

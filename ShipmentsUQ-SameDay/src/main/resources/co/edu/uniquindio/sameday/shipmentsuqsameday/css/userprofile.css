@@ -11,6 +11,16 @@
     font-family: "Segoe UI", Arial, sans-serif;
 }
 
+/* Estilo para el contenedor del encabezado */
+.header-container {
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-width: 0 0 1px 0;
+    border-width: 0 0 1px 0;
+}
+
 /* Título principal */
 .title-label {
     -fx-font-size: 24px;
@@ -28,9 +38,7 @@
     background: transparent;
     -fx-padding: 0;
     padding: 0;
-    -fx-fit-to-width: true;
-    -fx-fit-to-height: true;
-    -fx-hbar-policy: never;
+    /* Propiedades no CSS removidas */
     -fx-min-width: 0;
     min-width: 0;
     -fx-min-height: 0;
@@ -47,12 +55,13 @@
 .main-content {
     -fx-background-color: transparent;
     background-color: transparent;
-    -fx-min-width: 0;
-    min-width: 0;
-    -fx-min-height: 0;
-    min-height: 0;
+    -fx-min-width: 400;
+    min-width: 400px;
+    -fx-min-height: 1000;
+    min-height: 1000px;
     -fx-pref-width: -1;
-    -fx-pref-height: -1;
+    -fx-pref-height: 1200;
+    /* Esto asegurará que haya suficiente contenido para activar el scroll */
 }
 
 /* Cajas de sección */
@@ -160,4 +169,43 @@
 /* Separadores */
 .separator {
     -fx-opacity: 0.3;
+}
+
+/* Estilo para el ScrollPane principal */
+.main-scroll-pane {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-padding: 0;
+    padding: 0;
+    -fx-min-width: 0;
+    min-width: 0;
+    -fx-min-height: 0;
+    min-height: 0;
+    -fx-pref-width: -1;
+    -fx-pref-height: -1;
+    /* Mostrar siempre la barra vertical */
+    -fx-vbar-policy: always;
+}
+
+.main-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.main-scroll-pane .scroll-bar:vertical {
+    -fx-opacity: 0.8;
+    opacity: 0.8;
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.main-scroll-pane .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    opacity: 0;
+    -fx-pref-height: 0;
+}
+
+.main-scroll-pane .corner {
+    -fx-background-color: transparent;
+    background-color: transparent;
 }

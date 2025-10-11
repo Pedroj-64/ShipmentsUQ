@@ -33,6 +33,9 @@ public class PaymentsController {
      * Constructor del controlador
      */
     public PaymentsController() {
+        // Inicializamos los servicios antes de usarlos
+        co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.ServiceInitializer.initializeServices();
+        
         this.paymentService = PaymentService.getInstance();
         this.shipmentService = ShipmentService.getInstance();
         this.userService = UserService.getInstance();
@@ -222,6 +225,48 @@ public class PaymentsController {
                     LocalDateTime.now().toString().replace(":", "-") + ".pdf";
                     
             return reportName;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    /**
+     * Obtiene el monto pendiente de pago para un envío específico
+     * @param shipmentId El ID del envío
+     * @return El monto a pagar o null si no se encuentra
+     */
+    public Double getShipmentAmount(UUID shipmentId) {
+        try {
+            if (shipmentId == null) {
+                return null;
+            }
+            
+            // Buscar el envío
+            Optional<Shipment> shipmentOpt = shipmentService.findById(shipmentId);
+            if (shipmentOpt.isEmpty()) {
+                return null;
+            }
+            
+            Shipment shipment = shipmentOpt.get();
+            
+            // Verificar si el usuario actual es el dueño del envío
+            if (currentUser == null || !currentUser.getId().equals(shipment.getUser().getId())) {
+                return null;
+            }
+            
+            // Verificar si el envío ya está pagado
+            List<Payment> payments = paymentService.findByShipmentId(shipmentId);
+            boolean isPaid = payments.stream()
+                    .anyMatch(p -> p.getStatus() == PaymentStatus.COMPLETED);
+            
+            if (isPaid) {
+                return 0.0; // Ya está pagado
+            }
+            
+            // Devolver el costo del envío
+            return shipment.getCost();
+            
         } catch (Exception e) {
             e.printStackTrace();
             return null;

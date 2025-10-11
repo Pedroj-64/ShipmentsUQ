@@ -85,10 +85,46 @@ public class PaymentsViewController implements Initializable {
     }
     
     /**
+     * Precarga el ID del envío en el formulario de pago.
+     * Este método es llamado cuando se navega desde la pantalla de envíos
+     * con un ID específico para realizar un pago.
+     * 
+     * @param shipmentId El ID del envío a precargar en el formulario
+     */
+    public void preloadShipmentId(String shipmentId) {
+        if (shipmentId != null && !shipmentId.isEmpty()) {
+            txt_shipmentId.setText(shipmentId);
+            // Opcionalmente, cargar información adicional del envío
+            try {
+                UUID id = UUID.fromString(shipmentId);
+                Double amount = controller.getShipmentAmount(id);
+                if (amount != null) {
+                    txt_amount.setText(String.format("%.2f", amount));
+                }
+                
+                // Informar al usuario
+                lbl_status.setText("Información de envío cargada. Complete el formulario para realizar el pago.");
+                lbl_status.setStyle("-fx-text-fill: #27ae60;");
+            } catch (Exception e) {
+                // Si ocurre un error al cargar la información del envío
+                lbl_status.setText("ID de envío cargado. No se pudo obtener el monto automáticamente.");
+                lbl_status.setStyle("-fx-text-fill: #e67e22;");
+            }
+        }
+    }
+    
+    /**
      * Inicializa el controlador de negocio
      */
     private void initController() {
-        controller = new PaymentsController();
+        try {
+            controller = new PaymentsController();
+        } catch (Exception e) {
+            System.err.println("Error al inicializar PaymentsController: " + e.getMessage());
+            e.printStackTrace();
+            showAlert("Error de inicialización", "No se pudo inicializar el controlador de pagos", 
+                    "Error: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
     }
     
     /**

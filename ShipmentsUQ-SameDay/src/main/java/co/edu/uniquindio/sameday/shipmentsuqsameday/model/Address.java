@@ -1,5 +1,6 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.model;
 
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IGridCoordinate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Address implements Serializable {
+public class Address implements Serializable, IGridCoordinate {
     
     /** Constante para la serialización */
     private static final long serialVersionUID = 1L;
@@ -30,6 +31,24 @@ public class Address implements Serializable {
     private double coordX;  // Coordenada X en el mapa de cuadrícula
     private double coordY;  // Coordenada Y en el mapa de cuadrícula
     private boolean isDefault;
+    
+    /**
+     * Implementación de IGridCoordinate para obtener la coordenada X
+     * @return coordenada X de la dirección
+     */
+    @Override
+    public double getX() {
+        return coordX;
+    }
+    
+    /**
+     * Implementación de IGridCoordinate para obtener la coordenada Y
+     * @return coordenada Y de la dirección
+     */
+    @Override
+    public double getY() {
+        return coordY;
+    }
     
     /**
      * Obtiene la dirección completa formateada

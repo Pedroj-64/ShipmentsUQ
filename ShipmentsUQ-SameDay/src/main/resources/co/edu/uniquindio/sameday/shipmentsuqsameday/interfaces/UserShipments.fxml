@@ -6,6 +6,7 @@
 
 <ScrollPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.UserShipmentsViewController"
             fitToWidth="false"
             fitToHeight="true"
             pannable="true"
@@ -160,6 +161,10 @@
                 </padding>
                 <Button fx:id="btn_trackShipment" text="Rastrear Envío" 
                         styleClass="track-button" maxWidth="Infinity" />
+                <Button fx:id="btn_copyShipmentId" text="Copiar ID" 
+                        styleClass="copy-button" maxWidth="Infinity" />
+                <Button fx:id="btn_payShipment" text="Ir a Pago" 
+                        styleClass="pay-button" maxWidth="Infinity" />
             </VBox>
         </VBox>
     </right>

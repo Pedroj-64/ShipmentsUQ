@@ -103,10 +103,10 @@ public class ProfileAndAddressesViewController implements Initializable {
         
         // Configurar columna de coordenadas (concatenando coordX y coordY)
         col_coordinates.setCellValueFactory(cellData -> {
-            double latitude = cellData.getValue().getLatitude();
-            double longitude = cellData.getValue().getLongitude();
+            double coordX = cellData.getValue().getCoordX();
+            double coordY = cellData.getValue().getCoordY();
             return javafx.beans.binding.Bindings.createStringBinding(
-                () -> String.format("%.2f, %.2f", latitude, longitude)
+                () -> String.format("%.2f, %.2f", coordX, coordY)
             );
         });
         

@@ -189,8 +189,8 @@ public class ProfileAndAddressesController {
                     .street(addr.getStreet())
                     .city(addr.getCity())
                     .zone(addr.getZone())
-                    .latitude(addr.getCoordX())
-                    .longitude(addr.getCoordY())
+                    .coordX(addr.getCoordX())
+                    .coordY(addr.getCoordY())
                     .build())
                 .toList();
                 

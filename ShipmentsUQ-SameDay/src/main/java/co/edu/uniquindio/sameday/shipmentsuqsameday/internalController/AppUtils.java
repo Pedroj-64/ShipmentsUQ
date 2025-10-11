@@ -19,6 +19,26 @@ import java.util.Stack;
  * usuario.
  */
 public class AppUtils {
+    
+    /**
+     * Conversor para mostrar direcciones en ComboBox
+     */
+    public static class AddressDTOStringConverter extends javafx.util.StringConverter<co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.AddressDTO> {
+        @Override
+        public String toString(co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.AddressDTO addressDTO) {
+            if (addressDTO == null) {
+                return "";
+            }
+            // Mostrar alias y calle
+            return addressDTO.getAlias() + " - " + addressDTO.getStreet() + ", " + addressDTO.getCity();
+        }
+
+        @Override
+        public co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.AddressDTO fromString(String string) {
+            // Este método se usa para la edición del ComboBox, lo cual no permitimos
+            return null;
+        }
+    }
 
     /** Escena actual de la aplicación */
     private static Scene currentScene;

@@ -194,4 +194,13 @@ public class PaymentService implements Service<Payment, PaymentRepository> {
                                    payment.getUser().getId().equals(userId))
                 .collect(Collectors.toList());
     }
+    
+    /**
+     * Busca pagos por el ID de un envío
+     * @param shipmentId ID del envío
+     * @return lista de pagos asociados al envío
+     */
+    public List<Payment> findByShipmentId(UUID shipmentId) {
+        return repository.findByShipmentId(shipmentId);
+    }
 }

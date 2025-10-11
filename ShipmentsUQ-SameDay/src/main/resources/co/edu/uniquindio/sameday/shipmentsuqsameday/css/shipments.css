@@ -230,6 +230,48 @@
     background-color: #3873c4;
 }
 
+/* Estilos para el botón de copiar ID */
+.copy-button {
+    -fx-background-color: #f39c12;
+    background-color: #f39c12;
+    -fx-text-fill: white;
+    color: white;
+    -fx-padding: 8px;
+    padding: 8px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+    -fx-graphic-text-gap: 8;
+    -fx-margin-top: 8px;
+    margin-top: 8px;
+}
+
+.copy-button:hover {
+    -fx-background-color: #e67e22;
+    background-color: #e67e22;
+}
+
+/* Estilos para el botón de ir a pago */
+.pay-button {
+    -fx-background-color: #27ae60;
+    background-color: #27ae60;
+    -fx-text-fill: white;
+    color: white;
+    -fx-padding: 8px;
+    padding: 8px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+    -fx-graphic-text-gap: 8;
+    -fx-margin-top: 8px;
+    margin-top: 8px;
+}
+
+.pay-button:hover {
+    -fx-background-color: #2ecc71;
+    background-color: #2ecc71;
+}
+
 /* Contenedor de botones de acción */
 .actions-container {
     -fx-background-color: #f0f7ff;

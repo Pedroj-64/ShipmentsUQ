@@ -17,13 +17,15 @@ public class ShipmentDTO {
     private UUID id;
     private UUID userId;
     private UUID delivererId;
-    private AddressDTO origin;
-    private AddressDTO destination;
+    private AddressDTO originAddress;  // Renombrado para claridad
+    private AddressDTO destinationAddress;  // Renombrado para claridad
     private ShipmentStatus status;
     private ShipmentPriority priority;
     private double weight;
+    private String dimensions;  // Dimensiones en formato texto (largo x ancho x alto)
     private double volume;
     private double cost;
+    private double estimatedCost;  // Costo estimado durante cotización
     private LocalDateTime creationDate;
     private LocalDateTime assignmentDate;
     private LocalDateTime deliveryDate;

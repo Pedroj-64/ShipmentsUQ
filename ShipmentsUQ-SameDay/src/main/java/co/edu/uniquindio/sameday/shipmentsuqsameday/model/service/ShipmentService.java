@@ -1,17 +1,26 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.model.service;
 
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Incident;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.IncidentType;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Incident;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.DelivererStatus;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.IncidentType;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentPriority;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IDistanceCalculator;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.ShipmentRepository;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IGridCoordinate;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.DelivererRepository;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.ShipmentRepository;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.EuclideanDistanceCalculator;
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -76,6 +85,133 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
     @Override
     public ShipmentRepository getRepository() {
         return repository;
+    }
+    
+    /**
+     * Calcula la tarifa de envío basada en distancia, peso y prioridad
+     * @param origin dirección de origen
+     * @param destination dirección de destino
+     * @param weight peso en kg
+     * @param priority prioridad del envío
+     * @return tarifa calculada en moneda local
+     */
+    public double calculateShippingRate(IGridCoordinate origin, IGridCoordinate destination, double weight, ShipmentPriority priority) {
+        // Calcular distancia entre origen y destino
+        double distance = origin.distanceTo(destination);
+        
+        // Tarifa base según distancia (10 por unidad de distancia)
+        double baseRate = distance * 10.0;
+        
+        // Ajuste por peso (5 por kg)
+        double weightRate = weight * 5.0;
+        
+        // Multiplicador por prioridad
+        double priorityMultiplier = 1.0;
+        switch (priority) {
+            case STANDARD:
+                priorityMultiplier = 1.0;
+                break;
+            case PRIORITY:
+                priorityMultiplier = 1.5;
+                break;
+            case URGENT:
+                priorityMultiplier = 2.0;
+                break;
+        }
+        
+        return (baseRate + weightRate) * priorityMultiplier;
+    }
+    
+    /**
+     * Crea un nuevo envío y asigna automáticamente el repartidor más cercano
+     * @param user usuario que crea el envío
+     * @param origin dirección de origen
+     * @param destination dirección de destino
+     * @param weight peso en kg
+     * @param dimensions dimensiones en formato texto
+     * @param priority prioridad del envío
+     * @return el envío creado
+     */
+    public Shipment createShipment(User user, IGridCoordinate origin, IGridCoordinate destination, 
+                                  double weight, String dimensions, ShipmentPriority priority) {
+        // Calcular costo
+        double cost = calculateShippingRate(origin, destination, weight, priority);
+        
+        // Crear nuevo envío
+        Shipment shipment = Shipment.builder()
+                .id(UUID.randomUUID())
+                .user(user)
+                .origin((Address) origin)
+                .destination((Address) destination)
+                .status(ShipmentStatus.PENDING)
+                .priority(priority)
+                .weight(weight)
+                .specialInstructions(dimensions) // Guardamos las dimensiones en specialInstructions
+                .cost(cost)
+                .creationDate(LocalDateTime.now())
+                .build();
+        
+        // Asignar repartidor más cercano disponible
+        assignNearestDeliverer(shipment);
+        
+        // Guardar envío
+        return repository.save(shipment);
+    }
+    
+    /**
+     * Asigna el repartidor disponible más cercano al origen del envío
+     * @param shipment el envío al que asignar un repartidor
+     */
+    private void assignNearestDeliverer(Shipment shipment) {
+        if (delivererService == null) {
+            System.err.println("ERROR: DelivererService no inicializado en ShipmentService");
+            return;
+        }
+        
+        try {
+            // Encontrar repartidores disponibles
+            List<Deliverer> availableDeliverers = delivererService.findAvailableDeliverers();
+            
+            if (availableDeliverers.isEmpty()) {
+                System.err.println("No hay repartidores disponibles. El envío quedará pendiente.");
+                return;
+            }
+            
+            // Ordenar por distancia al origen
+            IGridCoordinate originCoord = shipment.getOrigin();
+            
+            // Encontrar el más cercano
+            Optional<Deliverer> nearestDeliverer = availableDeliverers.stream()
+                    .min(Comparator.comparingDouble(deliverer -> 
+                        deliverer.distanceTo(originCoord)));
+            
+            if (nearestDeliverer.isPresent()) {
+                Deliverer deliverer = nearestDeliverer.get();
+                
+                // Asignar el envío al repartidor
+                deliverer.getCurrentShipments().add(shipment);
+                
+                // Si el repartidor tiene demasiados envíos, marcarlo como BUSY
+                if (deliverer.getCurrentShipments().size() >= 3) {
+                    deliverer.setStatus(DelivererStatus.BUSY);
+                } else {
+                    deliverer.setStatus(DelivererStatus.ACTIVE);
+                }
+                
+                // Actualizar el repartidor
+                delivererService.update(deliverer);
+                
+                // Actualizar el envío con el repartidor asignado
+                shipment.setDeliverer(deliverer);
+                shipment.setStatus(ShipmentStatus.ASSIGNED);
+                shipment.setAssignmentDate(LocalDateTime.now());
+            } else {
+                System.err.println("Error al calcular el repartidor más cercano.");
+            }
+        } catch (Exception e) {
+            System.err.println("Error al asignar repartidor: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -147,14 +283,44 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
      * @return repartidor disponible o null si no hay ninguno
      */
     private Deliverer findAvailableDeliverer(Shipment shipment) {
-        // Obtenemos la zona de entrega del envío
-        String destinationZone = shipment.getDestination().getZone();
+        if (shipment.getOrigin() == null) {
+            throw new IllegalArgumentException("El envío debe tener un origen definido");
+        }
         
-        // Buscamos repartidores disponibles en esa zona
-        List<Deliverer> availableDeliverers = delivererService.findAvailableDeliverersInZone(destinationZone);
+        // Obtenemos la zona y las coordenadas de origen del envío
+        String originZone = shipment.getOrigin().getZone();
+        double originX = shipment.getOrigin().getCoordX();
+        double originY = shipment.getOrigin().getCoordY();
+        
+        // Primero intentamos encontrar el repartidor más cercano al origen
+        Deliverer nearestDeliverer = delivererService.findNearestAvailableDeliverer(originX, originY, originZone);
+        
+        // Si encontramos un repartidor cercano, lo devolvemos
+        if (nearestDeliverer != null) {
+            System.out.println("Repartidor asignado por proximidad: " + nearestDeliverer.getName() + 
+                            " - Distancia: " + nearestDeliverer.distanceTo(new IGridCoordinate() {
+                                @Override
+                                public double getX() {
+                                    return originX;
+                                }
+                                
+                                @Override
+                                public double getY() {
+                                    return originY;
+                                }
+                            }));
+            return nearestDeliverer;
+        }
+        
+        // Plan B: buscar por zona y carga de trabajo (método anterior)
+        List<Deliverer> availableDeliverers = delivererService.findAvailableDeliverersInZone(originZone);
         
         if (availableDeliverers.isEmpty()) {
-            return null;
+            // Si no hay en la zona de origen, intentamos con cualquier repartidor disponible
+            availableDeliverers = delivererService.getAvailableDeliverers();
+            if (availableDeliverers.isEmpty()) {
+                return null;
+            }
         }
         
         Deliverer bestDeliverer = null;
@@ -205,9 +371,40 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
      * @return envío creado
      */
     public Shipment createShipment(Shipment shipment) {
+        // Configurar el estado inicial y la fecha de creación
         shipment.setStatus(ShipmentStatus.PENDING);
         shipment.setCreationDate(LocalDateTime.now());
-        return repository.save(shipment);
+        
+        // Guardar el envío para asegurar que tenga un ID
+        shipment = repository.save(shipment);
+        
+        // Intentar asignar automáticamente un repartidor
+        try {
+            Deliverer availableDeliverer = findAvailableDeliverer(shipment);
+            
+            if (availableDeliverer != null) {
+                // Asignar el repartidor al envío
+                shipment.setDeliverer(availableDeliverer);
+                shipment.setStatus(ShipmentStatus.ASSIGNED);
+                shipment.setAssignmentDate(LocalDateTime.now());
+                
+                // Actualizar el repartidor
+                delivererService.assignShipment(availableDeliverer, shipment);
+                
+                // Actualizar el envío en la base de datos
+                repository.update(shipment);
+                
+                System.out.println("Envío " + shipment.getId() + " asignado automáticamente al repartidor " 
+                        + availableDeliverer.getName());
+            } else {
+                System.out.println("No se pudo asignar un repartidor automáticamente al envío " + shipment.getId());
+            }
+        } catch (Exception e) {
+            System.err.println("Error al intentar asignar repartidor automáticamente: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return shipment;
     }
 
     /**
@@ -293,5 +490,78 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 .filter(s -> s.getDestination().getZone().equals(zone))
                 .sorted((s1, s2) -> s2.getPriority().compareTo(s1.getPriority()))
                 .toList();
+    }
+    
+    /**
+     * Obtiene todos los envíos de un usuario específico
+     * @param userId ID del usuario
+     * @return lista de envíos del usuario
+     */
+    public List<Shipment> findByUserId(UUID userId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("El ID del usuario no puede ser nulo");
+        }
+        
+        // Filtrar todos los envíos para encontrar los del usuario especificado
+        return repository.findAll().stream()
+                .filter(shipment -> shipment.getUser() != null && 
+                         shipment.getUser().getId().equals(userId))
+                .toList();
+    }
+    
+    /**
+     * Cancela un envío existente
+     * @param shipmentId ID del envío a cancelar
+     * @return true si se canceló correctamente
+     */
+    public boolean cancelShipment(UUID shipmentId) {
+        if (shipmentId == null) {
+            return false;
+        }
+        
+        try {
+            // Encontrar el envío
+            Optional<Shipment> shipmentOpt = repository.findById(shipmentId);
+            if (!shipmentOpt.isPresent()) {
+                return false;
+            }
+            
+            Shipment shipment = shipmentOpt.get();
+            
+            // Verificar que el envío esté en un estado cancelable
+            if (shipment.getStatus() != ShipmentStatus.PENDING && 
+                shipment.getStatus() != ShipmentStatus.ASSIGNED) {
+                return false;
+            }
+            
+            // Si tiene un repartidor asignado, actualizar su estado
+            Deliverer deliverer = shipment.getDeliverer();
+            if (deliverer != null) {
+                // Quitar el envío de la lista del repartidor
+                deliverer.getCurrentShipments().remove(shipment);
+                
+                // Actualizar estado del repartidor
+                if (deliverer.getCurrentShipments().isEmpty()) {
+                    deliverer.setStatus(DelivererStatus.AVAILABLE);
+                } else {
+                    deliverer.setStatus(DelivererStatus.ACTIVE);
+                }
+                
+                // Actualizar el repartidor
+                if (delivererService != null) {
+                    delivererService.update(deliverer);
+                }
+            }
+            
+            // Actualizar el estado del envío
+            shipment.setStatus(ShipmentStatus.CANCELLED);
+            repository.update(shipment);
+            
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error al cancelar envío: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 }

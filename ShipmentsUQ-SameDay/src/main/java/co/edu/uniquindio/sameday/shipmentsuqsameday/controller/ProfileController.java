@@ -72,8 +72,8 @@ public class ProfileController {
             .street(address.getStreet())
             .city(address.getCity())
             .zone(address.getZone())
-            .latitude(address.getCoordX())  // Usamos coordX como latitude para compatibilidad
-            .longitude(address.getCoordY()) // Usamos coordY como longitude para compatibilidad
+            .coordX(address.getCoordX())
+            .coordY(address.getCoordY())
             .build();
     }
     

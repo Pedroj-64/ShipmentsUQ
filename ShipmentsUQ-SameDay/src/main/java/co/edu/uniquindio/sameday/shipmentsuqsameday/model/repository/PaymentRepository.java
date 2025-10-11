@@ -82,6 +82,19 @@ public class PaymentRepository extends BaseRepository<Payment> {
                 .filter(p -> p.getShipment().equals(shipment))
                 .collect(Collectors.toList());
     }
+    
+    /**
+     * Busca pagos por el ID de un envío
+     * @param shipmentId ID del envío
+     * @return lista de pagos asociados al envío
+     */
+    public List<Payment> findByShipmentId(UUID shipmentId) {
+        return findAll().stream()
+                .filter(p -> p.getShipment() != null && 
+                           p.getShipment().getId() != null && 
+                           p.getShipment().getId().equals(shipmentId))
+                .collect(Collectors.toList());
+    }
 
     /**
      * Calcula el total de ingresos en un rango de fechas
