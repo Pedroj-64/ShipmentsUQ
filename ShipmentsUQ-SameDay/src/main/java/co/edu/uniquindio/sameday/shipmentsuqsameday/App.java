@@ -31,6 +31,9 @@ public class App extends Application {
     
     /** Sesión actual del usuario */
     private static Session currentSession;
+    
+    /** Servicios del host para abrir archivos */
+    private static javafx.application.HostServices appHostServices;
 
     /**
      * Método que se ejecuta antes de iniciar la aplicación.
@@ -47,6 +50,9 @@ public class App extends Application {
     
     @Override
     public void start(Stage stage) throws IOException {
+        // Inicializar hostServices para abrir archivos
+        appHostServices = getHostServices();
+        
         // Configurar la escena inicial con la pantalla de login
         Parent root = FXMLLoader.load(App.class.getResource("interfaces/Login.fxml"));
         mainScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
@@ -109,11 +115,19 @@ public class App extends Application {
         }
     }
     
-    /**
-     * Obtiene la sesión actual del usuario
-     * @return la sesión actual
+        /**
+     * Devuelve la sesión actual del usuario.
+     * @return instancia de Session
      */
     public static Session getCurrentSession() {
         return currentSession;
+    }
+    
+    /**
+     * Devuelve los servicios del host para abrir archivos en aplicaciones externas.
+     * @return servicios del host
+     */
+    public static javafx.application.HostServices getAppHostServices() {
+        return appHostServices;
     }
 }

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.geometry.Insets?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            
+            
+            fitToWidth="true"
+            fitToHeight="true"
+            pannable="true">
+    <content>
+        <BorderPane prefWidth="1000.0" prefHeight="700.0">
+            <top>
+                <VBox alignment="CENTER" styleClass="header-container">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20" />
+                    </padding>
+                    <Label text="Dashboard de Métricas" styleClass="title-label" />
+                    <Label text="Información y estadísticas del sistema" styleClass="subtitle-label" />
+                </VBox>
+            </top>
+            <center>
+                <VBox spacing="20" styleClass="content-container">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20" />
+                    </padding>
+                    
+                    <!-- Tarjetas de métricas clave -->
+                    <HBox spacing="15" styleClass="metrics-cards-container">
+                        <VBox styleClass="metric-card">
+                            <Label text="Envíos Totales" styleClass="metric-label" />
+                            <Label fx:id="lbl_totalShipments" text="0" styleClass="metric-value" />
+                        </VBox>
+                        
+                        <VBox styleClass="metric-card">
+                            <Label text="Entregados" styleClass="metric-label" />
+                            <Label fx:id="lbl_deliveredShipments" text="0" styleClass="metric-value" />
+                        </VBox>
+                        
+                        <VBox styleClass="metric-card">
+                            <Label text="En Ruta" styleClass="metric-label" />
+                            <Label fx:id="lbl_inTransitShipments" text="0" styleClass="metric-value" />
+                        </VBox>
+                        
+                        <VBox styleClass="metric-card">
+                            <Label text="Pendientes" styleClass="metric-label" />
+                            <Label fx:id="lbl_pendingShipments" text="0" styleClass="metric-value" />
+                        </VBox>
+                    </HBox>
+                    
+                    <!-- Segunda fila de métricas -->
+                    <HBox spacing="15" styleClass="metrics-cards-container">
+                        <VBox styleClass="metric-card">
+                            <Label text="Usuarios" styleClass="metric-label" />
+                            <Label fx:id="lbl_totalUsers" text="0" styleClass="metric-value" />
+                        </VBox>
+                        
+                        <VBox styleClass="metric-card">
+                            <Label text="Repartidores" styleClass="metric-label" />
+                            <Label fx:id="lbl_totalDeliverers" text="0" styleClass="metric-value" />
+                        </VBox>
+                        
+                        <VBox styleClass="metric-card">
+                            <Label text="Ingresos Totales" styleClass="metric-label" />
+                            <Label fx:id="lbl_totalRevenue" text="$0.00" styleClass="metric-value" />
+                        </VBox>
+                        
+                        <VBox styleClass="metric-card">
+                            <Label text="Ingresos (Mes Actual)" styleClass="metric-label" />
+                            <Label fx:id="lbl_currentMonthRevenue" text="$0.00" styleClass="metric-value" />
+                        </VBox>
+                    </HBox>
+                    
+                    <!-- Ejemplo de gráficos -->
+                    <HBox spacing="15" styleClass="charts-container">
+                        <VBox styleClass="chart-card" HBox.hgrow="ALWAYS">
+                            <Label text="Estados de Envíos" styleClass="chart-title" />
+                            <PieChart fx:id="chart_shipmentStatus" legendVisible="true" VBox.vgrow="ALWAYS" />
+                        </VBox>
+                        <VBox styleClass="chart-card" HBox.hgrow="ALWAYS">
+                            <Label text="Envíos por Mes" styleClass="chart-title" />
+                            <BarChart fx:id="chart_shipmentsByMonth" legendVisible="true" VBox.vgrow="ALWAYS">
+                                <xAxis>
+                                    <CategoryAxis side="BOTTOM" />
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis side="LEFT" label="Cantidad" />
+                                </yAxis>
+                            </BarChart>
+                        </VBox>
+                    </HBox>
+                    
+                    <!-- Gráfico de líneas -->
+                    <HBox spacing="15" styleClass="charts-container">
+                        <VBox styleClass="chart-card" HBox.hgrow="ALWAYS">
+                            <Label text="Ingresos por Mes" styleClass="chart-title" />
+                            <LineChart fx:id="chart_revenueByMonth" legendVisible="true" VBox.vgrow="ALWAYS">
+                                <xAxis>
+                                    <CategoryAxis side="BOTTOM" />
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis side="LEFT" label="Monto ($)" />
+                                </yAxis>
+                            </LineChart>
+                        </VBox>
+                        
+                        <!-- Top repartidores -->
+                        <VBox styleClass="chart-card" HBox.hgrow="ALWAYS">
+                            <Label text="Mejores Repartidores" styleClass="chart-title" />
+                            <GridPane fx:id="grid_topDeliverers" vgap="5" hgap="15" styleClass="top-deliverers-grid">
+                                <padding>
+                                    <Insets top="10" right="10" bottom="10" left="10" />
+                                </padding>
+                                
+                                <!-- Los datos se cargan dinámicamente -->
+                                <columnConstraints>
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="100" prefWidth="150" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="50" prefWidth="80" />
+                                </columnConstraints>
+                            </GridPane>
+                            
+                            <!-- Tiempo promedio de entrega -->
+                            <VBox styleClass="avg-delivery-time" alignment="CENTER">
+                                <padding>
+                                    <Insets top="15" right="10" bottom="10" left="10" />
+                                </padding>
+                                <Label text="Tiempo Promedio de Entrega" styleClass="metric-label" />
+                                <Label fx:id="lbl_avgDeliveryTime" text="0.0 horas" styleClass="metric-value" />
+                            </VBox>
+                        </VBox>
+                    </HBox>
+                </VBox>
+            </center>
+            
+            <!-- Pie de página -->
+            <bottom>
+                <HBox alignment="CENTER_RIGHT" styleClass="footer-container">
+                    <padding>
+                        <Insets top="10" right="20" bottom="10" left="20" />
+                    </padding>
+                    <Label text="Datos actualizados: " styleClass="footer-label" />
+                    <Label text="Hoy" styleClass="footer-value" />
+                </HBox>
+            </bottom>
+        </BorderPane>
+    </content>
+</ScrollPane>

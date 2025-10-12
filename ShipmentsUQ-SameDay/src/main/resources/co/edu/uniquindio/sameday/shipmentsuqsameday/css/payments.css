@@ -13,11 +13,37 @@
     border-color: transparent;
     -fx-padding: 0;
     padding: 0;
+    -fx-fit-to-width: true;
+    -fx-fit-to-height: true;
+    -fx-hbar-policy: as-needed;
+    -fx-vbar-policy: as-needed;
 }
 
 .scroll-pane > .viewport {
     -fx-background-color: transparent;
     background-color: transparent;
+}
+
+/* Estilos para las barras de desplazamiento */
+.scroll-pane .scroll-bar:horizontal,
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: #f0f0f0;
+    background-color: #f0f0f0;
+    -fx-opacity: 0.8;
+    opacity: 0.8;
+}
+
+.scroll-pane .scroll-bar:horizontal .thumb,
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #c0c0c0;
+    background-color: #c0c0c0;
+    -fx-background-radius: 5em;
+}
+
+.scroll-pane .scroll-bar:horizontal .thumb:hover,
+.scroll-pane .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #a0a0a0;
+    background-color: #a0a0a0;
 }
 
 .scroll-bar:vertical,
@@ -70,6 +96,10 @@
     border-color: #e0e0e0;
     -fx-border-width: 0 1px 0 0;
     border-width: 0 1px 0 0;
+    -fx-min-width: 300;
+    min-width: 300px;
+    -fx-pref-width: 320;
+    width: 320px;
 }
 
 /* Título de secciones */
@@ -207,6 +237,10 @@
     background-color: white;
     -fx-padding: 10px;
     padding: 10px;
+    -fx-min-width: 400;
+    min-width: 400px;
+    -fx-hgrow: always;
+    -fx-vgrow: always;
 }
 
 /* Contenedor de filtros */

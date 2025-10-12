@@ -165,7 +165,8 @@ public class DataManager {
             // Usar el DataInitializer para crear datos de prueba
             co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping.DataInitializer.initializeAllTestData(
                 userRepository, 
-                addressRepository
+                addressRepository,
+                delivererRepository
             );
             
             // Actualizar el estado con los datos recién creados

@@ -1,9 +1,12 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.DelivererStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.UserRole;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.AddressRepository;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.DelivererRepository;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.UserRepository;
 
 import java.util.UUID;
@@ -98,12 +101,54 @@ public class DataInitializer {
     }
     
     /**
+     * Inicializa datos de prueba para repartidores
+     * @param delivererRepository Repositorio de repartidores
+     */
+    public static void initializeDeliverers(DelivererRepository delivererRepository) {
+        System.out.println("Inicializando repartidores de prueba...");
+        
+        // Repartidor 1 - Posición (0,0) para pruebas
+        Deliverer deliverer1 = Deliverer.builder()
+                .id(UUID.randomUUID())
+                .name("Juan Pérez")
+                .document("1094123456")
+                .phone("3001112233")
+                .status(DelivererStatus.AVAILABLE)
+                .zone("Centro")
+                .averageRating(4.8)
+                .totalDeliveries(57)
+                .currentX(0.0)  // Posición inicial en coordenada X para pruebas
+                .currentY(0.0)  // Posición inicial en coordenada Y para pruebas
+                .build();
+        delivererRepository.save(deliverer1);
+        
+        // Repartidor 2 - Posición (5,10) para pruebas
+        Deliverer deliverer2 = Deliverer.builder()
+                .id(UUID.randomUUID())
+                .name("Ana Gómez")
+                .document("1094654321")
+                .phone("3002223344")
+                .status(DelivererStatus.AVAILABLE)
+                .zone("Norte")
+                .averageRating(4.6)
+                .totalDeliveries(42)
+                .currentX(5.0)
+                .currentY(10.0)
+                .build();
+        delivererRepository.save(deliverer2);
+        
+        System.out.println("Repartidores de prueba creados: " + delivererRepository.findAll().size());
+    }
+    
+    /**
      * Inicializa todos los datos de prueba
      * @param userRepository Repositorio de usuarios
      * @param addressRepository Repositorio de direcciones
+     * @param delivererRepository Repositorio de repartidores
      */
-    public static void initializeAllTestData(UserRepository userRepository, AddressRepository addressRepository) {
+    public static void initializeAllTestData(UserRepository userRepository, AddressRepository addressRepository, DelivererRepository delivererRepository) {
         initializeUsers(userRepository);
         initializeAddresses(addressRepository, userRepository);
+        initializeDeliverers(delivererRepository);
     }
 }

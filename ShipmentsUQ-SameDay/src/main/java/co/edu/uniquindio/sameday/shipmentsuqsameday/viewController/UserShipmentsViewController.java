@@ -5,12 +5,14 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.UserShipmentsCont
 import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.ShipmentDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -559,19 +561,35 @@ public class UserShipmentsViewController implements Initializable {
     }
     
     /**
-     * Muestra la información de rastreo de un envío
+     * Muestra la información de rastreo de un envío en un mapa
      * @param shipment el envío a rastrear
      */
     private void trackShipment(ShipmentDTO shipment) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Rastreo de Envío");
-        alert.setHeaderText("Información de rastreo del envío " + shipment.getId());
-        
-        // Obtener información de rastreo
-        String trackingInfo = controller.getTrackingInfo(shipment.getId());
-        
-        alert.setContentText(trackingInfo);
-        alert.showAndWait();
+        try {
+            // Cargar el FXML de la ventana de seguimiento
+            FXMLLoader loader = new FXMLLoader(App.class.getResource("interfaces/ShipmentTracking.fxml"));
+            Parent root = loader.load();
+            
+            // Obtener el controlador y pasarle los datos necesarios
+            ShipmentTrackingViewController trackingController = loader.getController();
+            
+            // Iniciar servicio para obtener datos actualizados del envío
+            ShipmentService shipmentService = ShipmentService.getInstance();
+            
+            // Inicializar el controlador con los datos
+            trackingController.initData(shipment, shipmentService);
+            
+            // Crear y mostrar la ventana
+            Stage stage = new Stage();
+            stage.setTitle("Seguimiento de Envío - " + shipment.getId().toString());
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(true);
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("Error al abrir la ventana de seguimiento: " + e.getMessage());
+        }
     }
     
     /**

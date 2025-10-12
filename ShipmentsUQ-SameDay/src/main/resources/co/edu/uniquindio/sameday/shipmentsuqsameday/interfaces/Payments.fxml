@@ -10,9 +10,12 @@
             stylesheets="@../css/payments.css"
             fitToWidth="true"
             fitToHeight="true"
-            pannable="true">
+            pannable="true"
+            hbarPolicy="AS_NEEDED"
+            vbarPolicy="AS_NEEDED"
+            fx:id="mainScrollPane">
     <content>
-        <BorderPane prefWidth="950.0" prefHeight="600.0">
+        <BorderPane prefWidth="1000.0" prefHeight="600.0" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
 
             <!-- Zona superior (top) -->
             <top>
@@ -26,7 +29,7 @@
     
     <!-- Zona izquierda (left) - Formulario de pago simulado -->
     <left>
-        <VBox styleClass="form-container" prefWidth="320" maxWidth="320">
+        <VBox styleClass="form-container" prefWidth="320" minWidth="300" HBox.hgrow="NEVER">
             <padding>
                 <Insets top="15" right="15" bottom="15" left="15" />
             </padding>
@@ -123,7 +126,7 @@
     
     <!-- Zona central (center) - Historial de pagos -->
     <center>
-        <VBox spacing="10" styleClass="history-container">
+        <VBox spacing="10" styleClass="history-container" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
             <padding>
                 <Insets top="15" right="15" bottom="15" left="15" />
             </padding>
@@ -141,7 +144,10 @@
             </HBox>
             
             <!-- Tabla de pagos -->
-            <TableView fx:id="tbl_payments" VBox.vgrow="ALWAYS" maxHeight="350">
+            <TableView fx:id="tbl_payments" VBox.vgrow="ALWAYS" minHeight="200" maxHeight="Infinity">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
                 <columns>
                     <TableColumn fx:id="col_id" text="ID Pago" prefWidth="70" />
                     <TableColumn fx:id="col_date" text="Fecha" prefWidth="90" />

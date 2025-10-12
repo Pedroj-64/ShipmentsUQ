@@ -378,6 +378,9 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         // Guardar el envío para asegurar que tenga un ID
         shipment = repository.save(shipment);
         
+        // Guardar el estado para persistencia
+        co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager.getInstance().saveState();
+        
         // Intentar asignar automáticamente un repartidor
         try {
             Deliverer availableDeliverer = findAvailableDeliverer(shipment);
@@ -509,6 +512,61 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 .toList();
     }
     
+    /**
+     * Intenta asignar un repartidor disponible a un envío pagado
+     * @param shipmentId ID del envío a asignar
+     * @return true si se asignó correctamente, false si no se pudo asignar
+     */
+    public boolean tryAssignDeliverer(UUID shipmentId) {
+        if (shipmentId == null) {
+            return false;
+        }
+        
+        Optional<Shipment> shipmentOpt = repository.findById(shipmentId);
+        if (shipmentOpt.isEmpty()) {
+            return false;
+        }
+        
+        Shipment shipment = shipmentOpt.get();
+        
+        // Solo se pueden asignar envíos pendientes
+        if (shipment.getStatus() != ShipmentStatus.PENDING) {
+            return false;
+        }
+        
+        // Intentar asignar automáticamente un repartidor
+        try {
+            Deliverer availableDeliverer = findAvailableDeliverer(shipment);
+            
+            if (availableDeliverer != null) {
+                // Asignar el repartidor al envío
+                shipment.setDeliverer(availableDeliverer);
+                shipment.setStatus(ShipmentStatus.ASSIGNED);
+                shipment.setAssignmentDate(LocalDateTime.now());
+                
+                // Actualizar el repartidor
+                delivererService.assignShipment(availableDeliverer, shipment);
+                
+                // Actualizar el envío en la base de datos
+                repository.update(shipment);
+                
+                // Guardar el estado para persistencia
+                co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager.getInstance().saveState();
+                
+                System.out.println("Envío " + shipment.getId() + " asignado automáticamente al repartidor " 
+                        + availableDeliverer.getName());
+                return true;
+            } else {
+                System.out.println("No se pudo asignar un repartidor automáticamente al envío " + shipment.getId());
+                return false;
+            }
+        } catch (Exception e) {
+            System.err.println("Error al intentar asignar un repartidor al envío " + shipment.getId() + ": " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     /**
      * Cancela un envío existente
      * @param shipmentId ID del envío a cancelar

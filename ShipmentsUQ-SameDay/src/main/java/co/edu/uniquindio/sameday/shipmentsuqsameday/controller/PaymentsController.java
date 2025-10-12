@@ -1,8 +1,10 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.controller;
 
+import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.ServiceInitializer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Payment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.HtmlGenerator;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.UserPaymentMethod;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.PaymentDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.UserPaymentMethodDTO;
@@ -34,7 +36,7 @@ public class PaymentsController {
      */
     public PaymentsController() {
         // Inicializamos los servicios antes de usarlos
-        co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.ServiceInitializer.initializeServices();
+        ServiceInitializer.initializeServices();
         
         this.paymentService = PaymentService.getInstance();
         this.shipmentService = ShipmentService.getInstance();
@@ -178,7 +180,31 @@ public class PaymentsController {
             
             Payment processedPayment = paymentService.processPayment(shipment, paymentMethod);
             
-            return processedPayment.getStatus() == PaymentStatus.COMPLETED;
+            boolean paymentSuccess = processedPayment.getStatus() == PaymentStatus.COMPLETED;
+            
+            // Si el pago fue exitoso, intentar asignar un repartidor
+            if (paymentSuccess) {
+                try {
+                    // Intentar asignar repartidor
+                    boolean assignmentSuccess = shipmentService.tryAssignDeliverer(shipment.getId());
+                    
+                    if (assignmentSuccess) {
+                        System.out.println("Pago exitoso y repartidor asignado automáticamente para el envío: " 
+                            + shipment.getId());
+                    } else {
+                        System.out.println("Pago exitoso pero no se pudo asignar un repartidor automáticamente para el envío: " 
+                            + shipment.getId());
+                    }
+                    
+                    // Guardar el estado actualizado después del pago y asignación
+                    co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager.getInstance().saveState();
+                } catch (Exception ex) {
+                    System.err.println("Error al intentar asignar repartidor después del pago: " + ex.getMessage());
+                    // No afectamos el resultado del pago si falla la asignación
+                }
+            }
+            
+            return paymentSuccess;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -186,9 +212,9 @@ public class PaymentsController {
     }
     
     /**
-     * Obtiene un comprobante de pago
+     * Obtiene un comprobante de pago y lo guarda como HTML en la carpeta de descargas
      * @param paymentId ID del pago
-     * @return URL o ruta al comprobante
+     * @return Ruta completa al archivo de comprobante generado, o null si hay error
      */
     public String getPaymentReceipt(UUID paymentId) {
         try {
@@ -197,10 +223,10 @@ public class PaymentsController {
                 return null;
             }
             
-            // Aquí podríamos generar un PDF o documento con el comprobante
-            // Por ahora solo devolvemos una referencia
             Payment payment = paymentOpt.get();
-            return "receipt_" + payment.getPaymentReference() + ".pdf";
+            
+            // Generar el comprobante HTML utilizando la clase HtmlGenerator
+            return HtmlGenerator.generatePaymentReceipt(payment);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -208,8 +234,8 @@ public class PaymentsController {
     }
     
     /**
-     * Genera un reporte de pagos
-     * @return URL o ruta al reporte generado
+     * Genera un reporte de pagos y lo guarda como HTML en la carpeta de descargas
+     * @return Ruta completa al archivo del reporte generado, o null si hay error
      */
     public String generatePaymentReport() {
         try {
@@ -217,14 +243,11 @@ public class PaymentsController {
                 return null;
             }
             
+            // Obtener la lista de pagos del usuario actual
             List<Payment> payments = paymentService.findByUser(currentUser.getId());
             
-            // Aquí generaríamos un reporte de pagos
-            // Por ahora solo devolvemos una referencia
-            String reportName = "payment_report_" + currentUser.getId() + "_" + 
-                    LocalDateTime.now().toString().replace(":", "-") + ".pdf";
-                    
-            return reportName;
+            // Generar el reporte HTML utilizando la clase HtmlGenerator
+            return HtmlGenerator.generatePaymentReport(currentUser, payments);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

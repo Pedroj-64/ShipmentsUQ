@@ -6,7 +6,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import javafx.application.HostServices;
 
+import co.edu.uniquindio.sameday.shipmentsuqsameday.App;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.PaymentsController;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.PaymentDTO;
@@ -29,12 +31,22 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+
+import java.io.File;
+import java.net.URI;
+import java.util.Optional;
+
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
 
 /**
  * Controlador de vista para la pantalla de gestión de pagos.
@@ -67,8 +79,9 @@ public class PaymentsViewController implements Initializable {
     @FXML private Label lbl_status;
     @FXML private VBox vbox_paymentMethodInfo;
     
-    // Controlador de negocio
+    // Controladores de negocio
     private PaymentsController controller;
+    private ShipmentService shipmentService;
     
     // Listas para los pagos y métodos de pago
     private ObservableList<PaymentDTO> payments;
@@ -79,9 +92,65 @@ public class PaymentsViewController implements Initializable {
         // Inicializar controlador y componentes
         initController();
         setupUIControls();
+        configureScrollPane();
         loadPaymentMethods();
         loadPaymentHistory();
         setupEventHandlers();
+    }
+    
+    @FXML
+    private ScrollPane mainScrollPane;
+    
+    /**
+     * Configura el ScrollPane para asegurar que se adapte adecuadamente al redimensionar la ventana
+     */
+    private void configureScrollPane() {
+        try {
+            if (mainScrollPane != null) {
+                // Configuramos el ScrollPane para que se adapte a la ventana
+                mainScrollPane.setFitToWidth(true);
+                mainScrollPane.setFitToHeight(true);
+                mainScrollPane.setPannable(true);
+                
+                // Configuramos las políticas de barras de desplazamiento
+                mainScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+                mainScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+                
+                // Añadimos listener para redimensionar contenido cuando cambie el tamaño de la ventana
+                mainScrollPane.widthProperty().addListener((obs, oldVal, newVal) -> {
+                    adjustContentSize(mainScrollPane);
+                });
+                
+                mainScrollPane.heightProperty().addListener((obs, oldVal, newVal) -> {
+                    adjustContentSize(mainScrollPane);
+                });
+                
+                // Configurar la tabla para que se ajuste al espacio disponible
+                if (tbl_payments != null) {
+                    // Usando callback personalizado en lugar de CONSTRAINED_RESIZE_POLICY
+                    tbl_payments.setColumnResizePolicy(param -> true);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error al configurar ScrollPane: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Ajusta el tamaño del contenido del ScrollPane cuando la ventana cambia de tamaño
+     */
+    private void adjustContentSize(ScrollPane scrollPane) {
+        if (scrollPane != null && scrollPane.getContent() != null) {
+            BorderPane content = (BorderPane) scrollPane.getContent();
+            
+            // Ajustamos el tamaño del contenido en función del tamaño del ScrollPane
+            double width = scrollPane.getViewportBounds().getWidth();
+            double height = scrollPane.getViewportBounds().getHeight();
+            
+            // Aseguramos un tamaño mínimo
+            content.setPrefWidth(Math.max(width, 1000));
+            content.setPrefHeight(Math.max(height, 600));
+        }
     }
     
     /**
@@ -98,15 +167,34 @@ public class PaymentsViewController implements Initializable {
             try {
                 UUID id = UUID.fromString(shipmentId);
                 Double amount = controller.getShipmentAmount(id);
-                if (amount != null) {
-                    txt_amount.setText(String.format("%.2f", amount));
-                }
                 
-                // Informar al usuario
-                lbl_status.setText("Información de envío cargada. Complete el formulario para realizar el pago.");
-                lbl_status.setStyle("-fx-text-fill: #27ae60;");
+                if (amount != null) {
+                    if (amount > 0) {
+                        // Hay monto por pagar, habilitar formulario
+                        txt_amount.setText(String.format("%.2f", amount));
+                        btn_pay.setDisable(false);
+                        
+                        // Informar al usuario
+                        lbl_status.setText("Información de envío cargada. Complete el formulario para realizar el pago.");
+                        lbl_status.setStyle("-fx-text-fill: #27ae60;");
+                    } else {
+                        // El envío ya está pagado, deshabilitar formulario
+                        txt_amount.setText("0.00");
+                        btn_pay.setDisable(true);
+                        
+                        // Informar al usuario
+                        lbl_status.setText("Este envío ya ha sido pagado. No se requiere ninguna acción adicional.");
+                        lbl_status.setStyle("-fx-text-fill: #3498db;");
+                    }
+                } else {
+                    // No se pudo obtener información del envío
+                    btn_pay.setDisable(true);
+                    lbl_status.setText("No se encontró información de pago para este envío.");
+                    lbl_status.setStyle("-fx-text-fill: #e74c3c;");
+                }
             } catch (Exception e) {
                 // Si ocurre un error al cargar la información del envío
+                btn_pay.setDisable(true);
                 lbl_status.setText("ID de envío cargado. No se pudo obtener el monto automáticamente.");
                 lbl_status.setStyle("-fx-text-fill: #e67e22;");
             }
@@ -119,10 +207,11 @@ public class PaymentsViewController implements Initializable {
     private void initController() {
         try {
             controller = new PaymentsController();
+            shipmentService = ShipmentService.getInstance();
         } catch (Exception e) {
-            System.err.println("Error al inicializar PaymentsController: " + e.getMessage());
+            System.err.println("Error al inicializar controladores: " + e.getMessage());
             e.printStackTrace();
-            showAlert("Error de inicialización", "No se pudo inicializar el controlador de pagos", 
+            showAlert("Error de inicialización", "No se pudo inicializar los controladores", 
                     "Error: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
@@ -397,8 +486,25 @@ public class PaymentsViewController implements Initializable {
             boolean success = controller.processPayment(shipmentId, amount, paymentMethod, dueDate, reference);
             
             if (success) {
-                showAlert("Éxito", "Pago procesado", 
-                        "El pago se ha procesado correctamente", Alert.AlertType.INFORMATION);
+                // Verificar el estado del envío después del pago
+                UUID shipmentUUID = UUID.fromString(shipmentId);
+                Optional<Shipment> shipmentOpt = shipmentService.findById(shipmentUUID);
+                String message = "El pago se ha procesado correctamente.";
+                
+                // Si el envío está asignado, informar al usuario
+                if (shipmentOpt.isPresent() && shipmentOpt.get().getStatus() == ShipmentStatus.ASSIGNED) {
+                    Deliverer deliverer = shipmentOpt.get().getDeliverer();
+                    if (deliverer != null) {
+                        message += "\n\nSu envío ha sido asignado automáticamente al repartidor " + 
+                                deliverer.getName() + ".";
+                    } else {
+                        message += "\n\nSu envío ha sido asignado y está listo para entrega.";
+                    }
+                } else {
+                    message += "\n\nSu envío está siendo procesado. Pronto será asignado a un repartidor.";
+                }
+                
+                showAlert("Éxito", "Pago procesado", message, Alert.AlertType.INFORMATION);
                 clearPaymentForm();
                 loadPaymentHistory(); // Recargar historial con el nuevo pago
             } else {
@@ -485,16 +591,35 @@ public class PaymentsViewController implements Initializable {
      * Visualiza el comprobante de un pago
      */
     private void viewReceipt(UUID paymentId) {
-        String receiptPath = controller.getPaymentReceipt(paymentId);
-        
-        if (receiptPath != null) {
-            // En una implementación real abriríamos el PDF
-            // Aquí solo mostramos un mensaje de información
-            showAlert("Comprobante", "Visualizando comprobante", 
-                    "Comprobante: " + receiptPath, Alert.AlertType.INFORMATION);
-        } else {
-            showAlert("Error", "Comprobante no disponible", 
-                    "No se pudo obtener el comprobante del pago", Alert.AlertType.ERROR);
+        try {
+            String receiptPath = controller.getPaymentReceipt(paymentId);
+            
+            if (receiptPath != null) {
+                // Crear un objeto File para el comprobante
+                File receiptFile = new File(receiptPath);
+                
+                // Comprobar que existe
+                if (receiptFile.exists()) {
+                    // Abrir el archivo HTML en el navegador por defecto usando hostServices
+                    App.getAppHostServices().showDocument(receiptFile.toURI().toString());
+                    
+                    // Mostrar mensaje informativo
+                    showAlert("Comprobante", "Comprobante generado", 
+                            "El comprobante se ha generado y abierto en su navegador.\nArchivo: " + receiptPath, 
+                            Alert.AlertType.INFORMATION);
+                } else {
+                    showAlert("Error", "Comprobante no encontrado", 
+                            "El archivo del comprobante no se encuentra en la ubicación esperada", 
+                            Alert.AlertType.ERROR);
+                }
+            } else {
+                showAlert("Error", "Comprobante no disponible", 
+                        "No se pudo generar el comprobante del pago", Alert.AlertType.ERROR);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Error al abrir el comprobante", 
+                    "No se pudo abrir el archivo: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
     
@@ -502,16 +627,35 @@ public class PaymentsViewController implements Initializable {
      * Descarga un reporte de pagos
      */
     private void downloadReport() {
-        String reportPath = controller.generatePaymentReport();
-        
-        if (reportPath != null) {
-            // En una implementación real descargaríamos el PDF
-            // Aquí solo mostramos un mensaje de información
-            showAlert("Reporte", "Descargando reporte", 
-                    "Reporte guardado como: " + reportPath, Alert.AlertType.INFORMATION);
-        } else {
-            showAlert("Error", "Reporte no disponible", 
-                    "No se pudo generar el reporte de pagos", Alert.AlertType.ERROR);
+        try {
+            String reportPath = controller.generatePaymentReport();
+            
+            if (reportPath != null) {
+                // Crear un objeto File para el reporte
+                File reportFile = new File(reportPath);
+                
+                // Comprobar que existe
+                if (reportFile.exists()) {
+                    // Abrir el archivo HTML en el navegador por defecto usando hostServices
+                    App.getAppHostServices().showDocument(reportFile.toURI().toString());
+                    
+                    // Mostrar mensaje informativo
+                    showAlert("Reporte", "Reporte generado", 
+                            "El reporte se ha generado y abierto en su navegador.\nArchivo: " + reportPath, 
+                            Alert.AlertType.INFORMATION);
+                } else {
+                    showAlert("Error", "Reporte no encontrado", 
+                            "El archivo del reporte no se encuentra en la ubicación esperada", 
+                            Alert.AlertType.ERROR);
+                }
+            } else {
+                showAlert("Error", "Reporte no disponible", 
+                        "No se pudo generar el reporte de pagos", Alert.AlertType.ERROR);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error", "Error al abrir el reporte", 
+                    "No se pudo abrir el archivo: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
     

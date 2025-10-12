@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprobante de Pago - ShipmentsUQ</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2980b9;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            color: #2980b9;
+            margin: 0;
+        }
+        .company-info {
+            margin-bottom: 20px;
+        }
+        .receipt-details {
+            margin-bottom: 30px;
+        }
+        .receipt-details h2 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            color: #2980b9;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+            border-bottom: 1px solid #f9f9f9;
+        }
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .shipment-info {
+            margin-top: 20px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .payment-status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 0.8em;
+            color: #777;
+        }
+        @media print {
+            body {
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ShipmentsUQ - Comprobante de Pago</h1>
+            <p>Envíos rápidos y seguros para ti</p>
+        </div>
+        
+        <div class="company-info">
+            <p><strong>ShipmentsUQ SameDay</strong><br>
+            Universidad del Quindío<br>
+            Armenia, Quindío<br>
+            NIT: 890.000.432-8</p>
+        </div>
+        
+        <div class="receipt-details">
+            <h2>Detalles del Pago</h2>
+            <div class="detail-row">
+                <span class="detail-label">Referencia de Pago:</span>
+                <span>${paymentReference}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Fecha:</span>
+                <span>${paymentDate}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">ID del Pago:</span>
+                <span>${paymentId}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Método de Pago:</span>
+                <span>${paymentMethod}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Monto:</span>
+                <span>$${amount}</span>
+            </div>
+            
+            <div class="payment-status ${statusClass}">
+                Estado: ${status}
+            </div>
+        </div>
+        
+        <div class="shipment-info">
+            <h3>Información del Envío</h3>
+            <div class="detail-row">
+                <span class="detail-label">ID del Envío:</span>
+                <span>${shipmentId}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Cliente:</span>
+                <span>${customerName}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Origen:</span>
+                <span>${originAddress}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Destino:</span>
+                <span>${destinationAddress}</span>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Este documento sirve como comprobante oficial de su pago. Guarde este documento para futura referencia.</p>
+            <p>Generado el ${generationDate}</p>
+        </div>
+    </div>
+</body>
+</html>
