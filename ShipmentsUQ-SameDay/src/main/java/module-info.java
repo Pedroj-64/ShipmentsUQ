@@ -36,6 +36,10 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.internalController;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.util;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping;
-
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.service;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository;
     
+    // Exportar el paquete de decoradores
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator to javafx.base;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator;
 }

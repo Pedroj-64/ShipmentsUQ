@@ -5,6 +5,9 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Incident;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.command.AssignDelivererCommand;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.command.CancelShipmentCommand;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.command.CommandManager;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.DelivererStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.IncidentType;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentPriority;
@@ -425,9 +428,10 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         }
 
         if (delivererService.assignShipment(deliverer, shipment)) {
-            shipment.setDeliverer(deliverer);
-            shipment.setStatus(ShipmentStatus.ASSIGNED);
-            shipment.setAssignmentDate(LocalDateTime.now());
+            // Usar el patrón Command para asignar el repartidor
+            AssignDelivererCommand assignCommand = new AssignDelivererCommand(shipment, deliverer);
+            CommandManager.getInstance().executeCommand(assignCommand);
+            
             return repository.update(shipment);
         } else {
             throw new IllegalStateException("El repartidor no puede aceptar más envíos en este momento");
@@ -611,13 +615,46 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 }
             }
             
-            // Actualizar el estado del envío
-            shipment.setStatus(ShipmentStatus.CANCELLED);
+            // Usar el patrón Command para cancelar el envío
+            CancelShipmentCommand cancelCommand = new CancelShipmentCommand(shipment);
+            CommandManager.getInstance().executeCommand(cancelCommand);
+            
+            // Actualizar el envío en el repositorio
             repository.update(shipment);
             
             return true;
         } catch (Exception e) {
             System.err.println("Error al cancelar envío: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Deshace la última operación realizada en envíos
+     * @return true si se deshizo la operación correctamente
+     */
+    public boolean undoLastOperation() {
+        try {
+            boolean result = CommandManager.getInstance().undoLastCommand();
+            return result;
+        } catch (Exception e) {
+            System.err.println("Error al deshacer operación: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Rehace la última operación deshecha en envíos
+     * @return true si se rehizo la operación correctamente
+     */
+    public boolean redoLastOperation() {
+        try {
+            boolean result = CommandManager.getInstance().redoLastCommand();
+            return result;
+        } catch (Exception e) {
+            System.err.println("Error al rehacer operación: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

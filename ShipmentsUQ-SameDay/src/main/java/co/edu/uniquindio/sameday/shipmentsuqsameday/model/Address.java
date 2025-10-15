@@ -18,69 +18,75 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class Address implements Serializable, IGridCoordinate {
-    
-    /** Constante para la serialización */
+
     private static final long serialVersionUID = 1L;
     private UUID id;
     private String alias;
     private String street;
-    private String zone;    // Zona o sector de la ciudad
+    private String zone;
     private String city;
     private String zipCode;
     private String complement;
-    private double coordX;  // Coordenada X en el mapa de cuadrícula
-    private double coordY;  // Coordenada Y en el mapa de cuadrícula
+    private double coordX;
+    private double coordY;
     private boolean isDefault;
-    
+
     /**
      * Implementación de IGridCoordinate para obtener la coordenada X
+     * 
      * @return coordenada X de la dirección
      */
     @Override
     public double getX() {
         return coordX;
     }
-    
+
     /**
      * Implementación de IGridCoordinate para obtener la coordenada Y
+     * 
      * @return coordenada Y de la dirección
      */
     @Override
     public double getY() {
         return coordY;
     }
-    
+
     /**
      * Obtiene la dirección completa formateada
+     * 
      * @return String con la dirección completa
      */
     public String getFullAddress() {
         StringBuilder sb = new StringBuilder();
-        
+
         if (street != null && !street.isEmpty()) {
             sb.append(street);
         }
-        
+
         if (complement != null && !complement.isEmpty()) {
-            if (sb.length() > 0) sb.append(", ");
+            if (sb.length() > 0)
+                sb.append(", ");
             sb.append(complement);
         }
-        
+
         if (zone != null && !zone.isEmpty()) {
-            if (sb.length() > 0) sb.append(", ");
+            if (sb.length() > 0)
+                sb.append(", ");
             sb.append(zone);
         }
-        
+
         if (city != null && !city.isEmpty()) {
-            if (sb.length() > 0) sb.append(", ");
+            if (sb.length() > 0)
+                sb.append(", ");
             sb.append(city);
         }
-        
+
         if (zipCode != null && !zipCode.isEmpty()) {
-            if (sb.length() > 0) sb.append(" - ");
+            if (sb.length() > 0)
+                sb.append(" - ");
             sb.append(zipCode);
         }
-        
+
         return sb.length() > 0 ? sb.toString() : "Dirección no especificada";
     }
 }

@@ -71,6 +71,8 @@ public class UserShipmentsViewController implements Initializable {
     @FXML private Button btn_editShipment;
     @FXML private Button btn_cancelShipment;
     @FXML private Button btn_refreshShipments;
+    @FXML private Button btn_undoOperation;
+    @FXML private Button btn_redoOperation;
 
     // Controlador
     private UserShipmentsController controller;
@@ -95,6 +97,9 @@ public class UserShipmentsViewController implements Initializable {
             
             // Cargar datos iniciales
             loadShipments();
+            
+            // Actualizar estado de botones de deshacer/rehacer
+            updateUndoRedoButtons();
         } catch (Exception e) {
             showError("Error al inicializar: " + e.getMessage());
             e.printStackTrace();
@@ -250,6 +255,30 @@ public class UserShipmentsViewController implements Initializable {
         // Botón de refrescar
         btn_refreshShipments.setOnAction(event -> loadShipments());
         
+        // Botón de deshacer operación
+        btn_undoOperation.setOnAction(event -> {
+            boolean success = controller.undoLastOperation();
+            if (success) {
+                showInfo("Operación deshecha correctamente.");
+                loadShipments(); // Recargar envíos para reflejar los cambios
+            } else {
+                showError("No hay operaciones para deshacer.");
+            }
+            updateUndoRedoButtons();
+        });
+        
+        // Botón de rehacer operación
+        btn_redoOperation.setOnAction(event -> {
+            boolean success = controller.redoLastOperation();
+            if (success) {
+                showInfo("Operación rehecha correctamente.");
+                loadShipments(); // Recargar envíos para reflejar los cambios
+            } else {
+                showError("No hay operaciones para rehacer.");
+            }
+            updateUndoRedoButtons();
+        });
+        
         // Botón de rastrear envío
         btn_trackShipment.setOnAction(event -> {
             ShipmentDTO selected = tbl_shipments.getSelectionModel().getSelectedItem();
@@ -280,6 +309,8 @@ public class UserShipmentsViewController implements Initializable {
         btn_trackShipment.setDisable(true);
         btn_copyShipmentId.setDisable(true);
         btn_payShipment.setDisable(true);
+        btn_undoOperation.setDisable(true);
+        btn_redoOperation.setDisable(true);
     }
     
     /**
@@ -298,6 +329,9 @@ public class UserShipmentsViewController implements Initializable {
             
             // Crear filtered list
             filteredShipments = new FilteredList<>(shipmentsList);
+            
+            // Actualizar los botones de deshacer/rehacer
+            updateUndoRedoButtons();
             
             // Asignar a la tabla
             tbl_shipments.setItems(filteredShipments);
@@ -400,6 +434,15 @@ public class UserShipmentsViewController implements Initializable {
                     break;
                 case CANCELLED:
                     statusStyle += "-fx-text-fill: red;";
+                    break;
+                case INCIDENT:
+                    statusStyle += "-fx-text-fill: #e74c3c;";
+                    break;
+                case PENDING_REASSIGNMENT:
+                    statusStyle += "-fx-text-fill: #f39c12;";
+                    break;
+                default:
+                    statusStyle += "-fx-text-fill: gray;";
                     break;
             }
         }
@@ -540,7 +583,7 @@ public class UserShipmentsViewController implements Initializable {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Cancelar Envío");
         alert.setHeaderText("¿Está seguro que desea cancelar este envío?");
-        alert.setContentText("Esta acción no se puede deshacer.");
+        alert.setContentText("Esta operación se puede deshacer después usando el botón 'Deshacer'.");
         
         alert.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
@@ -550,6 +593,7 @@ public class UserShipmentsViewController implements Initializable {
                     if (success) {
                         loadShipments(); // Recargar la lista
                         showInfo("Envío cancelado exitosamente.");
+                        updateUndoRedoButtons(); // Actualizar botones de deshacer/rehacer
                     } else {
                         showError("No se pudo cancelar el envío.");
                     }
@@ -614,6 +658,21 @@ public class UserShipmentsViewController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    
+    /**
+     * Actualiza el estado de los botones de deshacer y rehacer
+     * según la disponibilidad de operaciones
+     */
+    private void updateUndoRedoButtons() {
+        try {
+            btn_undoOperation.setDisable(!controller.canUndo());
+            btn_redoOperation.setDisable(!controller.canRedo());
+        } catch (Exception e) {
+            // Si hay algún error, deshabilitamos ambos botones
+            btn_undoOperation.setDisable(true);
+            btn_redoOperation.setDisable(true);
+        }
     }
     
     /**

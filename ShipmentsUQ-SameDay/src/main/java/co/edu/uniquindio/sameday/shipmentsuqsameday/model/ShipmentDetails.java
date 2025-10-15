@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Data
 @Builder
 public class ShipmentDetails implements Serializable {
-    /** Constante para la serialización */
+
     private static final long serialVersionUID = 1L;
     private final double distance;
     private final double baseCost;

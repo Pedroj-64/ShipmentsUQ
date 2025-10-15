@@ -36,7 +36,6 @@ public class UserDashboardViewController implements Initializable {
     @FXML private Button btn_addresses;
     @FXML private Button btn_shipments;
     @FXML private Button btn_payments;
-    @FXML private Button btn_history;
     @FXML private Button btn_settings;
     @FXML private Button btn_help;
     @FXML private StackPane stk_contentArea;
@@ -87,7 +86,6 @@ public class UserDashboardViewController implements Initializable {
         btn_addresses.setOnAction(event -> loadModule("ProfileAndAddresses.fxml", "Direcciones"));
         btn_shipments.setOnAction(event -> loadModule("UserShipments.fxml", "Envíos"));
         btn_payments.setOnAction(event -> loadModule("Payments.fxml", "Pagos"));
-        // Removido el botón de historial ya que usa la misma interfaz que Envíos
         
         // Botones de configuración
         btn_settings.setOnAction(event -> handleSettings());

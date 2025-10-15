@@ -21,7 +21,6 @@ import java.util.UUID;
 @Builder
 public class Deliverer implements Serializable, IGridCoordinate {
     
-    /** Constante para la serialización */
     private static final long serialVersionUID = 1L;
     private UUID id;
     private String name;
@@ -31,14 +30,14 @@ public class Deliverer implements Serializable, IGridCoordinate {
     private String zone;
     private double averageRating;
     private int totalDeliveries;
-    private double currentX;  // Coordenada X actual en el GridMap
-    private double currentY;  // Coordenada Y actual en el GridMap
-    
+    private double currentX;
+    private double currentY;
+
     @Builder.Default
     private List<Shipment> currentShipments = new ArrayList<>();
     
     @Builder.Default
-    private List<Shipment> shipmentHistory = new ArrayList();
+    private List<Shipment> shipmentHistory = new ArrayList<>();
     
     /**
      * Implementación de IGridCoordinate para obtener la coordenada X

@@ -359,6 +359,46 @@
     background-color: #7f8c8d;
 }
 
+/* Estilos para el botón de deshacer */
+.undo-button {
+    -fx-background-color: #3498db;
+    background-color: #3498db;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.undo-button:hover {
+    -fx-background-color: #2980b9;
+    background-color: #2980b9;
+}
+
+/* Estilos para el botón de rehacer */
+.redo-button {
+    -fx-background-color: #9b59b6;
+    background-color: #9b59b6;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.redo-button:hover {
+    -fx-background-color: #8e44ad;
+    background-color: #8e44ad;
+}
+
 /* Estilo para el ScrollPane principal */
 .main-scroll-pane {
     -fx-background-color: transparent;

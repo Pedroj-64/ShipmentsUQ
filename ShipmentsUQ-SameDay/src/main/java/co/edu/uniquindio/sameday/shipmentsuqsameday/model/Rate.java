@@ -17,30 +17,29 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class Rate implements Serializable {
-    
-    /** Constante para la serialización */
+
     private static final long serialVersionUID = 1L;
     private UUID id;
-    
-    private LocalDateTime effectiveFrom;    // Fecha desde la que aplica la tarifa
-    private LocalDateTime effectiveUntil;   // Fecha hasta la que aplica la tarifa (null si es la actual)
-    private boolean isActive;               // Indica si es la tarifa actualmente vigente
-    
-    @Builder.Default
-    private final double baseRate = 5000.0;        // Tarifa base en pesos
-    
-    @Builder.Default
-    private final double costPerKm = 1000.0;       // Costo por kilómetro
+
+    private LocalDateTime effectiveFrom;
+    private LocalDateTime effectiveUntil;
+    private boolean isActive;
 
     @Builder.Default
-    private final double costPerKg = 2000.0;       // Costo por kilogramo
+    private final double baseRate = 5000.0; 
 
     @Builder.Default
-    private final double costPerM3 = 10000.0;      // Costo por metro cúbico
+    private final double costPerKm = 1000.0; 
 
     @Builder.Default
-    private final double insuranceSurcharge = 0.1;  // 10% de recargo por seguro
+    private final double costPerKg = 2000.0; 
 
     @Builder.Default
-    private final double fragileSurcharge = 0.15;   // 15% de recargo por paquete frágil
+    private final double costPerM3 = 10000.0; 
+
+    @Builder.Default
+    private final double insuranceSurcharge = 0.1; // 10% de IVA por seguro
+
+    @Builder.Default
+    private final double fragileSurcharge = 0.15; // 15% de IVA por paquete frágil
 }

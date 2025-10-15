@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.io.Serializable;
 import java.util.UUID;
 
@@ -17,8 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class UserPaymentMethod implements Serializable {
-    
-    /** Constante para la serialización */
+
     private static final long serialVersionUID = 1L;
     private UUID id;
     private User user;
@@ -27,11 +25,7 @@ public class UserPaymentMethod implements Serializable {
     private String lastFourDigits;
     private String cardType;
     private boolean isDefault;
-    
-    // Para métodos digitales (Nequi, Daviplata, etc.)
     private String phoneNumber;
-    
-    // Para PSE
     private String bankName;
     private String accountType;
 }

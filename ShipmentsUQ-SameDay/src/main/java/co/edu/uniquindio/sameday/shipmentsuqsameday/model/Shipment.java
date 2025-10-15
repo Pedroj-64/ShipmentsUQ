@@ -3,18 +3,14 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.model;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentPriority;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.Observable;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.Observable;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.Observer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +23,6 @@ import java.util.UUID;
 @Builder
 public class Shipment implements Observable {
     
-    /** Constante para la serialización */
     private static final long serialVersionUID = 1L;
     private UUID id;
     private User user;

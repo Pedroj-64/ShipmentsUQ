@@ -5,10 +5,14 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.ShipmentServiceRegistry;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.command.CommandManager;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.AddressDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.ShipmentDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.ShipmentRepository;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.DelivererService;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.Service;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService;
 
@@ -26,7 +30,12 @@ import java.util.stream.Collectors;
  */
 public class UserShipmentsController {
 
-    private final ShipmentService shipmentService;
+    // Servicio base sin decorar (para operaciones específicas)
+    private final ShipmentService baseShipmentService;
+    
+    // Servicio decorado con funcionalidades adicionales
+    private final Service<Shipment, ShipmentRepository> decoratedShipmentService;
+    
     private final UserService userService;
     private final DelivererService delivererService;
     private UUID currentUserId;
@@ -36,7 +45,12 @@ public class UserShipmentsController {
      * Constructor del controlador de envíos del usuario
      */
     public UserShipmentsController() {
-        this.shipmentService = ShipmentService.getInstance();
+        // Obtener el servicio base
+        this.baseShipmentService = ShipmentService.getInstance();
+        
+        // Obtener el servicio decorado del registro
+        this.decoratedShipmentService = ShipmentServiceRegistry.getDecoratedService();
+        
         this.userService = UserService.getInstance();
         this.delivererService = DelivererService.getInstance();
         
@@ -68,7 +82,7 @@ public class UserShipmentsController {
         
         try {
             // Obtener envíos del usuario desde el servicio
-            List<Shipment> shipments = shipmentService.findByUserId(currentUserId);
+            List<Shipment> shipments = baseShipmentService.findByUserId(currentUserId);
             
             // Convertir a DTOs para la vista
             return shipments.stream()
@@ -93,7 +107,7 @@ public class UserShipmentsController {
         
         try {
             // Validar que el envío pertenezca al usuario actual
-            Optional<Shipment> shipmentOpt = shipmentService.findById(shipmentId);
+            Optional<Shipment> shipmentOpt = decoratedShipmentService.findById(shipmentId);
             if (!shipmentOpt.isPresent()) {
                 return false;
             }
@@ -111,8 +125,8 @@ public class UserShipmentsController {
                 throw new IllegalStateException("Este envío no puede ser cancelado en su estado actual");
             }
             
-            // Cancelar el envío
-            return shipmentService.cancelShipment(shipmentId);
+            // Cancelar el envío - usamos el servicio base porque tiene método específico
+            return baseShipmentService.cancelShipment(shipmentId);
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -131,8 +145,8 @@ public class UserShipmentsController {
         }
         
         try {
-            // Obtener el envío
-            Optional<Shipment> shipmentOpt = shipmentService.findById(shipmentId);
+            // Obtener el envío (usamos el decorado para tener logging)
+            Optional<Shipment> shipmentOpt = decoratedShipmentService.findById(shipmentId);
             if (!shipmentOpt.isPresent()) {
                 return "Envío no encontrado";
             }
@@ -193,6 +207,12 @@ public class UserShipmentsController {
                     break;
                 case CANCELLED:
                     info.append("Este envío ha sido cancelado.");
+                    break;
+                case INCIDENT:
+                    info.append("Se ha reportado un incidente con su envío. Estamos trabajando para resolverlo.");
+                    break;
+                case PENDING_REASSIGNMENT:
+                    info.append("Su envío está en proceso de reasignación a otro repartidor.");
                     break;
             }
             
@@ -278,5 +298,55 @@ public class UserShipmentsController {
      */
     private String formatDateTime(LocalDateTime dateTime) {
         return dateTime != null ? dateTime.format(dateTimeFormatter) : "No disponible";
+    }
+    
+    /**
+     * Deshace la última operación realizada
+     * @return true si se deshizo correctamente, false en caso contrario
+     */
+    public boolean undoLastOperation() {
+        try {
+            return baseShipmentService.undoLastOperation();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Rehace la última operación deshecha
+     * @return true si se rehizo correctamente, false en caso contrario
+     */
+    public boolean redoLastOperation() {
+        try {
+            return baseShipmentService.redoLastOperation();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Verifica si hay operaciones para deshacer
+     * @return true si hay operaciones para deshacer, false en caso contrario
+     */
+    public boolean canUndo() {
+        try {
+            return CommandManager.getInstance().canUndo();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Verifica si hay operaciones para rehacer
+     * @return true si hay operaciones para rehacer, false en caso contrario
+     */
+    public boolean canRedo() {
+        try {
+            return CommandManager.getInstance().canRedo();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

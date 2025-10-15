@@ -179,6 +179,8 @@
             <Button fx:id="btn_newShipment" text="Nuevo Envío" styleClass="new-button" />
             <Button fx:id="btn_editShipment" text="Modificar" styleClass="edit-button" disable="true" />
             <Button fx:id="btn_cancelShipment" text="Cancelar" styleClass="cancel-button" disable="true" />
+            <Button fx:id="btn_undoOperation" text="Deshacer" styleClass="undo-button" disable="true" />
+            <Button fx:id="btn_redoOperation" text="Rehacer" styleClass="redo-button" disable="true" />
             <Button fx:id="btn_refreshShipments" text="Actualizar" styleClass="refresh-button" />
         </HBox>
     </bottom>
