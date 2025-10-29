@@ -7,6 +7,7 @@ import java.util.List;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.UserPaymentMethod;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping.DataInitializer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.*;
 
 /**
@@ -43,6 +44,35 @@ public class DataManager {
         
         // Cargar el estado guardado o crear uno nuevo
         loadOrCreateState();
+    }
+
+    // Getters para los repositorios
+    public UserRepository getUserRepository() {
+        return userRepository;
+    }
+
+    public DelivererRepository getDelivererRepository() {
+        return delivererRepository;
+    }
+
+    public ShipmentRepository getShipmentRepository() {
+        return shipmentRepository;
+    }
+
+    public AddressRepository getAddressRepository() {
+        return addressRepository;
+    }
+
+    public PaymentRepository getPaymentRepository() {
+        return paymentRepository;
+    }
+
+    public RateRepository getRateRepository() {
+        return rateRepository;
+    }
+
+    public IncidentRepository getIncidentRepository() {
+        return incidentRepository;
     }
     
     /**
@@ -93,7 +123,10 @@ public class DataManager {
                 
                 // Verificar si los datos se cargaron correctamente
                 if (appState.getUsers() == null || appState.getUsers().isEmpty()) {
-                    System.out.println("ADVERTENCIA: No se encontraron usuarios en el estado cargado. Inicializando datos nuevos.");
+                    System.out.println("ADVERTENCIA: No se encontraron datos en el estado cargado. Inicializando datos por defecto.");
+                    // Inicializar datos por defecto
+                    DataInitializer.initializeUsers(userRepository);
+                    DataInitializer.initializeDefaultDeliverer(delivererRepository);
                     // Eliminar el archivo corrupto
                     Serializer.eliminarArchivo(APP_STATE_FILE);
                     
@@ -162,8 +195,12 @@ public class DataManager {
         System.out.println("Inicializando datos de prueba...");
         
         try {
-            // Usar el DataInitializer para crear datos de prueba
-            co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping.DataInitializer.initializeAllTestData(
+            // Inicializar usuarios y repartidores
+            DataInitializer.initializeUsers(userRepository);
+            DataInitializer.initializeDefaultDeliverer(delivererRepository);
+            
+            // Usar el DataInitializer para crear otros datos de prueba
+                DataInitializer.initializeAllTestData(
                 userRepository, 
                 addressRepository,
                 delivererRepository

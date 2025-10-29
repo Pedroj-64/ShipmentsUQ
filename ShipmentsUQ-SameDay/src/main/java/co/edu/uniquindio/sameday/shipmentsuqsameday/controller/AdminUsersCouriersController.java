@@ -5,6 +5,8 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.DelivererStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.UserRole;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.DelivererRepository;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.UserRepository;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.DelivererService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService;
 import javafx.collections.FXCollections;
@@ -15,6 +17,8 @@ import javafx.scene.layout.Pane;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Controlador para la gestión de usuarios y repartidores
@@ -111,9 +115,13 @@ public class AdminUsersCouriersController implements Initializable {
      */
     private void loadMockData() {
         try {
-            // Inicializar los servicios (en una app real, esto vendría por inyección de dependencias)
-            userService = UserService.getInstance();
-            delivererService = DelivererService.getInstance();
+            // Obtener los repositorios del DataManager
+            UserRepository userRepository = co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager.getInstance().getUserRepository();
+            DelivererRepository delivererRepository = co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager.getInstance().getDelivererRepository();
+
+            // Inicializar los servicios con sus repositorios
+            userService = UserService.getInstance(userRepository);
+            delivererService = DelivererService.getInstance(delivererRepository);
             
             // Cargar usuarios desde el servicio
             usersList.clear();
@@ -333,6 +341,18 @@ public class AdminUsersCouriersController implements Initializable {
      */
     public ObservableList<Deliverer> getDeliverersList() {
         return deliverersList;
+    }
+
+    /**
+     * Obtiene los datos actuales según el modo
+     * @return Lista de usuarios o repartidores según el modo actual
+     */
+    public List<?> getCurrentData() {
+        if ("users".equals(currentMode)) {
+            return new ArrayList<>(usersList);
+        } else {
+            return new ArrayList<>(deliverersList);
+        }
     }
     
     /**

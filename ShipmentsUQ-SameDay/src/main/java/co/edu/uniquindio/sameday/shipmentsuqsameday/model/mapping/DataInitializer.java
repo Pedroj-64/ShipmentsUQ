@@ -48,6 +48,35 @@ public class DataInitializer {
         
         System.out.println("Usuarios de prueba creados: " + userRepository.findAll().size());
     }
+
+    /**
+     * Inicializa el repartidor por defecto en posición (0,0)
+     * @param delivererRepository Repositorio de repartidores
+     */
+    public static void initializeDefaultDeliverer(DelivererRepository delivererRepository) {
+        System.out.println("Inicializando repartidor por defecto...");
+        
+        if (delivererRepository.findAll().isEmpty()) {
+            Deliverer defaultDeliverer = Deliverer.builder()
+                .id(UUID.randomUUID())
+                .name("Repartidor Default")
+                .document("1234567890")
+                .phone("3001234567")
+                .status(DelivererStatus.AVAILABLE)
+                .zone("Centro")
+                .averageRating(5.0)
+                .totalDeliveries(0)
+                .currentX(0.0)
+                .currentY(0.0)
+                .build();
+            
+            delivererRepository.save(defaultDeliverer);
+            System.out.println("Repartidor por defecto creado en posición (0,0)");
+        } else {
+            System.out.println("Ya existe al menos un repartidor en el sistema");
+        }
+    }
+
     
     /**
      * Inicializa datos de prueba para direcciones

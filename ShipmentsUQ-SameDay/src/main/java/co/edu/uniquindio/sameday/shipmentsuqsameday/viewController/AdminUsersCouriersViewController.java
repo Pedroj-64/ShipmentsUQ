@@ -1,6 +1,7 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.viewController;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.AdminUsersCouriersController;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.DataLoadManager;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
@@ -14,6 +15,7 @@ import javafx.scene.layout.Pane;
 
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -82,11 +84,20 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     // Controlador de negocio
     private AdminUsersCouriersController controller;
     
+    @FXML private ComboBox<String> itemsPerPage;
+    @FXML private Button btn_prev;
+    @FXML private Button btn_next;
+    @FXML private Label lbl_pageInfo;
+    
     // Variables para la gestión de elementos seleccionados
     private User selectedUser;
     private Deliverer selectedDeliverer;
     private double selectedX = 0;
     private double selectedY = 0;
+    
+    private int currentPage = 0;
+    private int pageSize = 20;
+    private int totalItems = 0;
 
     /**
      * Inicializa el controlador de vista
@@ -96,6 +107,11 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         // Inicializar controlador
         controller = new AdminUsersCouriersController();
         controller.setViewController(this);
+        
+        // Configurar valor inicial del ComboBox de elementos por página
+        if (itemsPerPage != null) {
+            itemsPerPage.setValue("20");
+        }
         
         // Configurar botones de modo
         setupModeButtons();
@@ -119,6 +135,24 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         
         // Comenzar en modo usuarios
         controller.setMode("users");
+    }
+    
+    /**
+     * Actualiza los datos de la tabla con paginación
+     */
+    private void refreshTableData() {
+        try {
+            DataLoadManager.<Object>loadDataAsync(
+                tbl_data,
+                (List<Object>)controller.getCurrentData(),
+                currentPage,
+                pageSize
+            );
+            updatePaginationControls();
+        } catch (Exception e) {
+            e.printStackTrace();
+            showStatusMessage("Error al actualizar los datos: " + e.getMessage(), "error");
+        }
     }
     
     /**
@@ -205,6 +239,33 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
      * Configura la tabla y sus columnas
      */
     private void setupTable() {
+        // Configurar el ComboBox de elementos por página
+        itemsPerPage.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null) {
+                pageSize = Integer.parseInt(newVal);
+                currentPage = 0;
+                refreshTableData();
+                updatePaginationControls();
+            }
+        });
+        
+        // Configurar botones de navegación
+        btn_prev.setOnAction(e -> {
+            if (currentPage > 0) {
+                currentPage--;
+                refreshTableData();
+                updatePaginationControls();
+            }
+        });
+        
+        btn_next.setOnAction(e -> {
+            if ((currentPage + 1) * pageSize < totalItems) {
+                currentPage++;
+                refreshTableData();
+                updatePaginationControls();
+            }
+        });
+        
         // Configurar las columnas
         col_id.setCellValueFactory(cellData -> {
             Object item = cellData.getValue();
@@ -289,6 +350,7 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
                         selectedUser = null;
                         populateDelivererForm(selectedDeliverer);
                     }
+                    updateButtonStates(true);
                 }
             }
         );
@@ -305,10 +367,16 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
      * Configura los botones de acción
      */
     private void setupActionButtons() {
+        // Configurar estado inicial de los botones
+        btn_edit.setDisable(true);
+        btn_delete.setDisable(true);
+        
         // Botón de agregar
         btn_add.setOnAction(e -> {
             if (validateForm()) {
                 addItem();
+                clearForm();
+                updateButtonStates(false);
             }
         });
         
@@ -316,14 +384,23 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         btn_edit.setOnAction(e -> {
             if (validateForm()) {
                 editItem();
+                clearForm();
+                updateButtonStates(false);
             }
         });
         
         // Botón de eliminar
-        btn_delete.setOnAction(e -> deleteItem());
+        btn_delete.setOnAction(e -> {
+            deleteItem();
+            clearForm();
+            updateButtonStates(false);
+        });
         
         // Botón de limpiar
-        btn_clear.setOnAction(e -> clearForm());
+        btn_clear.setOnAction(e -> {
+            clearForm();
+            updateButtonStates(false);
+        });
     }
 
     /**
@@ -352,6 +429,12 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         if (success) {
             showStatusMessage("Elemento agregado correctamente", "success");
             clearForm();
+            // Recargar datos
+            if ("users".equals(controller.getMode())) {
+                loadTableData(controller.getUsersList());
+            } else {
+                loadTableData(controller.getDeliverersList());
+            }
         } else {
             showStatusMessage("Error al agregar elemento", "error");
         }
@@ -386,6 +469,12 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         
         if (success) {
             showStatusMessage("Elemento actualizado correctamente", "success");
+            // Recargar datos
+            if ("users".equals(controller.getMode())) {
+                loadTableData(controller.getUsersList());
+            } else {
+                loadTableData(controller.getDeliverersList());
+            }
         } else {
             showStatusMessage("Error al actualizar elemento", "error");
         }
@@ -406,6 +495,12 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         if (success) {
             showStatusMessage("Elemento eliminado correctamente", "success");
             clearForm();
+            // Recargar datos
+            if ("users".equals(controller.getMode())) {
+                loadTableData(controller.getUsersList());
+            } else {
+                loadTableData(controller.getDeliverersList());
+            }
         } else {
             showStatusMessage("Error al eliminar elemento", "error");
         }
@@ -502,8 +597,27 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     @Override
     @SuppressWarnings("unchecked")
     public void loadTableData(ObservableList<?> data) {
-        tbl_data.getItems().clear();
-        tbl_data.setItems((ObservableList<Object>) data);
+        try {
+            // Resetear la paginación y selección
+            currentPage = 0;
+            tbl_data.getSelectionModel().clearSelection();
+            
+            // Limpiar el formulario y actualizar estado de botones
+            clearForm();
+            updateButtonStates(false);
+            
+            // Usar DataLoadManager para cargar los datos de forma asíncrona
+            DataLoadManager.loadDataAsync(tbl_data, data, currentPage, pageSize);
+            
+            // Actualizar los controles de paginación después de cargar los datos
+            updatePaginationControls();
+            
+            // Mostrar mensaje de éxito
+            showStatusMessage("Datos cargados correctamente", "success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showStatusMessage("Error al cargar los datos: " + e.getMessage(), "error");
+        }
     }
 
     /**
@@ -603,6 +717,42 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     /**
      * Limpia los campos del formulario
      */
+    /**
+     * Actualiza los controles de paginación
+     */
+    private void updatePaginationControls() {
+        try {
+            DataLoadManager.searchData("", 
+                controller.getUsersList(), 
+                controller.getDeliverersList(),
+                currentPage,
+                pageSize)
+            .thenAccept(result -> {
+                totalItems = (int) result.getTotalItems();
+                javafx.application.Platform.runLater(() -> {
+                    btn_prev.setDisable(currentPage == 0);
+                    btn_next.setDisable((currentPage + 1) * pageSize >= totalItems);
+                    lbl_pageInfo.setText(String.format("Página %d de %d", 
+                        currentPage + 1, 
+                        result.getTotalPages()));
+                });
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            showStatusMessage("Error al actualizar la paginación: " + e.getMessage(), "error");
+        }
+    }
+
+    /**
+     * Actualiza el estado de los botones según si hay un elemento seleccionado
+     * @param itemSelected true si hay un elemento seleccionado, false si no
+     */
+    private void updateButtonStates(boolean itemSelected) {
+        btn_add.setDisable(itemSelected);
+        btn_edit.setDisable(!itemSelected);
+        btn_delete.setDisable(!itemSelected);
+    }
+
     private void clearForm() {
         // Limpiar información básica
         txt_name.setText("");
