@@ -2,16 +2,11 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.internalController;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator.ShipmentServiceDecoratorFactory;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.IncidentRepository;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.PaymentRepository;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.RateRepository;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.ShipmentRepository;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.DelivererService;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.IncidentService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.PaymentAnalyticsService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.PaymentProcessingService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.PaymentService;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.RateService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.Service;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.MockPaymentGateway;

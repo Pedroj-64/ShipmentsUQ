@@ -1,6 +1,7 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday;
 
 import javafx.application.Application;
+import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -33,7 +34,7 @@ public class App extends Application {
     private static Session currentSession;
     
     /** Servicios del host para abrir archivos */
-    private static javafx.application.HostServices appHostServices;
+    private static HostServices appHostServices;
 
     /**
      * Método que se ejecuta antes de iniciar la aplicación.
@@ -127,7 +128,7 @@ public class App extends Application {
      * Devuelve los servicios del host para abrir archivos en aplicaciones externas.
      * @return servicios del host
      */
-    public static javafx.application.HostServices getAppHostServices() {
+    public static HostServices getAppHostServices() {
         return appHostServices;
     }
 }
