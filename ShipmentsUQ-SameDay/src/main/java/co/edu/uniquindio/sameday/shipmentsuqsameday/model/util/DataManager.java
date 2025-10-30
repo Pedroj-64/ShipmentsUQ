@@ -124,9 +124,6 @@ public class DataManager {
                 // Verificar si los datos se cargaron correctamente
                 if (appState.getUsers() == null || appState.getUsers().isEmpty()) {
                     System.out.println("ADVERTENCIA: No se encontraron datos en el estado cargado. Inicializando datos por defecto.");
-                    // Inicializar datos por defecto
-                    DataInitializer.initializeUsers(userRepository);
-                    DataInitializer.initializeDefaultDeliverer(delivererRepository);
                     // Eliminar el archivo corrupto
                     Serializer.eliminarArchivo(APP_STATE_FILE);
                     
@@ -195,12 +192,8 @@ public class DataManager {
         System.out.println("Inicializando datos de prueba...");
         
         try {
-            // Inicializar usuarios y repartidores
-            DataInitializer.initializeUsers(userRepository);
-            DataInitializer.initializeDefaultDeliverer(delivererRepository);
-            
-            // Usar el DataInitializer para crear otros datos de prueba
-                DataInitializer.initializeAllTestData(
+            // Inicializar todos los datos de prueba de una vez
+            DataInitializer.initializeAllTestData(
                 userRepository, 
                 addressRepository,
                 delivererRepository

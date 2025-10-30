@@ -16,8 +16,8 @@
 
 <ScrollPane xmlns="http://javafx.com/javafx/23.0.1"
             xmlns:fx="http://javafx.com/fxml/1"
-            
-            
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.AdminMetricsViewController"
+            stylesheets="@../css/metrics.css"
             fitToWidth="true"
             fitToHeight="true"
             pannable="true">
@@ -86,13 +86,13 @@
                     
                     <!-- Ejemplo de gráficos -->
                     <HBox spacing="15" styleClass="charts-container">
-                        <VBox styleClass="chart-card" HBox.hgrow="ALWAYS">
+                        <VBox styleClass="chart-card" prefWidth="450" prefHeight="350">
                             <Label text="Estados de Envíos" styleClass="chart-title" />
-                            <PieChart fx:id="chart_shipmentStatus" legendVisible="true" VBox.vgrow="ALWAYS" />
+                            <PieChart fx:id="chart_shipmentStatus" legendVisible="true" prefHeight="300" />
                         </VBox>
-                        <VBox styleClass="chart-card" HBox.hgrow="ALWAYS">
+                        <VBox styleClass="chart-card" prefWidth="450" prefHeight="350">
                             <Label text="Envíos por Mes" styleClass="chart-title" />
-                            <BarChart fx:id="chart_shipmentsByMonth" legendVisible="true" VBox.vgrow="ALWAYS">
+                            <BarChart fx:id="chart_shipmentsByMonth" legendVisible="true" prefHeight="300">
                                 <xAxis>
                                     <CategoryAxis side="BOTTOM" />
                                 </xAxis>
@@ -105,9 +105,9 @@
                     
                     <!-- Gráfico de líneas -->
                     <HBox spacing="15" styleClass="charts-container">
-                        <VBox styleClass="chart-card" HBox.hgrow="ALWAYS">
+                        <VBox styleClass="chart-card" prefWidth="450" prefHeight="350">
                             <Label text="Ingresos por Mes" styleClass="chart-title" />
-                            <LineChart fx:id="chart_revenueByMonth" legendVisible="true" VBox.vgrow="ALWAYS">
+                            <LineChart fx:id="chart_revenueByMonth" legendVisible="true" prefHeight="300">
                                 <xAxis>
                                     <CategoryAxis side="BOTTOM" />
                                 </xAxis>
@@ -118,7 +118,7 @@
                         </VBox>
                         
                         <!-- Top repartidores -->
-                        <VBox styleClass="chart-card" HBox.hgrow="ALWAYS">
+                        <VBox styleClass="chart-card" prefWidth="450" prefHeight="350">
                             <Label text="Mejores Repartidores" styleClass="chart-title" />
                             <GridPane fx:id="grid_topDeliverers" vgap="5" hgap="15" styleClass="top-deliverers-grid">
                                 <padding>

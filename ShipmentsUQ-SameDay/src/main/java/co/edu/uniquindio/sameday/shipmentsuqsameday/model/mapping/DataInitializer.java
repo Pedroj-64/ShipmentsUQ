@@ -23,6 +23,12 @@ public class DataInitializer {
     public static void initializeUsers(UserRepository userRepository) {
         System.out.println("Inicializando usuarios de prueba...");
         
+        // Verificar si ya existen usuarios para evitar duplicados
+        if (!userRepository.findAll().isEmpty()) {
+            System.out.println("Ya existen usuarios en el sistema. Omitiendo inicialización.");
+            return;
+        }
+        
         // Usuario administrador
         User admin = User.builder()
                 .id(UUID.randomUUID())
@@ -86,6 +92,12 @@ public class DataInitializer {
     public static void initializeAddresses(AddressRepository addressRepository, UserRepository userRepository) {
         System.out.println("Inicializando direcciones de prueba...");
         
+        // Verificar si ya existen direcciones para evitar duplicados
+        if (!addressRepository.findAll().isEmpty()) {
+            System.out.println("Ya existen direcciones en el sistema. Omitiendo inicialización.");
+            return;
+        }
+        
         // Obtener usuarios
         User client = userRepository.findByEmail("cliente@gmail.com").orElse(null);
         if (client == null) {
@@ -135,6 +147,12 @@ public class DataInitializer {
      */
     public static void initializeDeliverers(DelivererRepository delivererRepository) {
         System.out.println("Inicializando repartidores de prueba...");
+        
+        // Verificar si ya existen repartidores para evitar duplicados
+        if (!delivererRepository.findAll().isEmpty()) {
+            System.out.println("Ya existen repartidores en el sistema. Omitiendo inicialización.");
+            return;
+        }
         
         // Repartidor 1 - Posición (0,0) para pruebas
         Deliverer deliverer1 = Deliverer.builder()

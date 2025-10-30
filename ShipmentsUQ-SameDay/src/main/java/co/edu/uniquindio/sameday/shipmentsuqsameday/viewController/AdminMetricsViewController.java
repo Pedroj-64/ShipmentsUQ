@@ -4,9 +4,6 @@ import java.net.URL;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.List;
-import java.util.HashMap;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.AdminMetricsController;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
@@ -19,14 +16,11 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.scene.control.Tooltip;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.util.StringConverter;
 
 /**
  * Controlador de vista para la pantalla de métricas administrativas.

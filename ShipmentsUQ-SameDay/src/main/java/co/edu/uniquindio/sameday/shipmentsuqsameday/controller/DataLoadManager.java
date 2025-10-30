@@ -88,9 +88,40 @@ public class DataLoadManager {
                deliverer.getPhone().toLowerCase().contains(search);
     }
 
-    public static void loadDataAsync(TableView<Object> tbl_data, ObservableList<?> data, int currentPage,
-            int pageSize) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'loadDataAsync'");
+    public static void loadDataAsync(TableView<Object> tableView, ObservableList<?> data, int pageIndex, int pageSize) {
+        Task<PaginatedDataDTO<Object>> task = new Task<>() {
+            @Override
+            protected PaginatedDataDTO<Object> call() {
+                int fromIndex = pageIndex * pageSize;
+                int toIndex = Math.min(fromIndex + pageSize, data.size());
+                
+                // Convertir ObservableList<?> a List<Object> para la paginación
+                List<Object> allData = data.stream()
+                    .map(item -> (Object) item)
+                    .collect(Collectors.toList());
+                
+                List<Object> pageData = allData.subList(fromIndex, toIndex);
+                int totalPages = (int) Math.ceil((double) data.size() / pageSize);
+                
+                return new PaginatedDataDTO<>(
+                    pageData,
+                    totalPages,
+                    data.size(),
+                    pageIndex
+                );
+            }
+        };
+        
+        task.setOnSucceeded(e -> {
+            PaginatedDataDTO<Object> result = task.getValue();
+            tableView.getItems().setAll(result.getItems());
+        });
+        
+        task.setOnFailed(e -> {
+            System.err.println("Error al cargar datos: " + task.getException().getMessage());
+            task.getException().printStackTrace();
+        });
+        
+        new Thread(task).start();
     }
 }

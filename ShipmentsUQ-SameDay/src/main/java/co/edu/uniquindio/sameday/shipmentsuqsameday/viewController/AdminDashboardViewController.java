@@ -88,8 +88,8 @@ public class AdminDashboardViewController implements Initializable {
         // Botón de envíos
         btn_shipments.setOnAction(e -> loadShipmentsView());
         
-        // Botón de métricas
-        btn_metrics.setOnAction(e -> loadMetricsView());
+        // Botón de métricas - AHORA CARGA LA NUEVA VISTA
+        btn_metrics.setOnAction(e -> loadMetricsNewView());
     }
     
     /**
@@ -174,6 +174,30 @@ public class AdminDashboardViewController implements Initializable {
             // Limpiar y mostrar la vista
             stk_contentArea.getChildren().clear();
             stk_contentArea.getChildren().add(metricsView);
+            
+            // Actualizar botones de menú
+            updateMenuButtonsState(btn_metrics);
+            
+            // Actualizar estado
+            lbl_statusMessage.setText("Métricas y Reportes");
+        } catch (IOException e) {
+            e.printStackTrace();
+            showErrorMessage("Error al cargar la vista de métricas: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Carga la NUEVA vista de métricas y reportes (sin errores)
+     */
+    private void loadMetricsNewView() {
+        try {
+            // Siempre cargar una vista nueva para asegurar datos actualizados
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/interfaces/AdminMetricsNew.fxml"));
+            Parent newMetricsView = loader.load();
+            
+            // Limpiar y mostrar la vista
+            stk_contentArea.getChildren().clear();
+            stk_contentArea.getChildren().add(newMetricsView);
             
             // Actualizar botones de menú
             updateMenuButtonsState(btn_metrics);

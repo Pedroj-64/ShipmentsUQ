@@ -6,6 +6,7 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.DelivererStatus;
+import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,10 +15,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.stream.Collectors;
 
 /**
  * Controlador de vista para la gestión de usuarios y repartidores
@@ -41,45 +40,42 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     @FXML private TableColumn<Object, String> col_phone;
     @FXML private TableColumn<Object, String> col_status;
     
-    // Referencias a los elementos del formulario básico
+    // Referencias a los elementos del formulario básico - USUARIOS
     @FXML private TextField txt_name;
     @FXML private TextField txt_info;
     @FXML private TextField txt_phone;
     @FXML private TextField txt_password;
-    @FXML private ChoiceBox<String> chb_status;
     @FXML private ChoiceBox<String> chb_role;
+    
+    // Referencias a los elementos del formulario - REPARTIDORES
+    @FXML private TextField txt_courier_name;
+    @FXML private TextField txt_courier_phone;
+    @FXML private TextField txt_document;
+    @FXML private TextField txt_zone;
+    @FXML private ChoiceBox<String> chb_status;
+    @FXML private TextField txt_rating;
+    @FXML private TextField txt_avgRating;
+    @FXML private TextField txt_totalDeliveries;
+    
+    // Botones de acción
     @FXML private Button btn_add;
     @FXML private Button btn_edit;
     @FXML private Button btn_delete;
     @FXML private Button btn_clear;
     
-    // Referencias a los elementos de pestañas
-    @FXML private TabPane tabPane;
-    @FXML private Tab tab_basicInfo;
-    @FXML private Tab tab_delivererInfo;
-    @FXML private Tab tab_coordinates;
-    @FXML private Tab tab_shipments;
-    
-    // Referencias para la información de repartidor
-    @FXML private TextField txt_document;
-    @FXML private TextField txt_zone;
-    @FXML private TextField txt_rating;
-    @FXML private TextField txt_totalDeliveries;
+    // Referencias a los TabPanes
+    @FXML private TabPane tabPane_users;
+    @FXML private TabPane tabPane_couriers;
     
     // Referencias para el mapa
     @FXML private Pane pane_mapContainer;
-    @FXML private Label lbl_coordinates;
     @FXML private Label lbl_coordDisplay;
     
-    // Referencias para las tablas de envíos
+    // Referencias para las tablas de envíos del repartidor
     @FXML private TableView<Shipment> tbl_currentShipments;
     @FXML private TableColumn<Shipment, String> col_shipment_id;
     @FXML private TableColumn<Shipment, String> col_shipment_status;
     @FXML private TableColumn<Shipment, String> col_shipment_date;
-    @FXML private TableView<Shipment> tbl_shipmentHistory;
-    @FXML private TableColumn<Shipment, String> col_history_id;
-    @FXML private TableColumn<Shipment, String> col_history_date;
-    @FXML private TableColumn<Shipment, String> col_history_rating;
     
     // Controlador de negocio
     private AdminUsersCouriersController controller;
@@ -118,9 +114,6 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         
         // Configurar la tabla principal
         setupTable();
-        
-        // Configurar el choicebox de estados
-        setupStatusChoiceBox();
         
         // Configurar botones de acción
         setupActionButtons();
@@ -191,40 +184,6 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
                 );
             });
         }
-        
-        // Configurar tabla de historial de envíos
-        if (tbl_shipmentHistory != null) {
-            col_history_id.setCellValueFactory(cellData -> {
-                Shipment item = cellData.getValue();
-                return javafx.beans.binding.Bindings.createStringBinding(
-                    () -> {
-                        return item != null && item.getId() != null ? 
-                            item.getId().toString().substring(0, 8) + "..." : "";
-                    }
-                );
-            });
-            
-            col_history_date.setCellValueFactory(cellData -> {
-                Shipment item = cellData.getValue();
-                return javafx.beans.binding.Bindings.createStringBinding(
-                    () -> {
-                        return item != null && item.getDeliveryDate() != null ? 
-                            item.getDeliveryDate().toString() : "";
-                    }
-                );
-            });
-            
-            col_history_rating.setCellValueFactory(cellData -> {
-                Shipment item = cellData.getValue();
-                return javafx.beans.binding.Bindings.createStringBinding(
-                    () -> {
-                        // Usamos el campo de costo temporalmente para la calificación
-                        // ya que no hay un campo específico para calificación en el modelo Shipment
-                        return item != null ? String.format("%.1f", item.getCost()) : "-";
-                    }
-                );
-            });
-        }
     }
 
     /**
@@ -270,11 +229,11 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         col_id.setCellValueFactory(cellData -> {
             Object item = cellData.getValue();
             if (item instanceof User) {
-                return javafx.beans.binding.Bindings.createStringBinding(
+                return Bindings.createStringBinding(
                     () -> ((User) item).getId().toString().substring(0, 8) + "..."
                 );
             } else if (item instanceof Deliverer) {
-                return javafx.beans.binding.Bindings.createStringBinding(
+                return Bindings.createStringBinding(
                     () -> ((Deliverer) item).getId().toString().substring(0, 8) + "..."
                 );
             }
@@ -284,11 +243,11 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         col_name.setCellValueFactory(cellData -> {
             Object item = cellData.getValue();
             if (item instanceof User) {
-                return javafx.beans.binding.Bindings.createStringBinding(
+                return Bindings.createStringBinding(
                     () -> ((User) item).getName()
                 );
             } else if (item instanceof Deliverer) {
-                return javafx.beans.binding.Bindings.createStringBinding(
+                return Bindings.createStringBinding(
                     () -> ((Deliverer) item).getName()
                 );
             }
@@ -298,11 +257,11 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         col_info.setCellValueFactory(cellData -> {
             Object item = cellData.getValue();
             if (item instanceof User) {
-                return javafx.beans.binding.Bindings.createStringBinding(
+                return Bindings.createStringBinding(
                     () -> ((User) item).getEmail()
                 );
             } else if (item instanceof Deliverer) {
-                return javafx.beans.binding.Bindings.createStringBinding(
+                return Bindings.createStringBinding(
                     () -> ((Deliverer) item).getDocument()
                 );
             }
@@ -312,11 +271,11 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         col_phone.setCellValueFactory(cellData -> {
             Object item = cellData.getValue();
             if (item instanceof User) {
-                return javafx.beans.binding.Bindings.createStringBinding(
+                return Bindings.createStringBinding(
                     () -> ((User) item).getPhone()
                 );
             } else if (item instanceof Deliverer) {
-                return javafx.beans.binding.Bindings.createStringBinding(
+                return Bindings.createStringBinding(
                     () -> ((Deliverer) item).getPhone()
                 );
             }
@@ -326,11 +285,11 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         col_status.setCellValueFactory(cellData -> {
             Object item = cellData.getValue();
             if (item instanceof User) {
-                return javafx.beans.binding.Bindings.createStringBinding(
+                return Bindings.createStringBinding(
                     () -> "Activo" // Para usuarios simplificamos a activo
                 );
             } else if (item instanceof Deliverer) {
-                return javafx.beans.binding.Bindings.createStringBinding(
+                return Bindings.createStringBinding(
                     () -> ((Deliverer) item).getStatus().name()
                 );
             }
@@ -354,13 +313,6 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
                 }
             }
         );
-    }
-
-    /**
-     * Configura el ChoiceBox de estados
-     */
-    private void setupStatusChoiceBox() {
-        // Inicialmente vacío, se poblará según el modo
     }
 
     /**
@@ -417,9 +369,9 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
             );
         } else {
             success = controller.addDeliverer(
-                txt_name.getText(),
-                txt_info.getText(),
-                txt_phone.getText(),
+                txt_courier_name.getText(),
+                txt_document.getText(),
+                txt_courier_phone.getText(),
                 txt_zone.getText(),
                 selectedX,
                 selectedY
@@ -457,9 +409,9 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
             DelivererStatus status = DelivererStatus.valueOf(chb_status.getValue());
             success = controller.editDeliverer(
                 selectedDeliverer,
-                txt_name.getText(),
-                txt_info.getText(),
-                txt_phone.getText(),
+                txt_courier_name.getText(),
+                txt_document.getText(),
+                txt_courier_phone.getText(),
                 txt_zone.getText(),
                 status,
                 selectedX,
@@ -511,25 +463,40 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
      * @return true si los datos son válidos
      */
     private boolean validateForm() {
-        // Validación básica
-        if (txt_name.getText().trim().isEmpty()) {
-            showStatusMessage("El nombre no puede estar vacío", "warning");
-            return false;
-        }
-        
-        if (txt_info.getText().trim().isEmpty()) {
-            showStatusMessage("El correo/documento no puede estar vacío", "warning");
-            return false;
-        }
-        
-        if (txt_phone.getText().trim().isEmpty()) {
-            showStatusMessage("El teléfono no puede estar vacío", "warning");
-            return false;
-        }
-        
-        // Si estamos en modo repartidores, validar zona
-        if (!"users".equals(controller.getMode())) {
-            if (txt_zone != null && txt_zone.getText().trim().isEmpty()) {
+        if ("users".equals(controller.getMode())) {
+            // Validación para usuarios
+            if (txt_name == null || txt_name.getText().trim().isEmpty()) {
+                showStatusMessage("El nombre no puede estar vacío", "warning");
+                return false;
+            }
+            
+            if (txt_info == null || txt_info.getText().trim().isEmpty()) {
+                showStatusMessage("El correo no puede estar vacío", "warning");
+                return false;
+            }
+            
+            if (txt_phone == null || txt_phone.getText().trim().isEmpty()) {
+                showStatusMessage("El teléfono no puede estar vacío", "warning");
+                return false;
+            }
+        } else {
+            // Validación para repartidores
+            if (txt_courier_name == null || txt_courier_name.getText().trim().isEmpty()) {
+                showStatusMessage("El nombre no puede estar vacío", "warning");
+                return false;
+            }
+            
+            if (txt_document == null || txt_document.getText().trim().isEmpty()) {
+                showStatusMessage("El documento no puede estar vacío", "warning");
+                return false;
+            }
+            
+            if (txt_courier_phone == null || txt_courier_phone.getText().trim().isEmpty()) {
+                showStatusMessage("El teléfono no puede estar vacío", "warning");
+                return false;
+            }
+            
+            if (txt_zone == null || txt_zone.getText().trim().isEmpty()) {
                 showStatusMessage("La zona no puede estar vacía", "warning");
                 return false;
             }
@@ -548,9 +515,6 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         lbl_formTitle.setText("users".equals(mode) ? 
             "Formulario de Usuario" : "Formulario de Repartidor");
         
-        // Cambiar etiqueta de información (correo o documento)
-        lbl_info.setText("users".equals(mode) ? "Correo:" : "Documento:");
-        
         // Cambiar botones de modo
         btn_usersMode.getStyleClass().remove("active");
         btn_couriersMode.getStyleClass().remove("active");
@@ -561,29 +525,17 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
             btn_couriersMode.getStyleClass().add("active");
         }
         
-        // Configurar visibilidad de las pestañas específicas para repartidor
+        // Mostrar/Ocultar TabPanes según el modo
         boolean isUserMode = "users".equals(mode);
         
-        // Mostrar u ocultar pestañas según el modo
-        if (tabPane != null) {
-            tab_delivererInfo.setDisable(isUserMode);
-            tab_coordinates.setDisable(isUserMode);
-            tab_shipments.setDisable(isUserMode);
+        if (tabPane_users != null) {
+            tabPane_users.setVisible(isUserMode);
+            tabPane_users.setManaged(isUserMode);
         }
         
-        // Poblar estados en el ChoiceBox según el modo
-        chb_status.getItems().clear();
-        if ("users".equals(mode)) {
-            chb_status.getItems().addAll("Activo", "Inactivo");
-            chb_status.setValue("Activo");
-        } else {
-            // Convertir enum DelivererStatus a lista de strings
-            chb_status.getItems().addAll(
-                Arrays.stream(DelivererStatus.values())
-                    .map(Enum::name)
-                    .collect(Collectors.toList())
-            );
-            chb_status.setValue(DelivererStatus.AVAILABLE.name());
+        if (tabPane_couriers != null) {
+            tabPane_couriers.setVisible(!isUserMode);
+            tabPane_couriers.setManaged(!isUserMode);
         }
         
         // Limpiar formulario
@@ -595,7 +547,6 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
      * @param data colección de datos a cargar
      */
     @Override
-    @SuppressWarnings("unchecked")
     public void loadTableData(ObservableList<?> data) {
         try {
             // Resetear la paginación y selección
@@ -674,7 +625,9 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         txt_name.setText(user.getName());
         txt_info.setText(user.getEmail());
         txt_phone.setText(user.getPhone());
-        chb_status.setValue("Activo");
+        if (chb_role != null && user.getRole() != null) {
+            chb_role.setValue(user.getRole().name());
+        }
     }
 
     /**
@@ -682,17 +635,17 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
      * @param deliverer repartidor a mostrar
      */
     private void populateDelivererForm(Deliverer deliverer) {
-        // Información básica
-        txt_name.setText(deliverer.getName());
-        txt_info.setText(deliverer.getDocument());
-        txt_phone.setText(deliverer.getPhone());
-        chb_status.setValue(deliverer.getStatus().name());
+        // Información básica del repartidor
+        if (txt_courier_name != null) txt_courier_name.setText(deliverer.getName());
+        if (txt_document != null) txt_document.setText(deliverer.getDocument());
+        if (txt_courier_phone != null) txt_courier_phone.setText(deliverer.getPhone());
+        if (txt_zone != null) txt_zone.setText(deliverer.getZone());
+        if (chb_status != null) chb_status.setValue(deliverer.getStatus().name());
         
-        // Información específica de repartidor
-        txt_document.setText(deliverer.getDocument());
-        txt_zone.setText(deliverer.getZone());
-        txt_rating.setText(String.format("%.2f", deliverer.getAverageRating()));
-        txt_totalDeliveries.setText(String.valueOf(deliverer.getTotalDeliveries()));
+        // Estadísticas
+        if (txt_rating != null) txt_rating.setText(String.format("%.2f", deliverer.getAverageRating()));
+        if (txt_avgRating != null) txt_avgRating.setText(String.format("%.2f", deliverer.getAverageRating()));
+        if (txt_totalDeliveries != null) txt_totalDeliveries.setText(String.valueOf(deliverer.getTotalDeliveries()));
         
         // Actualizar coordenadas
         selectedX = deliverer.getX();
@@ -702,15 +655,10 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
             lbl_coordDisplay.setText(String.format("X: %.1f, Y: %.1f", selectedX, selectedY));
         }
         
-        // Configurar tablas de envíos
+        // Configurar tabla de envíos en progreso
         if (tbl_currentShipments != null && deliverer.getCurrentShipments() != null) {
             tbl_currentShipments.getItems().clear();
             tbl_currentShipments.getItems().addAll(deliverer.getCurrentShipments());
-        }
-        
-        if (tbl_shipmentHistory != null && deliverer.getShipmentHistory() != null) {
-            tbl_shipmentHistory.getItems().clear();
-            tbl_shipmentHistory.getItems().addAll(deliverer.getShipmentHistory());
         }
     }
 
@@ -754,17 +702,22 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     }
 
     private void clearForm() {
-        // Limpiar información básica
-        txt_name.setText("");
-        txt_info.setText("");
-        txt_phone.setText("");
-        txt_password.setText("");
+        // Limpiar campos de usuarios
+        if (txt_name != null) txt_name.setText("");
+        if (txt_info != null) txt_info.setText("");
+        if (txt_phone != null) txt_phone.setText("");
+        if (txt_password != null) txt_password.setText("");
+        if (chb_role != null) chb_role.setValue(null);
         
-        // Limpiar información de repartidor
-        txt_document.setText("");
-        txt_zone.setText("");
-        txt_rating.setText("");
-        txt_totalDeliveries.setText("");
+        // Limpiar campos de repartidores
+        if (txt_courier_name != null) txt_courier_name.setText("");
+        if (txt_courier_phone != null) txt_courier_phone.setText("");
+        if (txt_document != null) txt_document.setText("");
+        if (txt_zone != null) txt_zone.setText("");
+        if (chb_status != null) chb_status.setValue(null);
+        if (txt_rating != null) txt_rating.setText("");
+        if (txt_avgRating != null) txt_avgRating.setText("");
+        if (txt_totalDeliveries != null) txt_totalDeliveries.setText("");
         
         // Limpiar coordenadas
         selectedX = 0;
@@ -773,13 +726,9 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
             lbl_coordDisplay.setText("X: 0.0, Y: 0.0");
         }
         
-        // Limpiar tablas
+        // Limpiar tabla de envíos
         if (tbl_currentShipments != null) {
             tbl_currentShipments.getItems().clear();
-        }
-        
-        if (tbl_shipmentHistory != null) {
-            tbl_shipmentHistory.getItems().clear();
         }
         
         // Restablecer selección

@@ -13,6 +13,7 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
     requires jdk.jsobject;
+    requires javafx.base;
 
     opens co.edu.uniquindio.sameday.shipmentsuqsameday to javafx.fxml;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.viewController to javafx.fxml;

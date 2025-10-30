@@ -1,85 +1,211 @@
-/* CSS muy simple para AdminMetrics */
+/* CSS para AdminMetrics - Dashboard Profesional */
 
-/* Colores básicos */
+/* ========== COLORES PRINCIPALES ========== */
 .root {
-    -fx-background-color: #f5f5f5;
-    background-color: #f5f5f5;
+    -fx-background-color: #f0f2f5;
 }
 
-/* Encabezado */
-.header {
-    -fx-background-color: #3498db;
-    background-color: #3498db;
-    -fx-padding: 15px;
-    padding: 15px;
+/* ========== ENCABEZADO ========== */
+.header-container {
+    -fx-background-color: linear-gradient(to right, #667eea 0%, #764ba2 100%);
+    -fx-padding: 25 20 25 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 3);
 }
 
-.header-text {
-    -fx-font-size: 24px;
-    font-size: 24px;
+.title-label {
+    -fx-font-size: 28px;
     -fx-font-weight: bold;
-    font-weight: bold;
     -fx-text-fill: white;
-    color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 2, 0, 0, 1);
 }
 
-.subtitle-text {
+.subtitle-label {
     -fx-font-size: 16px;
-    font-size: 16px;
-    -fx-text-fill: white;
-    color: white;
+    -fx-text-fill: rgba(255, 255, 255, 0.9);
+    -fx-padding: 5 0 0 0;
 }
 
-/* Tarjetas de métricas */
-.metric-box {
+/* ========== CONTENEDOR PRINCIPAL ========== */
+.content-container {
+    -fx-background-color: transparent;
+}
+
+/* ========== TARJETAS DE MÉTRICAS ========== */
+.metrics-cards-container {
+    -fx-alignment: center;
+}
+
+.metric-card {
     -fx-background-color: white;
-    background-color: white;
-    -fx-background-radius: 5px;
-    border-radius: 5px;
-    -fx-padding: 15px;
-    padding: 15px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
+    -fx-background-radius: 12px;
+    -fx-padding: 20 25 20 25;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 10, 0, 0, 2);
+    -fx-min-width: 180px;
+    -fx-alignment: center-left;
+    -fx-spacing: 8;
 }
 
-.metric-title {
-    -fx-font-size: 14px;
-    font-size: 14px;
-    -fx-text-fill: #7f8c8d;
-    color: #7f8c8d;
+.metric-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 15, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+.metric-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6c757d;
+    -fx-font-weight: 500;
 }
 
 .metric-value {
-    -fx-font-size: 22px;
-    font-size: 22px;
+    -fx-font-size: 32px;
     -fx-font-weight: bold;
-    font-weight: bold;
     -fx-text-fill: #2c3e50;
-    color: #2c3e50;
 }
 
-/* Gráficos */
-.chart-container {
+/* ========== CONTENEDOR DE GRÁFICOS ========== */
+.charts-container {
+    -fx-alignment: center;
+}
+
+.chart-card {
     -fx-background-color: white;
-    background-color: white;
-    -fx-background-radius: 5px;
-    border-radius: 5px;
-    -fx-padding: 10px;
-    padding: 10px;
+    -fx-background-radius: 12px;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 10, 0, 0, 2);
+    -fx-min-height: 350px;
+    -fx-spacing: 10;
 }
 
 .chart-title {
-    -fx-font-size: 16px;
-    font-size: 16px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    font-weight: bold;
     -fx-text-fill: #2c3e50;
-    color: #2c3e50;
+    -fx-padding: 0 0 10 0;
 }
 
-/* Pie de página */
-.footer {
+/* ========== ESTILOS DE GRÁFICOS ========== */
+.chart {
     -fx-padding: 10px;
-    padding: 10px;
-    -fx-text-fill: #7f8c8d;
-    color: #7f8c8d;
+}
+
+.chart-legend {
+    -fx-background-color: white;
+    -fx-padding: 10px;
+}
+
+.chart-plot-background {
+    -fx-background-color: #fafafa;
+}
+
+/* Colores para el PieChart */
+.default-color0.chart-pie { -fx-pie-color: #667eea; }
+.default-color1.chart-pie { -fx-pie-color: #764ba2; }
+.default-color2.chart-pie { -fx-pie-color: #f093fb; }
+.default-color3.chart-pie { -fx-pie-color: #4facfe; }
+.default-color4.chart-pie { -fx-pie-color: #43e97b; }
+.default-color5.chart-pie { -fx-pie-color: #fa709a; }
+.default-color6.chart-pie { -fx-pie-color: #fee140; }
+.default-color7.chart-pie { -fx-pie-color: #30cfd0; }
+
+/* Colores para BarChart y LineChart */
+.default-color0.chart-bar { -fx-bar-fill: #667eea; }
+.default-color0.chart-series-line { -fx-stroke: #667eea; }
+
+.default-color1.chart-bar { -fx-bar-fill: #764ba2; }
+.default-color1.chart-series-line { -fx-stroke: #764ba2; }
+
+/* ========== GRID DE TOP REPARTIDORES ========== */
+.top-deliverers-grid {
+    -fx-background-color: transparent;
+    -fx-hgap: 15;
+    -fx-vgap: 10;
+}
+
+.top-deliverers-grid Label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #2c3e50;
+}
+
+.top-deliverers-grid .label:first-child {
+    -fx-font-weight: bold;
+}
+
+/* ========== TIEMPO PROMEDIO DE ENTREGA ========== */
+.avg-delivery-time {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 8px;
+    -fx-padding: 15;
+    -fx-spacing: 8;
+}
+
+.avg-delivery-time .metric-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6c757d;
+}
+
+.avg-delivery-time .metric-value {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #667eea;
+}
+
+/* ========== PIE DE PÁGINA ========== */
+.footer-container {
+    -fx-background-color: white;
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 1 0 0 0;
+    -fx-padding: 15 20 15 20;
+}
+
+.footer-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #6c757d;
+}
+
+.footer-value {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* ========== ANIMACIONES Y TRANSICIONES ========== */
+.metric-card,
+.chart-card {
+    -fx-transition: all 0.3s ease;
+}
+
+/* ========== SCROLLBAR PERSONALIZADO ========== */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: derive(#667eea, 50%);
+    -fx-background-radius: 5px;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #667eea;
+}
+
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
 }
