@@ -75,6 +75,10 @@ public class AdminUsersCouriersController implements Initializable {
      * Inicializa el controlador del mapa de zonas
      * @param mapContainer el contenedor para el mapa
      */
+    public GridMapViewController getGridMapController() {
+        return gridMapController;
+    }
+
     public void initializeGridMap(Pane mapContainer) {
         gridMapController = new GridMapViewController(
             mapContainer.getPrefWidth(), 

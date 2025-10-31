@@ -9,6 +9,11 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.UserPaymentMethod;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping.DataInitializer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.*;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.*;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.DelivererService;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.IncidentService;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.RateService;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
 
 /**
  * Administrador de datos para cargar y guardar el estado de la aplicación.
@@ -33,17 +38,49 @@ public class DataManager {
     private RateRepository rateRepository;
     private IncidentRepository incidentRepository;
     
-    // Servicios - No necesitamos declarar servicios aquí porque trabajamos directamente con los repositorios
+    // Servicios
+    private RateService rateService;
+    private DelivererService delivererService;
+    private IncidentService incidentService;
+    private ShipmentService shipmentService;
+    
+    // Flag para control de inicialización
+    private boolean isInitialized = false;
     
     /**
      * Constructor privado para el patrón Singleton.
      */
     private DataManager() {
-        // Inicializar repositorios y servicios
-        initRepositoriesAndServices();
-        
-        // Cargar el estado guardado o crear uno nuevo
-        loadOrCreateState();
+        if (isInitialized) {
+            System.out.println("DataManager ya está inicializado. Omitiendo inicialización.");
+            return;
+        }
+
+        try {
+            System.out.println("Iniciando DataManager...");
+            
+            synchronized (DataManager.class) {
+                if (!isInitialized) {
+                    // Inicializar repositorios primero
+                    initRepositoriesAndServices();
+                    System.out.println("Repositorios inicializados");
+                    
+                    // Cargar el estado guardado o crear uno nuevo
+                    loadOrCreateState();
+                    System.out.println("Estado cargado");
+                    
+                    // Registrar hook para guardar al cerrar
+                    Runtime.getRuntime().addShutdownHook(new Thread(this::saveState));
+                    
+                    isInitialized = true;
+                    System.out.println("DataManager inicializado correctamente");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error durante la inicialización del DataManager: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Fallo en la inicialización del DataManager", e);
+        }
     }
 
     // Getters para los repositorios
@@ -114,48 +151,44 @@ public class DataManager {
     /**
      * Carga el estado guardado o crea uno nuevo si no existe.
      */
+    private boolean dataInitialized = false;
+    
     private void loadOrCreateState() {
         try {
+            if (userRepository.findAll().size() > 0) {
+                System.out.println("Ya existen datos en los repositorios. Omitiendo inicialización.");
+                return;
+            }
+            
             if (Serializer.existeArchivo(APP_STATE_FILE)) {
-                // Cargar estado desde el archivo
-                appState = (AppState) Serializer.cargarEstado(APP_STATE_FILE);
-                System.out.println("Estado de la aplicación cargado exitosamente.");
-                
-                // Verificar si los datos se cargaron correctamente
-                if (appState.getUsers() == null || appState.getUsers().isEmpty()) {
-                    System.out.println("ADVERTENCIA: No se encontraron datos en el estado cargado. Inicializando datos por defecto.");
-                    // Eliminar el archivo corrupto
-                    Serializer.eliminarArchivo(APP_STATE_FILE);
+                try {
+                    // Cargar estado desde el archivo
+                    appState = (AppState) Serializer.cargarEstado(APP_STATE_FILE);
+                    System.out.println("Estado de la aplicación cargado exitosamente.");
                     
-                    // Crear un nuevo estado
-                    appState = new AppState();
-                    
-                    // Inicializar datos de prueba
-                    initializeTestData();
-                } else {
-                    System.out.println("Usuarios encontrados en el estado cargado: " + appState.getUsers().size());
-                    // Cargar datos en los repositorios
-                    loadRepositories();
+                    // Verificar si los datos se cargaron correctamente
+                    if (appState.getUsers() != null && !appState.getUsers().isEmpty()) {
+                        System.out.println("Usuarios encontrados en el estado cargado: " + appState.getUsers().size());
+                        loadRepositories();
+                        dataInitialized = true;
+                        return;
+                    }
+                } catch (Exception e) {
+                    System.err.println("Error al cargar el estado desde archivo: " + e.getMessage());
+                    // Continuamos con la creación de nuevos datos
                 }
-            } else {
-                // Crear un nuevo estado
+            }
+            
+            if (!dataInitialized) {
+                // Si llegamos aquí, necesitamos crear nuevos datos
                 appState = new AppState();
-                System.out.println("Se ha creado un nuevo estado para la aplicación.");
-                
-                // Inicializar datos de prueba
+                System.out.println("Creando nuevo estado con datos de prueba.");
                 initializeTestData();
+                dataInitialized = true;
             }
         } catch (Exception e) {
-            // Si ocurre un error al cargar, crear un nuevo estado
-            appState = new AppState();
-            System.err.println("Error al cargar el estado de la aplicación: " + e.getMessage());
+            System.err.println("Error crítico en loadOrCreateState: " + e.getMessage());
             e.printStackTrace();
-            
-            // Eliminar archivo corrupto si existe
-            Serializer.eliminarArchivo(APP_STATE_FILE);
-            
-            // Inicializar datos de prueba
-            initializeTestData();
         }
     }
     

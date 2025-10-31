@@ -77,6 +77,15 @@ public class GridMapRenderer {
     }
     
     /**
+     * Limpia la selección actual
+     */
+    public void clearSelection() {
+        coordX = -1;
+        coordY = -1;
+        renderMap();
+    }
+
+    /**
      * Renderiza el mapa en el canvas
      */
     public void renderMap() {

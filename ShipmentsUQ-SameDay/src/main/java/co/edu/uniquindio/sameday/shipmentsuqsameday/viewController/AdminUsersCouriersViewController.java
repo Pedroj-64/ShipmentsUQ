@@ -647,7 +647,16 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         if (txt_avgRating != null) txt_avgRating.setText(String.format("%.2f", deliverer.getAverageRating()));
         if (txt_totalDeliveries != null) txt_totalDeliveries.setText(String.valueOf(deliverer.getTotalDeliveries()));
         
-        // Actualizar coordenadas
+        // Actualizar coordenadas en el mapa
+        if (controller != null && controller.getGridMapController() != null) {
+            controller.getGridMapController().clearSelection();
+            controller.getGridMapController().setSelectedCoordinates(deliverer.getCurrentX(), deliverer.getCurrentY());
+            // Actualizar el label de coordenadas si existe
+            if (lbl_coordDisplay != null) {
+                lbl_coordDisplay.setText(String.format("X: %.0f, Y: %.0f", 
+                    deliverer.getCurrentX(), deliverer.getCurrentY()));
+            }
+        }
         selectedX = deliverer.getX();
         selectedY = deliverer.getY();
         

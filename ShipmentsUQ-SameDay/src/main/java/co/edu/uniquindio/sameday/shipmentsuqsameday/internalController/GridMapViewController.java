@@ -66,7 +66,9 @@ public class GridMapViewController {
      * @param y coordenada Y
      */
     public void setSelectedCoordinates(double x, double y) {
+        renderer.clearSelection(); // Limpia la selección anterior
         renderer.setSelectedCoordinates(x, y);
+        renderer.renderMap(); // Actualiza el mapa
     }
     
     /**
@@ -90,5 +92,12 @@ public class GridMapViewController {
      */
     public void refreshMap() {
         renderer.renderMap();
+    }
+    
+    /**
+     * Limpia la selección actual en el mapa
+     */
+    public void clearSelection() {
+        renderer.clearSelection();
     }
 }

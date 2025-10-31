@@ -2,6 +2,7 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.Serializer;
 
 /**
  * Implementación base abstracta del repositorio usando un Map en memoria
@@ -78,6 +79,49 @@ public abstract class BaseRepository<T> implements Repository<T> {
      */
     protected abstract void setEntityId(T entity, UUID id);
     
+    /**
+     * Guarda el estado actual del repositorio en el archivo
+     * @throws IOException si hay error al guardar
+     */
+    public void saveToFile() {
+        try {
+            String fileName = getFileName();
+            Serializer.guardarEstado(new ArrayList<>(entities.values()), fileName);
+            System.out.println("Repositorio " + this.getClass().getSimpleName() + " guardado en " + fileName);
+        } catch (Exception e) {
+            System.err.println("Error al guardar repositorio " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Error al guardar repositorio", e);
+        }
+    }
+
+    /**
+     * Carga el estado del repositorio desde el archivo
+     * @throws IOException si hay error al cargar
+     */
+    @SuppressWarnings("unchecked")
+    public void loadFromFile() {
+        try {
+            String fileName = getFileName();
+            List<T> loadedEntities = (List<T>) Serializer.cargarEstado(fileName);
+            if (loadedEntities != null) {
+                loadEntities(loadedEntities);
+                System.out.println("Repositorio " + this.getClass().getSimpleName() + " cargado desde " + fileName);
+            }
+        } catch (Exception e) {
+            System.err.println("Error al cargar repositorio " + this.getClass().getSimpleName() + ": " + e.getMessage());
+            // No lanzamos excepción aquí para permitir inicio limpio si no hay archivo
+        }
+    }
+
+    /**
+     * Obtiene el nombre del archivo para serialización
+     * @return nombre del archivo
+     */
+    protected String getFileName() {
+        return "data/" + this.getClass().getSimpleName() + ".dat";
+    }
+
     /**
      * Carga una lista de entidades en el repositorio
      * @param entities Lista de entidades a cargar
