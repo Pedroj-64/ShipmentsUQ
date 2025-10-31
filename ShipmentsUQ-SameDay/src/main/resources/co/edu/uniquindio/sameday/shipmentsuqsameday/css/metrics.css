@@ -1,86 +1,142 @@
-/* CSS para AdminMetrics - Dashboard Profesional */
+/* 
+   metrics.css - Estilo para las métricas y reportes del sistema
+   Plataforma de logística ShipmentsUQ
+*/
 
-/* ========== COLORES PRINCIPALES ========== */
+/* Estilo general para la raíz (BorderPane) */
 .root {
-    -fx-background-color: #f0f2f5;
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
 }
 
-/* ========== ENCABEZADO ========== */
+/* Estilo para el contenedor del encabezado */
 .header-container {
-    -fx-background-color: linear-gradient(to right, #667eea 0%, #764ba2 100%);
-    -fx-padding: 25 20 25 20;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 3);
+    -fx-background-color: #f5f8fa;
+    background-color: #f5f8fa;
+    -fx-border-color: #e1e8ed;
+    border-color: #e1e8ed;
+    -fx-border-width: 0 0 1px 0;
+    border-width: 0 0 1px 0;
 }
 
-.title-label {
-    -fx-font-size: 28px;
+/* Título del encabezado */
+.header-title {
+    -fx-font-size: 26px;
+    font-size: 26px;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 2, 0, 0, 1);
+    font-weight: bold;
+    -fx-text-fill: #1a365d;
+    color: #1a365d;
 }
 
-.subtitle-label {
-    -fx-font-size: 16px;
-    -fx-text-fill: rgba(255, 255, 255, 0.9);
-    -fx-padding: 5 0 0 0;
-}
-
-/* ========== CONTENEDOR PRINCIPAL ========== */
+/* Contenedor del contenido principal */
 .content-container {
     -fx-background-color: transparent;
+    background-color: transparent;
 }
 
-/* ========== TARJETAS DE MÉTRICAS ========== */
-.metrics-cards-container {
-    -fx-alignment: center;
+/* Contenedores de secciones */
+.section-container {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-border-color: #e1e8ed;
+    border-color: #e1e8ed;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 8px;
+    border-radius: 8px;
+    -fx-padding: 20px;
+    padding: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 3, 0, 0, 1);
 }
 
-.metric-card {
-    -fx-background-color: white;
-    -fx-background-radius: 12px;
-    -fx-padding: 20 25 20 25;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 10, 0, 0, 2);
-    -fx-min-width: 180px;
-    -fx-alignment: center-left;
-    -fx-spacing: 8;
-}
-
-.metric-card:hover {
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 15, 0, 0, 4);
-    -fx-cursor: hand;
-}
-
-.metric-label {
-    -fx-font-size: 13px;
-    -fx-text-fill: #6c757d;
-    -fx-font-weight: 500;
-}
-
-.metric-value {
-    -fx-font-size: 32px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50;
-}
-
-/* ========== CONTENEDOR DE GRÁFICOS ========== */
-.charts-container {
-    -fx-alignment: center;
-}
-
-.chart-card {
-    -fx-background-color: white;
-    -fx-background-radius: 12px;
-    -fx-padding: 20;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 10, 0, 0, 2);
-    -fx-min-height: 350px;
-    -fx-spacing: 10;
-}
-
-.chart-title {
+/* Títulos de secciones */
+.section-title {
     -fx-font-size: 18px;
+    font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50;
-    -fx-padding: 0 0 10 0;
+    font-weight: bold;
+    -fx-text-fill: #1a365d;
+    color: #1a365d;
+    -fx-padding: 0 0 10px 0;
+    padding: 0 0 10px 0;
+}
+
+/* Tarjetas de métricas */
+.metric-card {
+    -fx-background-color: #f8fafc;
+    background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 6px;
+    border-radius: 6px;
+    -fx-padding: 15px;
+    padding: 15px;
+    -fx-spacing: 5px;
+}
+
+/* Etiquetas de métricas */
+.metric-label {
+    -fx-font-size: 12px;
+    font-size: 12px;
+    -fx-text-fill: #64748b;
+    color: #64748b;
+    -fx-font-weight: normal;
+    font-weight: normal;
+}
+
+/* Valores de métricas */
+.metric-value {
+    -fx-font-size: 24px;
+    font-size: 24px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1a365d;
+    color: #1a365d;
+}
+
+/* Contenedores de gráficos */
+.chart-container {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-border-color: #e2e8f0;
+    border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 6px;
+    border-radius: 6px;
+    -fx-padding: 15px;
+    padding: 15px;
+}
+
+/* Títulos de gráficos */
+.chart-title {
+    -fx-font-size: 16px;
+    font-size: 16px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1a365d;
+    color: #1a365d;
+    -fx-padding: 0 0 10px 0;
+    padding: 0 0 10px 0;
+}
+
+/* Detalles de estado */
+.status-details {
+    -fx-background-color: #f8fafc;
+    background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    border-color: #e2e8f0;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 6px;
+    border-radius: 6px;
+    -fx-padding: 15px;
+    padding: 15px;
 }
 
 /* ========== ESTILOS DE GRÁFICOS ========== */
@@ -114,98 +170,67 @@
 .default-color1.chart-bar { -fx-bar-fill: #764ba2; }
 .default-color1.chart-series-line { -fx-stroke: #764ba2; }
 
-/* ========== GRID DE TOP REPARTIDORES ========== */
-.top-deliverers-grid {
-    -fx-background-color: transparent;
-    -fx-hgap: 15;
-    -fx-vgap: 10;
+/* Estilos adicionales para texto */
+Label {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-text-fill: #475569;
+    color: #475569;
 }
 
-.top-deliverers-grid Label {
+/* Botones de reportes */
+.report-button {
+    -fx-background-color: #1a73e8;
+    background-color: #1a73e8;
+    -fx-text-fill: white;
+    color: white;
     -fx-font-size: 14px;
-    -fx-text-fill: #2c3e50;
+    font-size: 14px;
+    -fx-font-weight: 500;
+    font-weight: 500;
+    -fx-padding: 12px 24px;
+    padding: 12px 24px;
+    -fx-background-radius: 6px;
+    border-radius: 6px;
+    -fx-cursor: hand;
+    cursor: pointer;
+    -fx-border-width: 0;
+    border-width: 0;
 }
 
-.top-deliverers-grid .label:first-child {
-    -fx-font-weight: bold;
+.report-button:hover {
+    -fx-background-color: #1557b0;
+    background-color: #1557b0;
 }
 
-/* ========== TIEMPO PROMEDIO DE ENTREGA ========== */
-.avg-delivery-time {
-    -fx-background-color: #f8f9fa;
-    -fx-background-radius: 8px;
-    -fx-padding: 15;
-    -fx-spacing: 8;
+.report-button:pressed {
+    -fx-background-color: #1045a5;
+    background-color: #1045a5;
 }
 
-.avg-delivery-time .metric-label {
-    -fx-font-size: 12px;
-    -fx-text-fill: #6c757d;
+/* Gráficos específicos */
+.trend-chart {
+    -fx-background-color: transparent;
+    background-color: transparent;
 }
 
-.avg-delivery-time .metric-value {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #667eea;
-}
-
-/* ========== PIE DE PÁGINA ========== */
+/* Pie de página */
 .footer-container {
-    -fx-background-color: white;
-    -fx-border-color: #e9ecef;
-    -fx-border-width: 1 0 0 0;
-    -fx-padding: 15 20 15 20;
+    -fx-background-color: #f8fafc;
+    background-color: #f8fafc;
+    -fx-border-color: #e2e8f0;
+    border-color: #e2e8f0;
+    -fx-border-width: 1px 0 0 0;
+    border-width: 1px 0 0 0;
+    -fx-padding: 15px 20px;
+    padding: 15px 20px;
 }
 
-.footer-label {
-    -fx-font-size: 13px;
-    -fx-text-fill: #6c757d;
+/* Efectos hover para elementos interactivos */
+.metric-card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.15), 5, 0, 0, 2);
 }
 
-.footer-value {
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #2c3e50;
-}
-
-/* ========== ANIMACIONES Y TRANSICIONES ========== */
-.metric-card,
-.chart-card {
-    -fx-transition: all 0.3s ease;
-}
-
-/* ========== SCROLLBAR PERSONALIZADO ========== */
-.scroll-pane {
-    -fx-background-color: transparent;
-}
-
-.scroll-pane > .viewport {
-    -fx-background-color: transparent;
-}
-
-.scroll-bar:vertical {
-    -fx-background-color: transparent;
-}
-
-.scroll-bar:horizontal {
-    -fx-background-color: transparent;
-}
-
-.scroll-bar .thumb {
-    -fx-background-color: derive(#667eea, 50%);
-    -fx-background-radius: 5px;
-}
-
-.scroll-bar .thumb:hover {
-    -fx-background-color: #667eea;
-}
-
-.scroll-bar .track {
-    -fx-background-color: transparent;
-}
-
-.scroll-bar .increment-button,
-.scroll-bar .decrement-button {
-    -fx-background-color: transparent;
-    -fx-padding: 0;
+.report-button:focused {
+    -fx-effect: dropshadow(three-pass-box, rgba(26, 115, 232, 0.4), 8, 0, 0, 0);
 }
