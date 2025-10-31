@@ -14,6 +14,7 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     requires com.almasb.fxgl.all;
     requires jdk.jsobject;
     requires javafx.base;
+    requires java.desktop;
 
     opens co.edu.uniquindio.sameday.shipmentsuqsameday to javafx.fxml;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.viewController to javafx.fxml;

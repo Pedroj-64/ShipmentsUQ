@@ -192,7 +192,7 @@ public class AdminDashboardViewController implements Initializable {
     private void loadMetricsNewView() {
         try {
             // Siempre cargar una vista nueva para asegurar datos actualizados
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/interfaces/AdminMetricsNew.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/interfaces/AdminMetrics.fxml"));
             Parent newMetricsView = loader.load();
             
             // Limpiar y mostrar la vista

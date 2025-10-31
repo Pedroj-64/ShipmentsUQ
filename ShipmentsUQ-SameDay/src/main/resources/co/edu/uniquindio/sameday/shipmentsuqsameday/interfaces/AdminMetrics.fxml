@@ -123,6 +123,11 @@
                             <Button fx:id="btn_generateMonthlyReport" text="Reporte Mensual" styleClass="report-button" />
                             <Button fx:id="btn_generateDailyReport" text="Reporte Diario" styleClass="report-button" />
                         </HBox>
+                        
+                        <!-- Botón de actualizar -->
+                        <HBox spacing="10.0" alignment="CENTER">
+                            <Button fx:id="btn_refreshMetrics" onAction="#handleRefreshMetrics" text="🔄 Actualizar Métricas" styleClass="refresh-button" />
+                        </HBox>
                     </VBox>
 
                 </VBox>
