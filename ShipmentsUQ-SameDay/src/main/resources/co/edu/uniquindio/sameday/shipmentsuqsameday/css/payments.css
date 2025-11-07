@@ -1,0 +1,492 @@
+/* 
+   payments.css - Estilo para la pantalla de gestión de pagos
+   Plataforma de logística ShipmentsUQ
+*/
+
+/* Estilo para el ScrollPane */
+.scroll-pane {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-background: transparent;
+    background: transparent;
+    -fx-border-color: transparent;
+    border-color: transparent;
+    -fx-padding: 0;
+    padding: 0;
+    -fx-fit-to-width: true;
+    -fx-fit-to-height: true;
+    -fx-hbar-policy: as-needed;
+    -fx-vbar-policy: as-needed;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+/* Estilos para las barras de desplazamiento */
+.scroll-pane .scroll-bar:horizontal,
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: #f0f0f0;
+    background-color: #f0f0f0;
+    -fx-opacity: 0.8;
+    opacity: 0.8;
+}
+
+.scroll-pane .scroll-bar:horizontal .thumb,
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: #c0c0c0;
+    background-color: #c0c0c0;
+    -fx-background-radius: 5em;
+}
+
+.scroll-pane .scroll-bar:horizontal .thumb:hover,
+.scroll-pane .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #a0a0a0;
+    background-color: #a0a0a0;
+}
+
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: #f0f0f0;
+    background-color: #f0f0f0;
+}
+
+.scroll-bar:vertical .thumb,
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #c0c0c0;
+    background-color: #c0c0c0;
+    -fx-background-radius: 4px;
+}
+
+/* Estilo general para la raíz (BorderPane) */
+.root {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Estilo para el contenedor del encabezado */
+.header-container {
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-width: 0 0 1px 0;
+    border-width: 0 0 1px 0;
+}
+
+/* Estilo para el título principal */
+.title-label {
+    -fx-font-size: 28px;
+    font-size: 28px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1a56a7;
+    color: #1a56a7;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 4, 0, 0, 1);
+}
+
+/* Estilos para el formulario de pagos */
+.form-container {
+    -fx-background-color: #f8f8f8;
+    background-color: #f8f8f8;
+    -fx-border-color: #e0e0e0;
+    border-color: #e0e0e0;
+    -fx-border-width: 0 1px 0 0;
+    border-width: 0 1px 0 0;
+    -fx-min-width: 300;
+    min-width: 300px;
+    -fx-pref-width: 320;
+    width: 320px;
+}
+
+/* Título de secciones */
+.section-title {
+    -fx-font-size: 20px;
+    font-size: 20px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #333333;
+    color: #333333;
+    -fx-padding: 0 0 10px 0;
+    padding: 0 0 10px 0;
+}
+
+.subsection-title {
+    -fx-font-size: 16px;
+    font-size: 16px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #444444;
+    color: #444444;
+    -fx-padding: 10px 0 5px 0;
+    padding: 10px 0 5px 0;
+}
+
+/* Etiquetas de formulario */
+.form-label {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #555555;
+    color: #555555;
+}
+
+/* Campos de texto */
+.text-field, .password-field, .date-picker {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-background-radius: 5px;
+    -fx-border-color: #cccccc;
+    border-color: #cccccc;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 8px;
+    padding: 8px;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+/* Estilo para ComboBox y ChoiceBox */
+.combo-box, .choice-box {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-background-radius: 5px;
+    -fx-border-color: #cccccc;
+    border-color: #cccccc;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 3px;
+    padding: 3px;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+/* Efecto al enfocar campos de formulario */
+.text-field:focused, .password-field:focused, 
+.combo-box:focused, .choice-box:focused, .date-picker:focused {
+    -fx-border-color: #4a90e2;
+    border-color: #4a90e2;
+    -fx-effect: dropshadow(three-pass-box, rgba(74, 144, 226, 0.5), 3, 0, 0, 0);
+}
+
+/* Botones para el formulario de pago */
+.pay-button {
+    -fx-background-color: #27ae60;
+    background-color: #27ae60;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.pay-button:hover {
+    -fx-background-color: #2ecc71;
+    background-color: #2ecc71;
+}
+
+.clear-button {
+    -fx-background-color: #f0f0f0;
+    background-color: #f0f0f0;
+    -fx-text-fill: #555555;
+    color: #555555;
+    -fx-padding: 10px 20px;
+    padding: 10px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.clear-button:hover {
+    -fx-background-color: #e0e0e0;
+    background-color: #e0e0e0;
+}
+
+/* Sección de tarjeta de crédito */
+.card-section {
+    -fx-background-color: #fafafa;
+    background-color: #fafafa;
+    -fx-background-radius: 5px;
+    -fx-border-color: #e5e5e5;
+    border-color: #e5e5e5;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 10px;
+    padding: 10px;
+    -fx-margin-top: 15px;
+    margin-top: 15px;
+}
+
+/* Estilos para el historial de pagos */
+.history-container {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-padding: 10px;
+    padding: 10px;
+    -fx-min-width: 400;
+    min-width: 400px;
+    -fx-hgrow: always;
+    -fx-vgrow: always;
+}
+
+/* Contenedor de filtros */
+.filter-container {
+    -fx-background-color: #f8f8f8;
+    background-color: #f8f8f8;
+    -fx-background-radius: 5px;
+    -fx-border-color: #e5e5e5;
+    border-color: #e5e5e5;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 10px;
+    padding: 10px;
+    -fx-margin-bottom: 15px;
+    margin-bottom: 15px;
+}
+
+.filter-label {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #555555;
+    color: #555555;
+}
+
+.filter-button {
+    -fx-background-color: #1a56a7;
+    background-color: #1a56a7;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 6px 15px;
+    padding: 6px 15px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.filter-button:hover {
+    -fx-background-color: #3873c4;
+    background-color: #3873c4;
+}
+
+.clear-filter-button {
+    -fx-background-color: #f0f0f0;
+    background-color: #f0f0f0;
+    -fx-text-fill: #555555;
+    color: #555555;
+    -fx-padding: 6px 15px;
+    padding: 6px 15px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.clear-filter-button:hover {
+    -fx-background-color: #e0e0e0;
+    background-color: #e0e0e0;
+}
+
+/* Estilos para la tabla de pagos */
+.table-view {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #e0e0e0;
+    border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f0f0f0;
+    background-color: #f0f0f0;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #f9f9f9;
+    background-color: #f9f9f9;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #d1e6ff;
+    background-color: #d1e6ff;
+}
+
+/* Estilos para las celdas de estado según el valor */
+.status-approved {
+    -fx-text-fill: #27ae60;
+    color: #27ae60;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.status-rejected {
+    -fx-text-fill: #e74c3c;
+    color: #e74c3c;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.status-pending {
+    -fx-text-fill: #f39c12;
+    color: #f39c12;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+/* Botones para acciones del historial */
+.receipt-button {
+    -fx-background-color: #3498db;
+    background-color: #3498db;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 8px 15px;
+    padding: 8px 15px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.receipt-button:hover {
+    -fx-background-color: #2980b9;
+    background-color: #2980b9;
+}
+
+.report-button {
+    -fx-background-color: #e67e22;
+    background-color: #e67e22;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 8px 15px;
+    padding: 8px 15px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.report-button:hover {
+    -fx-background-color: #d35400;
+    background-color: #d35400;
+}
+
+/* Estilo para el contenedor de mensajes de estado */
+.status-container {
+    -fx-background-color: #fafafa;
+    background-color: #fafafa;
+    -fx-border-color: #e0e0e0;
+    border-color: #e0e0e0;
+    -fx-border-width: 1px 0 0 0;
+    border-width: 1px 0 0 0;
+}
+
+/* Estilos para la sección de método de pago */
+.payment-method-section {
+    -fx-background-color: #f8fcff;
+    background-color: #f8fcff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+    -fx-padding: 10px;
+    padding: 10px;
+    -fx-spacing: 10px;
+    margin-top: 15px;
+}
+
+/* Información del método de pago seleccionado */
+.payment-method-info {
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-padding: 8px;
+    padding: 8px;
+}
+
+.payment-method-details {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-text-fill: #333333;
+    color: #333333;
+}
+
+/* Botón para agregar nuevo método de pago */
+.add-payment-method-button {
+    -fx-background-color: #e6f0ff;
+    background-color: #e6f0ff;
+    -fx-text-fill: #1a56a7;
+    color: #1a56a7;
+    -fx-border-color: #c0d6f7;
+    border-color: #c0d6f7;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-padding: 5px 10px;
+    padding: 5px 10px;
+    -fx-font-size: 12px;
+    font-size: 12px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.add-payment-method-button:hover {
+    -fx-background-color: #d4e6ff;
+    background-color: #d4e6ff;
+}
+
+/* Estilos para los mensajes de estado */
+.status-label {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-padding: 5px 0;
+    padding: 5px 0;
+}
+
+/* Clases para mensajes de estado específicos */
+.success-message {
+    -fx-text-fill: #27ae60;
+    color: #27ae60;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.error-message {
+    -fx-text-fill: #e74c3c;
+    color: #e74c3c;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.info-message {
+    -fx-text-fill: #3498db;
+    color: #3498db;
+    -fx-font-style: italic;
+    font-style: italic;
+}

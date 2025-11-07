@@ -1,0 +1,278 @@
+/* 
+   addressform.css - Estilos para el formulario de direcciones
+   Plataforma de logística ShipmentsUQ
+*/
+
+/* Estilos generales */
+.root {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 3);
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+}
+
+/* Contenedor del encabezado */
+.header-container {
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-width: 0 0 1px 0;
+    border-width: 0 0 1px 0;
+}
+
+/* Título principal */
+.header-title {
+    -fx-font-size: 22px;
+    font-size: 22px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1a365d;
+    color: #1a365d;
+}
+
+/* Contenedor del formulario */
+.form-container {
+    -fx-background-color: #fcfcfc;
+    background-color: #fcfcfc;
+    -fx-border-color: #f0f0f0;
+    border-color: #f0f0f0;
+    -fx-border-width: 0 1px 0 0;
+    border-width: 0 1px 0 0;
+}
+
+/* Título de sección del formulario */
+.form-section-title {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #4a90e2;
+    color: #4a90e2;
+    -fx-padding: 0 0 10px 0;
+    padding: 0 0 10px 0;
+}
+
+/* Etiquetas del formulario */
+.form-label {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #495057;
+    color: #495057;
+    -fx-alignment: CENTER_RIGHT;
+    -fx-text-alignment: RIGHT;
+    text-align: right;
+}
+
+/* Campos de texto */
+.form-field {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #ced4da;
+    border-color: #ced4da;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-padding: 8px;
+    padding: 8px;
+}
+
+.form-field:focused {
+    -fx-border-color: #4a90e2;
+    border-color: #4a90e2;
+    -fx-border-width: 2px;
+    border-width: 2px;
+}
+
+/* Checkbox */
+.form-checkbox {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-text-fill: #495057;
+    color: #495057;
+    -fx-padding: 5px 0;
+    padding: 5px 0;
+}
+
+/* Texto de ayuda */
+.form-help-text {
+    -fx-font-size: 12px;
+    font-size: 12px;
+    -fx-font-style: italic;
+    font-style: italic;
+    -fx-text-fill: #6c757d;
+    color: #6c757d;
+    -fx-padding: 10px 0 0 0;
+    padding: 10px 0 0 0;
+}
+
+/* Contenedor del mapa */
+.map-container {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-padding: 10px;
+    padding: 10px;
+    -fx-max-height: 400px;
+    max-height: 400px;
+}
+
+/* Título del mapa */
+.map-title {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #4a90e2;
+    color: #4a90e2;
+}
+
+/* WebView para el mapa */
+.map-view {
+    -fx-border-color: #e0e0e0;
+    border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-background-color: #f9f9f9;
+    background-color: #f9f9f9;
+}
+
+/* Etiqueta de coordenadas */
+.coordinates-label {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #4a90e2;
+    color: #4a90e2;
+    -fx-padding: 8px 0 0 0;
+    padding: 8px 0 0 0;
+}
+
+/* Contenedor del mapa de cuadrícula */
+.grid-map-container {
+    -fx-background-color: #fafafa;
+    background-color: #fafafa;
+    -fx-border-color: #d0d0d0;
+    border-color: #d0d0d0;
+    -fx-border-width: 2px;
+    border-width: 2px;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-padding: 8px;
+    padding: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 4, 0, 0, 2);
+}
+
+.grid-map-container Canvas {
+    -fx-max-width: 100%;
+    max-width: 100%;
+    -fx-max-height: 100%;
+    max-height: 100%;
+}
+
+/* Contenedor de botones */
+.buttons-container {
+    -fx-background-color: #f8f9fa;
+    background-color: #f8f9fa;
+    -fx-border-color: #e9ecef;
+    border-color: #e9ecef;
+    -fx-border-width: 1px 0 0 0;
+    border-width: 1px 0 0 0;
+}
+
+/* Botón de guardar */
+.save-button {
+    -fx-background-color: #28a745;
+    background-color: #28a745;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 8px 20px;
+    padding: 8px 20px;
+    -fx-background-radius: 4px;
+    border-radius: 4px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.save-button:hover {
+    -fx-background-color: #218838;
+    background-color: #218838;
+}
+
+/* Botón de cancelar */
+.cancel-button {
+    -fx-background-color: #f2f2f2;
+    background-color: #f2f2f2;
+    -fx-text-fill: #495057;
+    color: #495057;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 8px 20px;
+    padding: 8px 20px;
+    -fx-background-radius: 4px;
+    border-radius: 4px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.cancel-button:hover {
+    -fx-background-color: #e2e6ea;
+    background-color: #e2e6ea;
+}
+
+/* Contenedor de estado */
+.status-container {
+    -fx-background-color: #f8f9fa;
+    background-color: #f8f9fa;
+    -fx-border-color: #e9ecef;
+    border-color: #e9ecef;
+    -fx-border-width: 0 0 0 0;
+    border-width: 0 0 0 0;
+}
+
+/* Mensaje de estado */
+.status-message {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-text-fill: #6c757d;
+    color: #6c757d;
+}
+
+/* Estilos específicos para mensajes */
+.success-message {
+    -fx-text-fill: #28a745;
+    color: #28a745;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.error-message {
+    -fx-text-fill: #dc3545;
+    color: #dc3545;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.warning-message {
+    -fx-text-fill: #ffc107;
+    color: #ffc107;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.info-message {
+    -fx-text-fill: #17a2b8;
+    color: #17a2b8;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}

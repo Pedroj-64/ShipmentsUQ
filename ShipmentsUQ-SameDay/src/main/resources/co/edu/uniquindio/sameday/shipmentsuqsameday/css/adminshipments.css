@@ -1,0 +1,450 @@
+/* 
+   adminshipments.css - Estilo para la pantalla de gestión de envíos
+   Plataforma de logística ShipmentsUQ
+*/
+
+/* Estilo general para la raíz (BorderPane) */
+.root {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Estilo para el contenedor del encabezado */
+.header-container {
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-width: 0 0 1px 0;
+    border-width: 0 0 1px 0;
+}
+
+/* Título principal */
+.header-title {
+    -fx-font-size: 26px;
+    font-size: 26px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1a365d;
+    color: #1a365d;
+}
+
+/* Contenedor del centro */
+.center-container {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+/* Contenedor de filtros */
+.filter-container {
+    -fx-background-color: #f8f9fa;
+    background-color: #f8f9fa;
+    -fx-background-radius: 5px;
+    border-radius: 5px;
+    -fx-border-color: #e9ecef;
+    border-color: #e9ecef;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+}
+
+/* Etiquetas de filtro */
+.filter-label {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #495057;
+    color: #495057;
+}
+
+/* Campos de filtro */
+.filter-field {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #ced4da;
+    border-color: #ced4da;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-padding: 5px;
+    padding: 5px;
+}
+
+.filter-field:focused {
+    -fx-border-color: #4a90e2;
+    border-color: #4a90e2;
+}
+
+/* Botón de filtro */
+.filter-button {
+    -fx-background-color: #4a90e2;
+    background-color: #4a90e2;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 8px 15px;
+    padding: 8px 15px;
+    -fx-background-radius: 4px;
+    border-radius: 4px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.filter-button:hover {
+    -fx-background-color: #3a7fcf;
+    background-color: #3a7fcf;
+}
+
+/* Botón de limpiar filtros */
+.clear-filter-button {
+    -fx-background-color: #f8f9fa;
+    background-color: #f8f9fa;
+    -fx-text-fill: #495057;
+    color: #495057;
+    -fx-border-color: #ced4da;
+    border-color: #ced4da;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-padding: 8px 15px;
+    padding: 8px 15px;
+    -fx-background-radius: 4px;
+    border-radius: 4px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.clear-filter-button:hover {
+    -fx-background-color: #e9ecef;
+    background-color: #e9ecef;
+}
+
+/* Tabla de envíos */
+.shipments-table {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: #dee2e6;
+    border-color: #dee2e6;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 5px;
+    border-radius: 5px;
+}
+
+/* Encabezados de la tabla */
+.shipments-table .column-header {
+    -fx-background-color: #1a365d;
+    background-color: #1a365d;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px;
+    padding: 10px;
+}
+
+.shipments-table .column-header-background {
+    -fx-background-color: #1a365d;
+    background-color: #1a365d;
+}
+
+/* Filas de la tabla */
+.shipments-table .table-row-cell {
+    -fx-background-color: white;
+    background-color: white;
+    -fx-border-color: transparent transparent #f0f0f0 transparent;
+    border-color: transparent transparent #f0f0f0 transparent;
+    -fx-border-width: 1px;
+    border-width: 1px;
+}
+
+.shipments-table .table-row-cell:odd {
+    -fx-background-color: #f8f9fa;
+    background-color: #f8f9fa;
+}
+
+.shipments-table .table-row-cell:selected {
+    -fx-background-color: #e8f0fe;
+    background-color: #e8f0fe;
+    -fx-text-fill: #1a365d;
+    color: #1a365d;
+}
+
+/* Contenedor inferior de acciones */
+.bottom-container {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+/* Contenedor de acciones */
+.actions-container {
+    -fx-background-color: #f8f9fa;
+    background-color: #f8f9fa;
+    -fx-border-color: #e9ecef;
+    border-color: #e9ecef;
+    -fx-border-width: 1px 0;
+    border-width: 1px 0;
+}
+
+/* Botón de asignar repartidor */
+.assign-button {
+    -fx-background-color: #4a90e2;
+    background-color: #4a90e2;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 15px;
+    padding: 10px 15px;
+    -fx-background-radius: 4px;
+    border-radius: 4px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.assign-button:hover {
+    -fx-background-color: #3a7fcf;
+    background-color: #3a7fcf;
+}
+
+/* Botón de actualizar estado */
+.update-button {
+    -fx-background-color: #ff9800;
+    background-color: #ff9800;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 15px;
+    padding: 10px 15px;
+    -fx-background-radius: 4px;
+    border-radius: 4px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.update-button:hover {
+    -fx-background-color: #f57c00;
+    background-color: #f57c00;
+}
+
+/* Botón de incidencia */
+.incident-button {
+    -fx-background-color: #e53935;
+    background-color: #e53935;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 15px;
+    padding: 10px 15px;
+    -fx-background-radius: 4px;
+    border-radius: 4px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.incident-button:hover {
+    -fx-background-color: #d32f2f;
+    background-color: #d32f2f;
+}
+
+/* Botón de eliminar envío */
+.delete-button {
+    -fx-background-color: #5f6368;
+    background-color: #5f6368;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 15px;
+    padding: 10px 15px;
+    -fx-background-radius: 4px;
+    border-radius: 4px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    -fx-background-color: #474b50;
+    background-color: #474b50;
+}
+
+/* Contenedor de estado */
+.status-container {
+    -fx-background-color: #f8f9fa;
+    background-color: #f8f9fa;
+}
+
+/* Etiqueta de estado */
+.status-label {
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+/* Estados de envío para la columna de estado */
+.state-requested {
+    -fx-text-fill: #757575;
+    color: #757575;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.state-assigned {
+    -fx-text-fill: #4a90e2;
+    color: #4a90e2;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.state-in-route {
+    -fx-text-fill: #ff9800;
+    color: #ff9800;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.state-delivered {
+    -fx-text-fill: #43a047;
+    color: #43a047;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.state-incident {
+    -fx-text-fill: #e53935;
+    color: #e53935;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+/* Panel de detalle */
+.detail-container {
+    -fx-background-color: #f8f9fa;
+    background-color: #f8f9fa;
+    -fx-border-color: #e9ecef;
+    border-color: #e9ecef;
+    -fx-border-width: 0 0 0 1px;
+    border-width: 0 0 0 1px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 1);
+}
+
+/* Título del panel de detalle */
+.detail-title {
+    -fx-font-size: 18px;
+    font-size: 18px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1a365d;
+    color: #1a365d;
+    -fx-padding: 0 0 10px 0;
+    padding: 0 0 10px 0;
+    -fx-border-color: #dee2e6;
+    border-color: #dee2e6;
+    -fx-border-width: 0 0 1px 0;
+    border-width: 0 0 1px 0;
+}
+
+/* Elementos de detalle */
+.detail-item {
+    -fx-padding: 5px 0;
+    padding: 5px 0;
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+/* Etiquetas de detalle */
+.detail-label {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #495057;
+    color: #495057;
+    -fx-min-width: 80px;
+    min-width: 80px;
+}
+
+/* Valores de detalle */
+.detail-value {
+    -fx-font-size: 14px;
+    font-size: 14px;
+    -fx-text-fill: #212529;
+    color: #212529;
+    -fx-wrap-text: true;
+    -fx-text-alignment: left;
+    text-align: left;
+}
+
+/* Sección adicional de detalle */
+.detail-section {
+    -fx-font-size: 16px;
+    font-size: 16px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #1a365d;
+    color: #1a365d;
+    -fx-padding: 10px 0 5px 0;
+    padding: 10px 0 5px 0;
+    -fx-border-color: #dee2e6;
+    border-color: #dee2e6;
+    -fx-border-width: 1px 0 0 0;
+    border-width: 1px 0 0 0;
+}
+
+/* Contenedor de información adicional */
+.additional-info-container {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-border-color: #e9ecef;
+    border-color: #e9ecef;
+    -fx-border-width: 1px;
+    border-width: 1px;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-padding: 10px;
+    padding: 10px;
+}
+
+/* Etiquetas completas */
+.detail-label-full {
+    -fx-font-size: 13px;
+    font-size: 13px;
+    -fx-text-fill: #495057;
+    color: #495057;
+    -fx-wrap-text: true;
+}
+
+/* Mensajes de estado */
+.success-message {
+    -fx-text-fill: #43a047;
+    color: #43a047;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.error-message {
+    -fx-text-fill: #e53935;
+    color: #e53935;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.warning-message {
+    -fx-text-fill: #ff9800;
+    color: #ff9800;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.info-message {
+    -fx-text-fill: #4a90e2;
+    color: #4a90e2;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}

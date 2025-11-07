@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.ShipmentTrackingViewController"
+            prefWidth="600" prefHeight="500"
+            styleClass="tracking-container"
+            stylesheets="@../css/shipment-tracking.css">
+    
+    <!-- Barra superior con información general -->
+    <top>
+        <VBox spacing="10" styleClass="tracking-header">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            
+            <Label text="Seguimiento de Envío" styleClass="tracking-title"/>
+            
+            <HBox spacing="20">
+                <VBox spacing="5">
+                    <Label text="ID del Envío:" styleClass="tracking-label"/>
+                    <Label fx:id="lbl_shipmentId" styleClass="tracking-value"/>
+                </VBox>
+                
+                <VBox spacing="5">
+                    <Label text="Estado:" styleClass="tracking-label"/>
+                    <Label fx:id="lbl_shipmentStatus" styleClass="tracking-value"/>
+                </VBox>
+                
+                <VBox spacing="5">
+                    <Label text="Repartidor:" styleClass="tracking-label"/>
+                    <Label fx:id="lbl_delivererName" styleClass="tracking-value"/>
+                </VBox>
+            </HBox>
+        </VBox>
+    </top>
+    
+    <!-- Área central para el mapa -->
+    <center>
+        <VBox spacing="10">
+            <padding>
+                <Insets top="10" right="15" bottom="10" left="15"/>
+            </padding>
+            
+            <Label text="Ubicación actual del repartidor" styleClass="section-title"/>
+            
+            <!-- Contenedor para el mapa -->
+            <Pane fx:id="mapContainer" minHeight="280" maxHeight="280" prefHeight="280" minWidth="560" maxWidth="560" prefWidth="560" styleClass="map-container"/>
+            
+            <!-- Detalles de la ubicación -->
+            <HBox spacing="15" alignment="CENTER">
+                <Label text="Coordenadas:" styleClass="tracking-label"/>
+                <Label fx:id="lbl_coordinates" styleClass="coordinates-value"/>
+                
+                <Label text="Distancia al destino:" styleClass="tracking-label"/>
+                <Label fx:id="lbl_distanceToDestination" styleClass="tracking-value"/>
+            </HBox>
+        </VBox>
+    </center>
+    
+    <!-- Barra inferior con botones -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="15" styleClass="tracking-actions">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15"/>
+            </padding>
+            
+            <Button fx:id="btn_refresh" text="Actualizar ubicación" styleClass="refresh-button"/>
+            <Button fx:id="btn_close" text="Cerrar" styleClass="close-button"/>
+        </HBox>
+    </bottom>
+    
+</BorderPane>

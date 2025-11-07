@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
+
+<BorderPane maxHeight="550.0" maxWidth="900.0" minHeight="550.0" minWidth="900.0" prefHeight="550.0" prefWidth="900.0" styleClass="root" stylesheets="@../css/addressform.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.AddressFormViewController">
+   <top>
+      <HBox alignment="CENTER" styleClass="header-container" BorderPane.alignment="CENTER">
+         <children>
+            <Label fx:id="lbl_title" styleClass="header-title" text="Registrar Dirección" />
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+         </padding>
+      </HBox>
+   </top>
+   <left>
+      <VBox spacing="10.0" styleClass="form-container" BorderPane.alignment="CENTER">
+         <children>
+            <Label styleClass="form-section-title" text="Información de la dirección" />
+            <GridPane hgap="10.0" vgap="12.0">
+              <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="200.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label fx:id="lbl_alias" styleClass="form-label" text="Alias:" />
+                  <Label fx:id="lbl_street" styleClass="form-label" text="Calle / Dirección:" GridPane.rowIndex="1" />
+                  <Label fx:id="lbl_zone" styleClass="form-label" text="Zona / Sector:" GridPane.rowIndex="2" />
+                  <Label fx:id="lbl_city" styleClass="form-label" text="Ciudad:" GridPane.rowIndex="3" />
+                  <Label fx:id="lbl_zipCode" styleClass="form-label" text="Código Postal:" GridPane.rowIndex="4" />
+                  <Label fx:id="lbl_complement" styleClass="form-label" text="Complemento:" GridPane.rowIndex="5" />
+                  <TextField fx:id="txt_alias" promptText="Ej: Casa, Oficina" styleClass="form-field" GridPane.columnIndex="1" />
+                  <TextField fx:id="txt_street" promptText="Calle, número, etc." styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="txt_zone" promptText="Barrio o sector" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <TextField fx:id="txt_city" promptText="Ciudad" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <TextField fx:id="txt_zipCode" promptText="Código postal" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <TextField fx:id="txt_complement" promptText="Apartamento, piso, etc." styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                  <CheckBox fx:id="chk_default" mnemonicParsing="false" styleClass="form-checkbox" text="Establecer como dirección predeterminada" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+               </children>
+            </GridPane>
+            <Label styleClass="form-help-text" text="* Haz clic en el mapa para seleccionar la ubicación exacta" wrapText="true" />
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+   </left>
+   <center>
+      <VBox spacing="8.0" styleClass="map-container" BorderPane.alignment="CENTER">
+         <children>
+            <Label styleClass="map-title" text="Ubicación en el mapa">
+               <VBox.margin>
+                  <Insets bottom="5.0" />
+               </VBox.margin>
+            </Label>
+            <StackPane fx:id="mapContainer" maxHeight="340.0" maxWidth="400.0" minHeight="300.0" minWidth="360.0" prefHeight="320.0" prefWidth="380.0" styleClass="grid-map-container">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </StackPane>
+            <Label fx:id="lbl_coordinates" styleClass="coordinates-label" text="Coordenadas: --">
+               <VBox.margin>
+                  <Insets top="8.0" />
+               </VBox.margin>
+            </Label>
+         </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+         <padding>
+            <Insets bottom="15.0" left="10.0" right="15.0" top="15.0" />
+         </padding>
+      </VBox>
+   </center>
+   <bottom>
+      <VBox spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox alignment="CENTER" spacing="15.0" styleClass="buttons-container">
+               <children>
+                  <Button fx:id="btn_save" mnemonicParsing="false" styleClass="save-button" text="Guardar Dirección" />
+                  <Button fx:id="btn_cancel" mnemonicParsing="false" styleClass="cancel-button" text="Cancelar" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="0.0" right="0.0" top="10.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" styleClass="status-container">
+               <children>
+                  <Label fx:id="lbl_status" styleClass="status-message" text="Completa el formulario y selecciona la ubicación en el mapa" />
+               </children>
+               <padding>
+                  <Insets bottom="10.0" left="20.0" right="20.0" top="5.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </bottom>
+</BorderPane>

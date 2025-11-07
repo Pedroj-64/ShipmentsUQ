@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.UserShipmentsViewController"
+            fitToWidth="false"
+            fitToHeight="true"
+            pannable="true"
+            hbarPolicy="AS_NEEDED"
+            vbarPolicy="NEVER"
+            styleClass="main-scroll-pane-horizontal"
+            maxHeight="1.7976931348623157E308" 
+            maxWidth="1.7976931348623157E308"
+            VBox.vgrow="ALWAYS" 
+            HBox.hgrow="ALWAYS"
+            stylesheets="@../css/shipments.css">
+    <content>
+        <BorderPane
+            maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+            prefHeight="-1" prefWidth="1200"
+            minWidth="1100" 
+            VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+
+    <!-- Zona superior (top) -->
+    <top>
+        <HBox alignment="CENTER" styleClass="header-container">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20" />
+            </padding>
+            <Label text="Mis Envíos" styleClass="title-label" />
+        </HBox>
+    </top>
+    
+    <!-- Zona central (center) - Tabla de envíos -->
+    <center>
+        <VBox spacing="15" styleClass="content-container" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20" />
+            </padding>
+            
+            <!-- Controles de filtro -->
+            <HBox spacing="10" alignment="CENTER">
+                <Label text="Desde:" styleClass="filter-label" />
+                <DatePicker fx:id="dp_startDate" promptText="Fecha inicio" />
+                
+                <Label text="Hasta:" styleClass="filter-label" />
+                <DatePicker fx:id="dp_endDate" promptText="Fecha fin" />
+                
+                <Label text="Estado:" styleClass="filter-label" />
+                <ChoiceBox fx:id="chb_status" styleClass="filter-choice" />
+                
+                <Button fx:id="btn_filter" text="Filtrar" styleClass="filter-button" />
+                <Button fx:id="btn_clearFilter" text="Limpiar" styleClass="clear-button" />
+            </HBox>
+            
+            <!-- Tabla de envíos -->
+            <TableView fx:id="tbl_shipments" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="col_id" text="ID de Envío" prefWidth="110" />
+                    <TableColumn fx:id="col_origin" text="Origen" prefWidth="200" />
+                    <TableColumn fx:id="col_destination" text="Destino" prefWidth="200" />
+                    <TableColumn fx:id="col_status" text="Estado" prefWidth="140" />
+                    <TableColumn fx:id="col_date" text="Fecha" prefWidth="140" />
+                    <TableColumn fx:id="col_cost" text="Costo" prefWidth="120" />
+                </columns>
+                <placeholder>
+                    <Label text="No hay envíos para mostrar" />
+                </placeholder>
+            </TableView>
+        </VBox>
+    </center>
+    
+    <!-- Zona derecha (right) - Detalles del envío seleccionado -->
+    <right>
+        <VBox styleClass="detail-container" minWidth="300" prefWidth="350" maxWidth="450">
+            <padding>
+                <Insets top="20" right="20" bottom="20" left="20" />
+            </padding>
+            
+            <Label text="Detalle del envío" styleClass="section-title" />
+            <Separator />
+            
+            <GridPane vgap="10" hgap="10" styleClass="detail-grid">
+                <padding>
+                    <Insets top="15" right="0" bottom="0" left="0" />
+                </padding>
+                
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="80" />
+                    <ColumnConstraints hgrow="ALWAYS" />
+                </columnConstraints>
+                
+                <!-- ID del envío -->
+                <Label text="ID:" styleClass="detail-label" 
+                       GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <Label fx:id="lbl_detailId" text="-" styleClass="detail-value" 
+                       GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                
+                <!-- Origen -->
+                <Label text="Origen:" styleClass="detail-label" 
+                       GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <Label fx:id="lbl_detailOrigin" text="-" styleClass="detail-value" 
+                       GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                
+                <!-- Destino -->
+                <Label text="Destino:" styleClass="detail-label" 
+                       GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <Label fx:id="lbl_detailDestination" text="-" styleClass="detail-value" 
+                       GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                
+                <!-- Estado -->
+                <Label text="Estado:" styleClass="detail-label" 
+                       GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <Label fx:id="lbl_detailStatus" text="-" styleClass="detail-value" 
+                       GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                
+                <!-- Fecha -->
+                <Label text="Fecha:" styleClass="detail-label" 
+                       GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                <Label fx:id="lbl_detailDate" text="-" styleClass="detail-value" 
+                       GridPane.rowIndex="4" GridPane.columnIndex="1" />
+                
+                <!-- Peso -->
+                <Label text="Peso:" styleClass="detail-label" 
+                       GridPane.rowIndex="5" GridPane.columnIndex="0" />
+                <Label fx:id="lbl_detailWeight" text="-" styleClass="detail-value" 
+                       GridPane.rowIndex="5" GridPane.columnIndex="1" />
+                
+                <!-- Dimensiones -->
+                <Label text="Dimensiones:" styleClass="detail-label" 
+                       GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                <Label fx:id="lbl_detailDimensions" text="-" styleClass="detail-value" 
+                       GridPane.rowIndex="6" GridPane.columnIndex="1" />
+                
+                <!-- Servicios adicionales -->
+                <Label text="Servicios:" styleClass="detail-label" 
+                       GridPane.rowIndex="7" GridPane.columnIndex="0" />
+                <Label fx:id="lbl_detailServices" text="-" styleClass="detail-value" 
+                       GridPane.rowIndex="7" GridPane.columnIndex="1" />
+                
+                <!-- Costo -->
+                <Label text="Costo:" styleClass="detail-label" 
+                       GridPane.rowIndex="8" GridPane.columnIndex="0" />
+                <Label fx:id="lbl_detailCost" text="-" styleClass="detail-value" 
+                       GridPane.rowIndex="8" GridPane.columnIndex="1" />
+                
+                <!-- Repartidor -->
+                <Label text="Repartidor:" styleClass="detail-label" 
+                       GridPane.rowIndex="9" GridPane.columnIndex="0" />
+                <Label fx:id="lbl_detailDeliverer" text="-" styleClass="detail-value" 
+                       GridPane.rowIndex="9" GridPane.columnIndex="1" />
+            </GridPane>
+            
+            <VBox spacing="10" alignment="CENTER" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets top="20" right="0" bottom="0" left="0" />
+                </padding>
+                <Button fx:id="btn_trackShipment" text="Rastrear Envío" 
+                        styleClass="track-button" maxWidth="Infinity" />
+                <Button fx:id="btn_copyShipmentId" text="Copiar ID" 
+                        styleClass="copy-button" maxWidth="Infinity" />
+                <Button fx:id="btn_payShipment" text="Ir a Pago" 
+                        styleClass="pay-button" maxWidth="Infinity" />
+            </VBox>
+        </VBox>
+    </right>
+    
+    <!-- Zona inferior (bottom) - Botones de acción -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="15" styleClass="actions-container">
+            <padding>
+                <Insets top="15" right="20" bottom="20" left="20" />
+            </padding>
+            
+            <Button fx:id="btn_newShipment" text="Nuevo Envío" styleClass="new-button" />
+            <Button fx:id="btn_editShipment" text="Modificar" styleClass="edit-button" disable="true" />
+            <Button fx:id="btn_cancelShipment" text="Cancelar" styleClass="cancel-button" disable="true" />
+            <Button fx:id="btn_undoOperation" text="Deshacer" styleClass="undo-button" disable="true" />
+            <Button fx:id="btn_redoOperation" text="Rehacer" styleClass="redo-button" disable="true" />
+            <Button fx:id="btn_refreshShipments" text="Actualizar" styleClass="refresh-button" />
+        </HBox>
+    </bottom>
+    
+</BorderPane>
+    </content>
+</ScrollPane>

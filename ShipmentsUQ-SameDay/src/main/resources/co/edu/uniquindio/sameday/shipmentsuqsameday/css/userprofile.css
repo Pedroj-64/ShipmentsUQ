@@ -1,0 +1,211 @@
+/* 
+   userprofile.css - Estilo para la pantalla de perfil de usuario
+   Plataforma de logística ShipmentsUQ
+*/
+
+/* Estilo general para la raíz (BorderPane) */
+.root {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+
+/* Estilo para el contenedor del encabezado */
+.header-container {
+    -fx-background-color: #f0f7ff;
+    background-color: #f0f7ff;
+    -fx-border-color: #d0e1ff;
+    border-color: #d0e1ff;
+    -fx-border-width: 0 0 1px 0;
+    border-width: 0 0 1px 0;
+}
+
+/* Título principal */
+.title-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a56a7;
+    -fx-padding: 10px 0;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 4, 0, 0, 1);
+}
+
+/* Contenedor principal con scroll */
+.content-pane {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-background: transparent;
+    background: transparent;
+    -fx-padding: 0;
+    padding: 0;
+    /* Propiedades no CSS removidas */
+    -fx-min-width: 0;
+    min-width: 0;
+    -fx-min-height: 0;
+    min-height: 0;
+    -fx-pref-width: -1;
+    -fx-pref-height: -1;
+}
+
+.content-pane > .viewport {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.main-content {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-min-width: 400;
+    min-width: 400px;
+    -fx-min-height: 1000;
+    min-height: 1000px;
+    -fx-pref-width: -1;
+    -fx-pref-height: 1200;
+    /* Esto asegurará que haya suficiente contenido para activar el scroll */
+}
+
+/* Cajas de sección */
+.section-box {
+    -fx-background-color: #f9f9f9;
+    -fx-background-radius: 8px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 8px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 5, 0, 0, 2);
+}
+
+/* Títulos de sección */
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-padding: 0 0 10px 0;
+}
+
+/* Etiquetas de campo */
+.field-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #555555;
+    -fx-font-weight: normal;
+}
+
+/* Campos de texto */
+.text-field, .password-field {
+    -fx-background-color: white;
+    -fx-background-radius: 5px;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+}
+
+/* Efecto al enfocar campos */
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #4a90e2;
+    -fx-effect: dropshadow(three-pass-box, rgba(74, 144, 226, 0.5), 5, 0, 0, 0);
+}
+
+/* Botón primario */
+.primary-button {
+    -fx-background-color: #1a56a7;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 12px 20px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-graphic-text-gap: 8;
+    -fx-alignment: center;
+}
+
+.primary-button:hover {
+    -fx-background-color: #3873c4;
+}
+
+/* CheckBox personalizado */
+.check-box {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+}
+
+.check-box .box {
+    -fx-background-color: white;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 3px;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+.check-box:selected .box {
+    -fx-background-color: #1a56a7;
+}
+
+/* Barra de estado */
+.status-bar {
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px 0 0 0;
+}
+
+.status-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #555555;
+}
+
+/* Mensajes */
+.success-message {
+    -fx-text-fill: #27ae60;
+    -fx-font-weight: bold;
+}
+
+.error-message {
+    -fx-text-fill: #e74c3c;
+    -fx-font-weight: bold;
+}
+
+/* Separadores */
+.separator {
+    -fx-opacity: 0.3;
+}
+
+/* Estilo para el ScrollPane principal */
+.main-scroll-pane {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-padding: 0;
+    padding: 0;
+    -fx-min-width: 0;
+    min-width: 0;
+    -fx-min-height: 0;
+    min-height: 0;
+    -fx-pref-width: -1;
+    -fx-pref-height: -1;
+    /* Mostrar siempre la barra vertical */
+    -fx-vbar-policy: always;
+}
+
+.main-scroll-pane > .viewport {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.main-scroll-pane .scroll-bar:vertical {
+    -fx-opacity: 0.8;
+    opacity: 0.8;
+    -fx-background-color: transparent;
+    background-color: transparent;
+}
+
+.main-scroll-pane .scroll-bar:horizontal {
+    -fx-opacity: 0;
+    opacity: 0;
+    -fx-pref-height: 0;
+}
+
+.main-scroll-pane .corner {
+    -fx-background-color: transparent;
+    background-color: transparent;
+}

@@ -1,0 +1,94 @@
+/* Estilos para la pantalla de seguimiento de envíos */
+
+.tracking-container {
+    -fx-background-color: #f8f9fa;
+}
+
+.tracking-header {
+    -fx-background-color: #f0f4f9;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1 0;
+}
+
+.tracking-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+}
+
+.tracking-label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #6c757d;
+}
+
+.tracking-value {
+    -fx-font-weight: normal;
+    -fx-text-fill: #212529;
+}
+
+.coordinates-value {
+    -fx-font-family: "Courier New";
+    -fx-font-weight: bold;
+    -fx-text-fill: #0d6efd;
+}
+
+.section-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+    -fx-padding: 5 0 5 0;
+}
+
+.map-container {
+    -fx-background-color: #ffffff;
+    background-color: #ffffff;
+    -fx-border-color: #dee2e6;
+    border-color: #dee2e6;
+    -fx-border-width: 2;
+    border-width: 2px;
+    -fx-border-radius: 5;
+    border-radius: 5px;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+    padding: 10px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 2);
+}
+
+.map-container Canvas {
+    -fx-cursor: default;
+    cursor: default;
+    -fx-max-width: 560;
+    max-width: 560px;
+    -fx-max-height: 280;
+    max-height: 280px;
+}
+
+.tracking-actions {
+    -fx-background-color: #f0f4f9;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1 0 0 0;
+}
+
+.refresh-button {
+    -fx-background-color: #0d6efd;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15 8 15;
+    -fx-background-radius: 4;
+}
+
+.refresh-button:hover {
+    -fx-background-color: #0b5ed7;
+}
+
+.close-button {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15 8 15;
+    -fx-background-radius: 4;
+}
+
+.close-button:hover {
+    -fx-background-color: #5a6268;
+}

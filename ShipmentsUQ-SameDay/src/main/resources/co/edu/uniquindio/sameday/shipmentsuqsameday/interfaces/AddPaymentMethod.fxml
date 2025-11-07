@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            stylesheets="@../css/addpaymentmethod.css"
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.AddPaymentMethodViewController"
+            prefWidth="600.0" prefHeight="550.0">
+
+    <!-- Encabezado -->
+    <top>
+        <VBox alignment="CENTER" styleClass="header-container">
+            <padding>
+                <Insets top="20" right="20" bottom="15" left="20" />
+            </padding>
+            <Label text="Agregar Método de Pago" styleClass="title-label" />
+            <Separator />
+        </VBox>
+    </top>
+    
+    <!-- Formulario principal -->
+    <center>
+        <ScrollPane fitToWidth="true">
+            <content>
+                <VBox styleClass="form-container" spacing="15">
+                    <padding>
+                        <Insets top="20" right="30" bottom="20" left="30" />
+                    </padding>
+                    
+                    <!-- Selector de tipo de método de pago -->
+                    <GridPane hgap="15" vgap="15">
+                        <padding>
+                            <Insets bottom="15" />
+                        </padding>
+                        
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="NEVER" minWidth="150" />
+                            <ColumnConstraints hgrow="ALWAYS" />
+                        </columnConstraints>
+                        
+                        <Label text="Tipo de método:" styleClass="form-label"
+                               GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                        <ChoiceBox fx:id="chb_paymentMethodType" 
+                                  GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity" />
+                        
+                        <Label text="Alias:" styleClass="form-label"
+                               GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                        <TextField fx:id="txt_alias" promptText="Ej: Mi tarjeta personal" 
+                                  GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                                  
+                        <Label text="Establecer como predeterminado:" styleClass="form-label"
+                               GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                        <CheckBox fx:id="chk_isDefault" 
+                                 GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                    </GridPane>
+                    
+                    <!-- Sección de tarjeta de crédito/débito -->
+                    <TitledPane text="Datos de Tarjeta" fx:id="tp_cardSection" expanded="true" styleClass="section-pane">
+                        <GridPane hgap="15" vgap="15">
+                            <padding>
+                                <Insets top="15" right="10" bottom="15" left="10" />
+                            </padding>
+                            
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="NEVER" minWidth="150" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+                            
+                            <Label text="Número de tarjeta:" styleClass="form-label"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                            <TextField fx:id="txt_cardNumber" promptText="XXXX-XXXX-XXXX-XXXX" 
+                                      GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                            
+                            <Label text="Tipo de tarjeta:" styleClass="form-label"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                            <ChoiceBox fx:id="chb_cardType" 
+                                      GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity" />
+                            
+                            <Label text="Fecha de expiración:" styleClass="form-label"
+                                   GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                            <TextField fx:id="txt_cardExpiry" promptText="MM/AA" 
+                                      GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                            
+                            <Label text="Código de seguridad:" styleClass="form-label"
+                                   GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                            <PasswordField fx:id="txt_cardCvv" promptText="123" 
+                                          GridPane.rowIndex="3" GridPane.columnIndex="1" />
+                        </GridPane>
+                    </TitledPane>
+                    
+                    <!-- Sección de pago móvil (Nequi/Daviplata) -->
+                    <TitledPane text="Pago Móvil" fx:id="tp_mobileSection" expanded="false" styleClass="section-pane">
+                        <GridPane hgap="15" vgap="15">
+                            <padding>
+                                <Insets top="15" right="10" bottom="15" left="10" />
+                            </padding>
+                            
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="NEVER" minWidth="150" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+                            
+                            <Label text="Número de teléfono:" styleClass="form-label"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                            <TextField fx:id="txt_phoneNumber" promptText="Ej: 3001234567" 
+                                      GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                            
+                            <Label text="Plataforma:" styleClass="form-label"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                            <ChoiceBox fx:id="chb_mobilePaymentPlatform" 
+                                      GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity" />
+                        </GridPane>
+                    </TitledPane>
+                    
+                    <!-- Sección de PSE -->
+                    <TitledPane text="PSE (Débito Bancario)" fx:id="tp_pseSection" expanded="false" styleClass="section-pane">
+                        <GridPane hgap="15" vgap="15">
+                            <padding>
+                                <Insets top="15" right="10" bottom="15" left="10" />
+                            </padding>
+                            
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="NEVER" minWidth="150" />
+                                <ColumnConstraints hgrow="ALWAYS" />
+                            </columnConstraints>
+                            
+                            <Label text="Banco:" styleClass="form-label"
+                                   GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                            <ComboBox fx:id="cmb_bank" promptText="Seleccione su banco" 
+                                     GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity" />
+                            
+                            <Label text="Tipo de cuenta:" styleClass="form-label"
+                                   GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                            <ChoiceBox fx:id="chb_accountType" 
+                                      GridPane.rowIndex="1" GridPane.columnIndex="1" maxWidth="Infinity" />
+                        </GridPane>
+                    </TitledPane>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+    
+    <!-- Botones de acción -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="20" styleClass="button-container">
+            <padding>
+                <Insets top="15" right="30" bottom="20" left="30" />
+            </padding>
+            <Button fx:id="btn_save" text="Guardar" styleClass="save-button" />
+            <Button fx:id="btn_cancel" text="Cancelar" styleClass="cancel-button" />
+        </HBox>
+    </bottom>
+</BorderPane>

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.PaymentsViewController"
+            stylesheets="@../css/payments.css"
+            fitToWidth="true"
+            fitToHeight="true"
+            pannable="true"
+            hbarPolicy="AS_NEEDED"
+            vbarPolicy="AS_NEEDED"
+            fx:id="mainScrollPane">
+    <content>
+        <BorderPane prefWidth="1000.0" prefHeight="600.0" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+
+            <!-- Zona superior (top) -->
+            <top>
+                <HBox alignment="CENTER" styleClass="header-container">
+                    <padding>
+                        <Insets top="20" right="20" bottom="20" left="20" />
+                    </padding>
+                    <Label text="Gestión de Pagos" styleClass="title-label" />
+                </HBox>
+            </top>
+    
+    <!-- Zona izquierda (left) - Formulario de pago simulado -->
+    <left>
+        <VBox styleClass="form-container" prefWidth="320" minWidth="300" HBox.hgrow="NEVER">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15" />
+            </padding>
+            
+            <Label text="Registrar Pago" styleClass="section-title" />
+            <Separator />
+            
+            <GridPane hgap="10" vgap="10" styleClass="payment-form">
+                <padding>
+                    <Insets top="20" right="0" bottom="20" left="0" />
+                </padding>
+                
+                <columnConstraints>
+                    <ColumnConstraints hgrow="NEVER" minWidth="120" />
+                    <ColumnConstraints hgrow="ALWAYS" minWidth="150" />
+                </columnConstraints>
+                
+                <!-- ID del Envío -->
+                <Label text="ID del Envío:" styleClass="form-label" 
+                       GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                <TextField fx:id="txt_shipmentId" promptText="Ingrese ID del envío" 
+                          GridPane.rowIndex="0" GridPane.columnIndex="1" />
+                
+                <!-- Monto -->
+                <Label text="Monto:" styleClass="form-label" 
+                       GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                <TextField fx:id="txt_amount" promptText="Ej: 50000" 
+                          GridPane.rowIndex="1" GridPane.columnIndex="1" />
+                
+                <!-- Método de pago -->
+                <Label text="Método de pago:" styleClass="form-label" 
+                       GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                <ChoiceBox fx:id="chb_paymentMethod" 
+                          GridPane.rowIndex="2" GridPane.columnIndex="1" maxWidth="Infinity" />
+                
+                <!-- Fecha de vencimiento -->
+                <Label text="Fecha vencimiento:" styleClass="form-label" 
+                       GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                <DatePicker fx:id="dp_dueDate" promptText="Fecha límite de pago"
+                          GridPane.rowIndex="3" GridPane.columnIndex="1" maxWidth="Infinity" />
+                
+                <!-- Referencia o comentario -->
+                <Label text="Referencia:" styleClass="form-label" 
+                       GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                <TextField fx:id="txt_reference" promptText="Referencia o comentario (opcional)" 
+                          GridPane.rowIndex="4" GridPane.columnIndex="1" />
+            </GridPane>
+            
+            <!-- Sección de selección de método de pago -->
+            <VBox styleClass="payment-method-section" fx:id="vbox_paymentMethodSection" spacing="10">
+                <Label text="Método de Pago" styleClass="subsection-title" />
+                
+                <GridPane hgap="10" vgap="10">
+                    <padding>
+                        <Insets top="10" right="0" bottom="10" left="0" />
+                    </padding>
+                    
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="120" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="150" />
+                    </columnConstraints>
+                    
+                    <!-- Selección de método de pago guardado -->
+                    <Label text="Seleccionar:" styleClass="form-label" 
+                           GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                    <ComboBox fx:id="cmb_savedPaymentMethods" promptText="Seleccione un método de pago" 
+                              GridPane.rowIndex="0" GridPane.columnIndex="1" maxWidth="Infinity" />
+                </GridPane>
+                
+                <!-- Información del método seleccionado -->
+                <VBox fx:id="vbox_paymentMethodInfo" styleClass="payment-method-info" visible="true">
+                    <padding>
+                        <Insets top="5" right="5" bottom="5" left="5" />
+                    </padding>
+                    <Label fx:id="lbl_paymentMethodDetails" styleClass="payment-method-details" />
+                </VBox>
+                
+                <!-- Botón para agregar nuevo método de pago -->
+                <HBox alignment="CENTER_RIGHT">
+                    <Button fx:id="btn_addPaymentMethod" text="Agregar Nuevo Método" styleClass="add-payment-method-button" />
+                </HBox>
+            </VBox>
+            
+            <!-- Botones para el formulario de pago -->
+            <HBox alignment="CENTER" spacing="10" styleClass="form-buttons">
+                <padding>
+                    <Insets top="20" right="0" bottom="0" left="0" />
+                </padding>
+                <Button fx:id="btn_pay" text="Pagar" styleClass="pay-button" />
+                <Button fx:id="btn_clear" text="Limpiar" styleClass="clear-button" />
+            </HBox>
+        </VBox>
+    </left>
+    
+    <!-- Zona central (center) - Historial de pagos -->
+    <center>
+        <VBox spacing="10" styleClass="history-container" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS">
+            <padding>
+                <Insets top="15" right="15" bottom="15" left="15" />
+            </padding>
+            
+            <Label text="Historial de Pagos" styleClass="section-title" />
+            
+            <!-- Filtros para el historial -->
+            <HBox spacing="10" alignment="CENTER_LEFT" styleClass="filter-container">
+                <Label text="Filtrar por fecha:" styleClass="filter-label" />
+                <DatePicker fx:id="dp_filterDate" />
+                <Label text="Estado:" styleClass="filter-label" />
+                <ChoiceBox fx:id="chb_filterStatus" />
+                <Button fx:id="btn_filter" text="Filtrar" styleClass="filter-button" />
+                <Button fx:id="btn_clearFilter" text="Limpiar" styleClass="clear-filter-button" />
+            </HBox>
+            
+            <!-- Tabla de pagos -->
+            <TableView fx:id="tbl_payments" VBox.vgrow="ALWAYS" minHeight="200" maxHeight="Infinity">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                </columnResizePolicy>
+                <columns>
+                    <TableColumn fx:id="col_id" text="ID Pago" prefWidth="70" />
+                    <TableColumn fx:id="col_date" text="Fecha" prefWidth="90" />
+                    <TableColumn fx:id="col_shipmentId" text="ID Envío" prefWidth="70" />
+                    <TableColumn fx:id="col_amount" text="Monto" prefWidth="90" />
+                    <TableColumn fx:id="col_method" text="Método" prefWidth="100" />
+                    <TableColumn fx:id="col_status" text="Estado" prefWidth="90" />
+                </columns>
+                <placeholder>
+                    <Label text="No hay pagos registrados" />
+                </placeholder>
+            </TableView>
+            
+            <!-- Botones para el historial de pagos -->
+            <HBox alignment="CENTER" spacing="15" styleClass="history-buttons">
+                <Button fx:id="btn_viewReceipt" text="Ver Comprobante" styleClass="receipt-button" disable="true" />
+                <Button fx:id="btn_downloadReport" text="Descargar Reporte" styleClass="report-button" />
+            </HBox>
+        </VBox>
+    </center>
+    
+    <!-- Zona inferior (bottom) - Mensajes del sistema -->
+    <bottom>
+        <HBox alignment="CENTER_LEFT" styleClass="status-container">
+            <padding>
+                <Insets top="10" right="20" bottom="10" left="20" />
+            </padding>
+            <Label fx:id="lbl_status" text="" styleClass="status-label" />
+        </HBox>
+    </bottom>
+    
+        </BorderPane>
+    </content>
+</ScrollPane>

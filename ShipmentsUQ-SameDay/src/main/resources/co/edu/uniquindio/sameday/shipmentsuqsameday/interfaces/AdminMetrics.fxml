@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.geometry.Insets?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
+           prefHeight="700.0" prefWidth="1000.0" styleClass="root" 
+           stylesheets="@../css/metrics.css" 
+           xmlns="http://javafx.com/javafx/18.0.1" 
+           xmlns:fx="http://javafx.com/fxml/1" 
+           fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.AdminMetricsViewController">
+           
+    <top>
+        <HBox alignment="CENTER" styleClass="header-container">
+            <children>
+                <Label fx:id="lbl_title" styleClass="header-title" text="Métricas y Reportes del Sistema" />
+            </children>
+            <padding>
+                <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+            </padding>
+        </HBox>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" pannable="true">
+            <content>
+                <VBox spacing="20.0" styleClass="content-container">
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+
+                    <!-- Métricas principales de envíos -->
+                    <VBox spacing="10.0" styleClass="section-container">
+                        <Label text="Resumen de Envíos" styleClass="section-title" />
+                        <GridPane hgap="15.0" vgap="15.0">
+                            <VBox GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="metric-card" alignment="CENTER">
+                                <Label text="Total de Envíos" styleClass="metric-label" />
+                                <Label fx:id="lbl_totalShipments" text="0" styleClass="metric-value" />
+                            </VBox>
+                            
+                            <VBox GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="metric-card" alignment="CENTER">
+                                <Label text="Envíos del Mes" styleClass="metric-label" />
+                                <Label fx:id="lbl_monthlyShipments" text="0" styleClass="metric-value" />
+                            </VBox>
+                            
+                            <VBox GridPane.columnIndex="2" GridPane.rowIndex="0" styleClass="metric-card" alignment="CENTER">
+                                <Label text="Envíos del Día" styleClass="metric-label" />
+                                <Label fx:id="lbl_dailyShipments" text="0" styleClass="metric-value" />
+                            </VBox>
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Estado detallado de envíos -->
+                    <VBox spacing="10.0" styleClass="section-container">
+                        <Label text="Estado de Envíos" styleClass="section-title" />
+                        <HBox spacing="20.0">
+                            <VBox HBox.hgrow="ALWAYS" styleClass="chart-container">
+                                <Label text="Distribución por Estado" styleClass="chart-title" />
+                                <PieChart fx:id="chart_shipmentStatus" prefHeight="250.0" />
+                            </VBox>
+                            
+                            <VBox HBox.hgrow="ALWAYS" styleClass="status-details">
+                                <GridPane hgap="10.0" vgap="8.0">
+                                    <Label text="Pendientes:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                                    <Label fx:id="lbl_pendingShipments" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                    
+                                    <Label text="En Ruta:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                                    <Label fx:id="lbl_inTransitShipments" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    
+                                    <Label text="Entregados:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                    <Label fx:id="lbl_deliveredShipments" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    
+                                    <Label text="Cancelados:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                    <Label fx:id="lbl_cancelledShipments" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                </GridPane>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+
+                    <!-- Métricas de eficiencia -->
+                    <VBox spacing="10.0" styleClass="section-container">
+                        <Label text="Métricas de Eficiencia" styleClass="section-title" />
+                        <GridPane hgap="20.0" vgap="10.0">
+                            <Label text="Tiempo Promedio de Entrega:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                            <Label fx:id="lbl_avgDeliveryTime" text="0 min" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                            
+                            <Label text="Tasa de Entrega Exitosa:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                            <Label fx:id="lbl_successRate" text="0%" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                            
+                            <Label text="Eficiencia de Repartidores:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                            <Label fx:id="lbl_courierEfficiency" text="0%" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        </GridPane>
+                    </VBox>
+
+                    <!-- Gráfico de tendencias -->
+                    <VBox spacing="10.0" styleClass="section-container">
+                        <Label text="Tendencias Mensuales" styleClass="section-title" />
+                        <BarChart fx:id="chart_monthlyTrend" prefHeight="300.0" styleClass="trend-chart">
+                            <xAxis>
+                                <CategoryAxis label="Mes" />
+                            </xAxis>
+                            <yAxis>
+                                <NumberAxis label="Cantidad de Envíos" />
+                            </yAxis>
+                        </BarChart>
+                    </VBox>
+
+                    <!-- Botones de reportes -->
+                    <VBox spacing="10.0" styleClass="section-container">
+                        <Label text="Generar Reportes" styleClass="section-title" />
+                        <HBox spacing="15.0" alignment="CENTER">
+                            <Button fx:id="btn_generateGeneralReport" text="Reporte General" styleClass="report-button" />
+                            <Button fx:id="btn_generateMonthlyReport" text="Reporte Mensual" styleClass="report-button" />
+                            <Button fx:id="btn_generateDailyReport" text="Reporte Diario" styleClass="report-button" />
+                        </HBox>
+                        
+                        <!-- Botón de actualizar -->
+                        <HBox spacing="10.0" alignment="CENTER">
+                            <Button fx:id="btn_refreshMetrics" onAction="#handleRefreshMetrics" text="🔄 Actualizar Métricas" styleClass="refresh-button" />
+                        </HBox>
+                    </VBox>
+
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER_RIGHT" styleClass="footer-container">
+            <padding>
+                <Insets bottom="10.0" left="20.0" right="20.0" top="10.0" />
+            </padding>
+            <Label text="Última actualización: " />
+            <Label fx:id="lbl_lastUpdate" text="--/--/---- --:--" />
+        </HBox>
+    </bottom>
+</BorderPane>
