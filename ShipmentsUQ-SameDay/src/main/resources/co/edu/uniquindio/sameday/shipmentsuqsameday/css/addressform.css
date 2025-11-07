@@ -118,6 +118,8 @@
     background-color: white;
     -fx-padding: 10px;
     padding: 10px;
+    -fx-max-height: 400px;
+    max-height: 400px;
 }
 
 /* Título del mapa */
@@ -156,14 +158,24 @@
 
 /* Contenedor del mapa de cuadrícula */
 .grid-map-container {
-    -fx-background-color: white;
-    background-color: white;
-    -fx-border-color: #e0e0e0;
-    border-color: #e0e0e0;
-    -fx-border-width: 1px;
-    border-width: 1px;
+    -fx-background-color: #fafafa;
+    background-color: #fafafa;
+    -fx-border-color: #d0d0d0;
+    border-color: #d0d0d0;
+    -fx-border-width: 2px;
+    border-width: 2px;
     -fx-border-radius: 4px;
     border-radius: 4px;
+    -fx-padding: 8px;
+    padding: 8px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 4, 0, 0, 2);
+}
+
+.grid-map-container Canvas {
+    -fx-max-width: 100%;
+    max-width: 100%;
+    -fx-max-height: 100%;
+    max-height: 100%;
 }
 
 /* Contenedor de botones */

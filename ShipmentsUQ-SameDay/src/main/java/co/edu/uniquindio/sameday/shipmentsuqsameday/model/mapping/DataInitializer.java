@@ -119,7 +119,7 @@ public class DataInitializer {
                 .build();
         addressRepository.save(address1);
         
-        // El man vive en el norte mero parche (inviten a laures muchachos :v)
+        // El man vive en el norte mero parche (inviten a laureles muchachos :v)
         Address address2 = Address.builder()
                 .id(UUID.randomUUID())
                 .alias("Oficina")

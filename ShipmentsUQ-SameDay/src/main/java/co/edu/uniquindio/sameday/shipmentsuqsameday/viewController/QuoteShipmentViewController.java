@@ -178,7 +178,7 @@ public class QuoteShipmentViewController implements Initializable {
                     .build();
             
             // Mostrar resultado
-            lbl_quoteResult.setText(String.format("Costo estimado: $%.2f", calculatedRate));
+            lbl_quoteResult.setText(String.format("Costo estimado: $%.2f en pesos", calculatedRate));
             lbl_status.setText("Cotización calculada exitosamente");
             
             // Habilitar botón de confirmación

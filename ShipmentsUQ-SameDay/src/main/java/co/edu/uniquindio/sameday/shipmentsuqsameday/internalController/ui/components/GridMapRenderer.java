@@ -17,6 +17,7 @@ public class GridMapRenderer {
     private final double cellSize;
     private double coordX = -1;
     private double coordY = -1;
+    private boolean clickable = true;  // Controla si el mapa es clickeable
     
     /**
      * Constructor para crear un nuevo renderizador de mapa de cuadrícula
@@ -26,21 +27,39 @@ public class GridMapRenderer {
      * @param cellSize tamaño de cada celda en píxeles
      */
     public GridMapRenderer(GridMap gridMap, double width, double height, double cellSize) {
+        this(gridMap, width, height, cellSize, true);
+    }
+    
+    /**
+     * Constructor para crear un nuevo renderizador de mapa de cuadrícula
+     * @param gridMap el mapa de cuadrícula a renderizar
+     * @param width ancho del canvas
+     * @param height alto del canvas
+     * @param cellSize tamaño de cada celda en píxeles
+     * @param clickable indica si el mapa debe responder a clics
+     */
+    public GridMapRenderer(GridMap gridMap, double width, double height, double cellSize, boolean clickable) {
         this.gridMap = gridMap;
         this.canvas = new Canvas(width, height);
         this.cellSize = cellSize;
+        this.clickable = clickable;
         
-        // Configurar canvas para capturar clics
-        canvas.setOnMouseClicked(e -> {
-            coordX = (int)(e.getX() / cellSize);
-            coordY = (int)(e.getY() / cellSize);
-            renderMap(); // Volver a dibujar para mostrar la selección
-            
-            // Aquí se podría llamar a un listener para notificar la selección
-            if (coordinateListener != null) {
-                coordinateListener.onCoordinateSelected(coordX, coordY);
-            }
-        });
+        // Configurar canvas para capturar clics solo si está habilitado
+        if (clickable) {
+            canvas.setOnMouseClicked(e -> {
+                coordX = (int)(e.getX() / cellSize);
+                coordY = (int)(e.getY() / cellSize);
+                renderMap(); // Volver a dibujar para mostrar la selección
+                
+                // Aquí se podría llamar a un listener para notificar la selección
+                if (coordinateListener != null) {
+                    coordinateListener.onCoordinateSelected(coordX, coordY);
+                }
+            });
+        } else {
+            // Cambiar el cursor para indicar que no es clickeable
+            canvas.setStyle("-fx-cursor: default;");
+        }
     }
     
     /**

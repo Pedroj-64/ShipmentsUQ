@@ -277,7 +277,7 @@ public class AdminShipmentsViewController implements Initializable, AdminShipmen
         // Habilitar los botones según el estado del envío
         ShipmentStatus status = selectedShipment.getStatus();
         
-        // Solo se puede asignar repartidor a envíos en estado CREATED
+        // Solo se puede asignar repartidor a envíos en estado ASSIGNED o PENDING
         btn_assignCourier.setDisable(status != ShipmentStatus.ASSIGNED && status != ShipmentStatus.PENDING);
         
         // Se puede actualizar estado para cualquier envío que no esté DELIVERED o CANCELLED
@@ -286,8 +286,8 @@ public class AdminShipmentsViewController implements Initializable, AdminShipmen
         // Se puede registrar incidencia para cualquier envío que esté en proceso
         btn_incident.setDisable(status == ShipmentStatus.DELIVERED || status == ShipmentStatus.CANCELLED);
 
-        // Solo se pueden eliminar envíos en estado PENDING
-        btn_deleteShipment.setDisable(status != ShipmentStatus.PENDING && status != ShipmentStatus.PENDING);
+        // Solo se pueden eliminar envíos en estado PENDING o CANCELLED
+        btn_deleteShipment.setDisable(status != ShipmentStatus.PENDING && status != ShipmentStatus.CANCELLED);
     }
 
     /**

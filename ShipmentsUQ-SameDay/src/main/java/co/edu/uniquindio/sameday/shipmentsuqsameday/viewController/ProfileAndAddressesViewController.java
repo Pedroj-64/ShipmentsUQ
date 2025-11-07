@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -310,7 +311,7 @@ public class ProfileAndAddressesViewController implements Initializable {
         try {
             // Cargar la interfaz del formulario de direcciones
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/interfaces/AddressForm.fxml"));
-            Scene scene = new Scene(loader.load());
+            Parent root = loader.load();
             
             // Obtener el controlador y configurarlo
             AddressFormViewController controller = loader.getController();
@@ -321,6 +322,9 @@ public class ProfileAndAddressesViewController implements Initializable {
                 controller.loadAddressForEdit(address);
             }
             
+            // Crear escena con dimensiones específicas
+            Scene scene = new Scene(root, 900, 550);
+            
             // Crear y configurar el diálogo
             Stage dialogStage = new Stage();
             dialogStage.setTitle(address == null ? "Nueva Dirección" : "Editar Dirección");
@@ -328,6 +332,15 @@ public class ProfileAndAddressesViewController implements Initializable {
             dialogStage.initStyle(StageStyle.UTILITY); // Estilo simplificado
             dialogStage.setScene(scene);
             dialogStage.setResizable(false);
+            
+            // Establecer tamaño mínimo y máximo para evitar problemas
+            dialogStage.setMinWidth(900);
+            dialogStage.setMinHeight(550);
+            dialogStage.setMaxWidth(900);
+            dialogStage.setMaxHeight(550);
+            
+            // Centrar el diálogo en la pantalla
+            dialogStage.centerOnScreen();
             
             // Mostrar el diálogo y esperar a que se cierre
             dialogStage.showAndWait();

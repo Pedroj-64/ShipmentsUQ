@@ -85,10 +85,32 @@ public class AddressFormViewController implements Initializable {
      */
     private void setupMapView() {
         try {
-            // Inicializar el controlador del mapa con las dimensiones del contenedor
-            double mapWidth = mapContainer.getPrefWidth();
-            double mapHeight = mapContainer.getPrefHeight();
-            double cellSize = 20; // Tamaño de cada celda del grid
+            // Esperar a que el contenedor tenga sus dimensiones finales
+            mapContainer.widthProperty().addListener((obs, oldVal, newVal) -> {
+                if (mapViewController == null && newVal.doubleValue() > 0) {
+                    initializeMap();
+                }
+            });
+            
+            // Inicializar inmediatamente si ya tiene dimensiones
+            if (mapContainer.getWidth() > 0) {
+                initializeMap();
+            }
+            
+        } catch (Exception e) {
+            showErrorMessage("Error al configurar el mapa: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Inicializa el mapa con las dimensiones correctas
+     */
+    private void initializeMap() {
+        try {
+            // Usar dimensiones fijas más conservadoras para evitar sobreposición
+            double mapWidth = 360;  // Ancho fijo
+            double mapHeight = 300; // Alto fijo
+            double cellSize = 18;   // Tamaño de celda más pequeño para que quepa mejor
             
             mapViewController = new GridMapViewController(mapWidth, mapHeight, cellSize);
             
@@ -101,7 +123,7 @@ public class AddressFormViewController implements Initializable {
             });
             
         } catch (Exception e) {
-            showErrorMessage("Error al configurar el mapa: " + e.getMessage());
+            showErrorMessage("Error al inicializar el mapa: " + e.getMessage());
         }
     }
     

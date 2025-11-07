@@ -20,12 +20,23 @@ public class GridMapViewController {
      * @param cellSize tamaño de cada celda en píxeles
      */
     public GridMapViewController(double containerWidth, double containerHeight, double cellSize) {
+        this(containerWidth, containerHeight, cellSize, true);
+    }
+    
+    /**
+     * Constructor para el controlador del mapa de cuadrícula
+     * @param containerWidth ancho del contenedor
+     * @param containerHeight alto del contenedor
+     * @param cellSize tamaño de cada celda en píxeles
+     * @param clickable indica si el mapa debe responder a clics del usuario
+     */
+    public GridMapViewController(double containerWidth, double containerHeight, double cellSize, boolean clickable) {
         // Calcular el número de celdas basado en el tamaño del contenedor
         int numCellsX = (int) (containerWidth / cellSize);
         int numCellsY = (int) (containerHeight / cellSize);
         
         this.gridMap = new GridMap(numCellsX, numCellsY);
-        this.renderer = new GridMapRenderer(gridMap, containerWidth, containerHeight, cellSize);
+        this.renderer = new GridMapRenderer(gridMap, containerWidth, containerHeight, cellSize, clickable);
         
         // Configurar el listener para capturar la selección de coordenadas
         this.renderer.setCoordinateListener((x, y) -> {

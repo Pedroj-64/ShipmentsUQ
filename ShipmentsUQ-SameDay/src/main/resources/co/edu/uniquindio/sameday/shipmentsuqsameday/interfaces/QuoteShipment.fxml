@@ -10,8 +10,8 @@
       stylesheets="@../css/quote.css"
       alignment="CENTER" 
       spacing="20" 
-      prefWidth="600" 
-      prefHeight="500">
+      prefWidth="800" 
+      prefHeight="600">
 
     <!-- Encabezado -->
     <HBox alignment="CENTER">

@@ -87,22 +87,32 @@ public class UserShipmentsViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
+            System.out.println("DEBUG: Inicializando UserShipmentsViewController");
+            
             // Inicializar el controlador
             controller = new UserShipmentsController();
+            System.out.println("DEBUG: Controlador inicializado");
             
             // Configurar componentes
             setupTable();
             setupFilters();
             setupButtons();
             
+            System.out.println("DEBUG: Componentes configurados");
+            
             // Cargar datos iniciales
             loadShipments();
             
+            System.out.println("DEBUG: Envíos cargados");
+            
             // Actualizar estado de botones de deshacer/rehacer
             updateUndoRedoButtons();
+            
+            System.out.println("DEBUG: Inicialización completada");
         } catch (Exception e) {
-            showError("Error al inicializar: " + e.getMessage());
+            System.err.println("ERROR en initialize: " + e.getMessage());
             e.printStackTrace();
+            showError("Error al inicializar: " + e.getMessage());
         }
     }
     
@@ -588,16 +598,27 @@ public class UserShipmentsViewController implements Initializable {
         alert.showAndWait().ifPresent(result -> {
             if (result == ButtonType.OK) {
                 try {
+                    System.out.println("DEBUG: Intentando cancelar envío " + shipment.getId());
+                    
                     boolean success = controller.cancelShipment(shipment.getId());
+                    
+                    System.out.println("DEBUG: Cancelación exitosa = " + success);
                     
                     if (success) {
                         loadShipments(); // Recargar la lista
                         showInfo("Envío cancelado exitosamente.");
-                        updateUndoRedoButtons(); // Actualizar botones de deshacer/rehacer
+                        
+                        // Actualizar botones después de la operación
+                        javafx.application.Platform.runLater(() -> {
+                            updateUndoRedoButtons();
+                            System.out.println("DEBUG: Botones actualizados después de cancelar");
+                        });
                     } else {
                         showError("No se pudo cancelar el envío.");
                     }
                 } catch (Exception e) {
+                    System.err.println("ERROR al cancelar envío: " + e.getMessage());
+                    e.printStackTrace();
                     showError("Error al cancelar envío: " + e.getMessage());
                 }
             }
@@ -666,10 +687,17 @@ public class UserShipmentsViewController implements Initializable {
      */
     private void updateUndoRedoButtons() {
         try {
-            btn_undoOperation.setDisable(!controller.canUndo());
-            btn_redoOperation.setDisable(!controller.canRedo());
+            boolean canUndoNow = controller.canUndo();
+            boolean canRedoNow = controller.canRedo();
+            
+            System.out.println("DEBUG: canUndo = " + canUndoNow + ", canRedo = " + canRedoNow);
+            
+            btn_undoOperation.setDisable(!canUndoNow);
+            btn_redoOperation.setDisable(!canRedoNow);
         } catch (Exception e) {
-            // Si hay algún error, deshabilitamos ambos botones
+            System.err.println("Error al actualizar botones undo/redo: " + e.getMessage());
+            e.printStackTrace();
+            // En caso de error, deshabilitamos ambos botones
             btn_undoOperation.setDisable(true);
             btn_redoOperation.setDisable(true);
         }

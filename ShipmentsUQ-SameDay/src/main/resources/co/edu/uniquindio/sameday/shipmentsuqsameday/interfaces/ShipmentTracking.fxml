@@ -49,7 +49,7 @@
             <Label text="Ubicación actual del repartidor" styleClass="section-title"/>
             
             <!-- Contenedor para el mapa -->
-            <Pane fx:id="mapContainer" prefHeight="300" VBox.vgrow="ALWAYS" styleClass="map-container"/>
+            <Pane fx:id="mapContainer" minHeight="280" maxHeight="280" prefHeight="280" minWidth="560" maxWidth="560" prefWidth="560" styleClass="map-container"/>
             
             <!-- Detalles de la ubicación -->
             <HBox spacing="15" alignment="CENTER">

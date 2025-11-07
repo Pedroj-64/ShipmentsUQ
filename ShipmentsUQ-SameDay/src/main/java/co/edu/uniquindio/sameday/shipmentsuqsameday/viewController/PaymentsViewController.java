@@ -6,11 +6,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
-import javafx.application.HostServices;
-
 import co.edu.uniquindio.sameday.shipmentsuqsameday.App;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.PaymentsController;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.PaymentDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.UserPaymentMethodDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.PaymentMethod;
@@ -29,10 +26,10 @@ import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane.ScrollBarPolicy;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
@@ -40,7 +37,6 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 
 import java.io.File;
-import java.net.URI;
 import java.util.Optional;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
@@ -113,9 +109,9 @@ public class PaymentsViewController implements Initializable {
                 mainScrollPane.setPannable(true);
                 
                 // Configuramos las políticas de barras de desplazamiento
-                mainScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-                mainScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
-                
+                mainScrollPane.setHbarPolicy(ScrollBarPolicy.AS_NEEDED);
+                mainScrollPane.setVbarPolicy(ScrollBarPolicy.AS_NEEDED);
+
                 // Añadimos listener para redimensionar contenido cuando cambie el tamaño de la ventana
                 mainScrollPane.widthProperty().addListener((obs, oldVal, newVal) -> {
                     adjustContentSize(mainScrollPane);
@@ -217,9 +213,48 @@ public class PaymentsViewController implements Initializable {
     }
     
     /**
+     * Configura el TextField de monto para aceptar solo números decimales
+     * con punto o coma como separador decimal
+     */
+    private void setupAmountTextField() {
+        txt_amount.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isEmpty()) {
+                // Permitir solo números, punto y coma
+                String filtered = newValue.replaceAll("[^0-9.,]", "");
+                
+                // Reemplazar coma por punto para estandarizar
+                filtered = filtered.replace(',', '.');
+                
+                // Permitir solo un punto decimal
+                int firstDotIndex = filtered.indexOf('.');
+                if (firstDotIndex != -1) {
+                    String beforeDot = filtered.substring(0, firstDotIndex + 1);
+                    String afterDot = filtered.substring(firstDotIndex + 1).replace(".", "");
+                    filtered = beforeDot + afterDot;
+                }
+                
+                // Limitar a dos decimales
+                if (filtered.contains(".")) {
+                    String[] parts = filtered.split("\\.");
+                    if (parts.length > 1 && parts[1].length() > 2) {
+                        filtered = parts[0] + "." + parts[1].substring(0, 2);
+                    }
+                }
+                
+                if (!filtered.equals(newValue)) {
+                    txt_amount.setText(filtered);
+                }
+            }
+        });
+    }
+    
+    /**
      * Configura los controles de la UI
      */
     private void setupUIControls() {
+        // Configurar el TextField de monto para aceptar solo números decimales
+        setupAmountTextField();
+        
         // Configurar el ChoiceBox de métodos de pago
         chb_paymentMethod.setItems(FXCollections.observableArrayList(PaymentMethod.values()));
         chb_paymentMethod.setConverter(new StringConverter<PaymentMethod>() {

@@ -18,7 +18,6 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.UUID;
 
 /**
  * Controlador para la interfaz de seguimiento de envíos que muestra la ubicación del repartidor en un mapa
@@ -51,18 +50,13 @@ public class ShipmentTrackingViewController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Configurar el mapa con un tamaño adecuado para la visualización
-        double mapWidth = 550;
-        double mapHeight = 300;
-        double cellSize = 20; // Tamaño de cada celda en píxeles
+        double mapWidth = 560;   // Ancho fijo
+        double mapHeight = 280;  // Alto fijo
+        double cellSize = 20;    // Tamaño de cada celda en píxeles
         
-        // Inicializar el controlador del mapa y el mapa
-        mapController = new GridMapViewController(mapWidth, mapHeight, cellSize);
+        // Inicializar el controlador del mapa (NO clickeable para tracking)
+        mapController = new GridMapViewController(mapWidth, mapHeight, cellSize, false);
         gridMap = new GridMap((int)(mapWidth/cellSize), (int)(mapHeight/cellSize));
-        
-        // Configurar el listener para clicks en el mapa (opcional)
-        mapController.setCoordinateListener((x, y) -> {
-            // No hacemos nada cuando el usuario hace clic, es sólo para visualización
-        });
         
         // Inicializar el mapa en el contenedor
         mapController.initialize(mapContainer);
