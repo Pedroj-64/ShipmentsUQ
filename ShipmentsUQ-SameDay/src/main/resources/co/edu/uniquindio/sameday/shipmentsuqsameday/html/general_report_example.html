@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte General - ShipmentsUQ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3f4f7 100%);
+            color: #1a365d;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(26, 54, 93, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '📊';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 8rem;
+            opacity: 0.1;
+            transform: rotate(-15deg);
+            z-index: 0;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .report-info {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .report-info .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px 0;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .summary-section {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #2196f3;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 25px rgba(33, 150, 243, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        .summary-section h3 {
+            color: #0d47a1;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #2196f3, #1976d2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(33, 150, 243, 0.25);
+        }
+
+        .stat-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .value {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #2196f3;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .label {
+            font-size: 1rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            color: #1a365d;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2196f3;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tbody tr:hover {
+            background: #e3f2fd;
+            transform: scale(1.01);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge.created { background: #e3f2fd; color: #0d47a1; }
+        .badge.in_transit { background: #fff3e0; color: #e65100; }
+        .badge.delivered { background: #e8f5e9; color: #2e7d32; }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #6c757d;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .footer .company-name {
+            font-weight: bold;
+            color: #1a365d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Reporte General de Envíos</h1>
+            <p class="subtitle">Análisis completo del sistema</p>
+        </div>
+
+        <div class="report-info">
+            <div class="info-item">
+                <span class="icon">📅</span>
+                <span><strong>Fecha de generación:</strong> 6 de Noviembre de 2024 - 18:45</span>
+            </div>
+            <div class="info-item">
+                <span class="icon">🏢</span>
+                <span><strong>Sistema:</strong> ShipmentsUQ SameDay</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Resumen General -->
+            <div class="summary-section">
+                <h3>📈 Resumen General del Sistema</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="icon">📦</div>
+                        <div class="value">156</div>
+                        <div class="label">Total Envíos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">✅</div>
+                        <div class="value">98</div>
+                        <div class="label">Entregados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">🚚</div>
+                        <div class="value">42</div>
+                        <div class="label">En Tránsito</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">🕐</div>
+                        <div class="value">16</div>
+                        <div class="label">Pendientes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">💰</div>
+                        <div class="value">$4,578,900</div>
+                        <div class="label">Ingresos Totales</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon">⚡</div>
+                        <div class="value">95%</div>
+                        <div class="label">Tasa de Éxito</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Envíos por Estado -->
+            <h2 class="section-title">
+                <span>📋</span>
+                Distribución por Estado
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Estado</th>
+                        <th>Cantidad</th>
+                        <th>Porcentaje</th>
+                        <th>Tendencia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge created">Creado</span></td>
+                        <td>16</td>
+                        <td>10.3%</td>
+                        <td>📊 Estable</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge in_transit">En Tránsito</span></td>
+                        <td>42</td>
+                        <td>26.9%</td>
+                        <td>📈 Aumentando</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge delivered">Entregado</span></td>
+                        <td>98</td>
+                        <td>62.8%</td>
+                        <td>✅ Excelente</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Repartidores Activos -->
+            <h2 class="section-title">
+                <span>👥</span>
+                Rendimiento de Repartidores
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Repartidor</th>
+                        <th>Envíos Completados</th>
+                        <th>En Curso</th>
+                        <th>Calificación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>👤 Juan Pérez</td>
+                        <td>28</td>
+                        <td>3</td>
+                        <td>⭐⭐⭐⭐⭐ 4.8</td>
+                    </tr>
+                    <tr>
+                        <td>👤 María García</td>
+                        <td>24</td>
+                        <td>2</td>
+                        <td>⭐⭐⭐⭐⭐ 4.9</td>
+                    </tr>
+                    <tr>
+                        <td>👤 Carlos López</td>
+                        <td>22</td>
+                        <td>4</td>
+                        <td>⭐⭐⭐⭐ 4.6</td>
+                    </tr>
+                    <tr>
+                        <td>👤 Ana Rodríguez</td>
+                        <td>24</td>
+                        <td>1</td>
+                        <td>⭐⭐⭐⭐⭐ 4.7</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>Generado por <span class="company-name">ShipmentsUQ SameDay</span> - Sistema de Gestión de Envíos</p>
+            <p>© 2024 Universidad del Quindío. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

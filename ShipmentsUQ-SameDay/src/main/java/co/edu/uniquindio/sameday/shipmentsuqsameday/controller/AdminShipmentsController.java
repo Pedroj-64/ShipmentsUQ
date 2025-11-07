@@ -132,15 +132,47 @@ public class AdminShipmentsController implements Initializable {
      */
     public void showAssignCourierDialog(Shipment shipment) {
         try {
+            System.out.println("\n=== DEBUG: Asignación Manual de Repartidor ===");
+            System.out.println("Envío ID: " + shipment.getId());
+            System.out.println("Estado actual del envío: " + shipment.getStatus());
+            
+            // Obtener TODOS los repartidores para debug
+            List<Deliverer> allDeliverers = delivererService.findAll();
+            System.out.println("Total de repartidores en el sistema: " + allDeliverers.size());
+            
+            for (Deliverer d : allDeliverers) {
+                System.out.println("  - " + d.getName() + 
+                                   " | Estado: " + d.getStatus() + 
+                                   " | Envíos actuales: " + d.getCurrentShipments().size() +
+                                   " | Zona: " + d.getZone());
+            }
+            
             // Obtener la lista de repartidores disponibles
             List<Deliverer> availableDeliverers = delivererService.getAvailableDeliverers();
+            System.out.println("Repartidores disponibles para asignación: " + availableDeliverers.size());
             
             if (availableDeliverers.isEmpty()) {
-                if (viewController != null) {
-                    viewController.showStatusMessage("No hay repartidores disponibles", "warning");
+                System.out.println("❌ No hay repartidores disponibles (estado AVAILABLE)");
+                
+                // Buscar también repartidores ACTIVE
+                List<Deliverer> activeDeliverers = delivererService.findAll().stream()
+                    .filter(d -> d.getStatus() == co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.DelivererStatus.ACTIVE)
+                    .toList();
+                
+                System.out.println("Repartidores ACTIVE encontrados: " + activeDeliverers.size());
+                
+                if (!activeDeliverers.isEmpty()) {
+                    availableDeliverers = new ArrayList<>(activeDeliverers);
+                    System.out.println("✓ Usando repartidores ACTIVE en su lugar");
+                } else {
+                    if (viewController != null) {
+                        viewController.showStatusMessage("No hay repartidores disponibles ni activos en el sistema", "warning");
+                    }
+                    return;
                 }
-                return;
             }
+            
+            System.out.println("Mostrando diálogo con " + availableDeliverers.size() + " repartidores");
             
             // Crear el diálogo
             Dialog<Deliverer> dialog = new Dialog<>();

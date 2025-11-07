@@ -219,14 +219,34 @@ public class DelivererService implements Service<Deliverer, DelivererRepository>
     }
 
     /**
-     * Obtiene la lista de repartidores disponibles
+     * Obtiene la lista de repartidores disponibles para asignación
+     * Incluye repartidores con estado AVAILABLE y ACTIVE (que pueden tomar más envíos)
      * @return lista de repartidores disponibles ordenados por calificación
      */
     public List<Deliverer> getAvailableDeliverers() {
-        return repository.findAll().stream()
-            .filter(d -> d.getStatus() == DelivererStatus.AVAILABLE)
+        System.out.println("\n=== DEBUG: getAvailableDeliverers() ===");
+        
+        List<Deliverer> allDeliverers = repository.findAll();
+        System.out.println("Total repartidores en repositorio: " + allDeliverers.size());
+        
+        List<Deliverer> available = allDeliverers.stream()
+            .filter(d -> {
+                boolean isAvailable = d.getStatus() == DelivererStatus.AVAILABLE;
+                boolean isActive = d.getStatus() == DelivererStatus.ACTIVE && 
+                                   d.getCurrentShipments().size() < MAX_CONCURRENT_SHIPMENTS;
+                
+                System.out.println("  - " + d.getName() + 
+                                   " | Estado: " + d.getStatus() + 
+                                   " | Envíos: " + d.getCurrentShipments().size() + 
+                                   " | Disponible para asignar: " + (isAvailable || isActive));
+                
+                return isAvailable || isActive;
+            })
             .sorted(Comparator.comparingDouble(Deliverer::getAverageRating).reversed())
             .toList();
+        
+        System.out.println("Total repartidores disponibles para asignación: " + available.size());
+        return available;
     }
     
     /**

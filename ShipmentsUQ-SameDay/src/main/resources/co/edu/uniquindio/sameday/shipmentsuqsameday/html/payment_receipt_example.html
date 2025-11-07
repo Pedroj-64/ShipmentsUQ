@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo de Pago - ShipmentsUQ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #d8f3dc 0%, #f0f9ff 100%);
+            color: #064e3b;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(6, 78, 59, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '✅';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 8rem;
+            opacity: 0.1;
+            transform: rotate(-15deg);
+            z-index: 0;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .receipt-number {
+            background: rgba(255, 255, 255, 0.25);
+            padding: 10px 25px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .success-banner {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 5px solid #10b981;
+            padding: 20px 30px;
+            text-align: center;
+            border-bottom: 1px solid #6ee7b7;
+        }
+
+        .success-banner .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .success-banner h2 {
+            color: #065f46;
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .success-banner p {
+            color: #047857;
+            font-size: 1.1rem;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .info-section {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .info-section h3 {
+            color: #065f46;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .info-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid #10b981;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .info-item .label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item .value {
+            font-size: 1.1rem;
+            color: #064e3b;
+            font-weight: 600;
+        }
+
+        .payment-details {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border: 2px solid #10b981;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .payment-details::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        .payment-details h3 {
+            color: #065f46;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .amount-display {
+            text-align: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 1;
+        }
+
+        .amount-label {
+            font-size: 0.95rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .amount-value {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #10b981;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            position: relative;
+            z-index: 1;
+        }
+
+        .payment-method .icon {
+            font-size: 2.5rem;
+        }
+
+        .payment-method .details {
+            text-align: left;
+        }
+
+        .payment-method .method-label {
+            font-size: 0.85rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .payment-method .method-value {
+            font-size: 1.2rem;
+            color: #064e3b;
+            font-weight: 600;
+        }
+
+        .shipment-info {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        .shipment-info h3 {
+            color: #065f46;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .shipment-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .shipment-row:last-child {
+            border-bottom: none;
+        }
+
+        .shipment-row .label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .shipment-row .value {
+            color: #064e3b;
+            font-weight: 600;
+        }
+
+        .footer-notes {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .footer-notes h4 {
+            color: #065f46;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .footer-notes p {
+            color: #047857;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            padding: 25px 30px;
+            text-align: center;
+            color: #065f46;
+            border-top: 1px solid #bbf7d0;
+        }
+
+        .footer .company-name {
+            font-weight: bold;
+            color: #064e3b;
+            font-size: 1.1rem;
+        }
+
+        .footer p {
+            margin: 5px 0;
+        }
+
+        .footer .contact {
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✅ Recibo de Pago</h1>
+            <p class="subtitle">Confirmación de transacción exitosa</p>
+            <div class="receipt-number">Recibo #REC-20241106-001</div>
+        </div>
+
+        <div class="success-banner">
+            <div class="icon">🎉</div>
+            <h2>¡Pago Procesado Exitosamente!</h2>
+            <p>Su pago ha sido recibido y confirmado</p>
+        </div>
+
+        <div class="content">
+            <!-- Información del Cliente -->
+            <div class="info-section">
+                <h3>👤 Información del Cliente</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="label">Nombre</div>
+                        <div class="value">Paula Moreno García</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Email</div>
+                        <div class="value">paula.moreno@example.com</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Teléfono</div>
+                        <div class="value">+57 312 456 7890</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Fecha de Pago</div>
+                        <div class="value">6 de Noviembre de 2024</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detalles del Pago -->
+            <div class="payment-details">
+                <h3>💰 Detalles de la Transacción</h3>
+                <div class="amount-display">
+                    <div class="amount-label">Monto Total Pagado</div>
+                    <div class="amount-value">$35,500</div>
+                </div>
+                <div class="payment-method">
+                    <div class="icon">💳</div>
+                    <div class="details">
+                        <div class="method-label">Método de Pago</div>
+                        <div class="method-value">Tarjeta de Crédito •••• 4532</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Información del Envío -->
+            <div class="shipment-info">
+                <h3>📦 Información del Envío</h3>
+                <div class="shipment-row">
+                    <span class="label">ID del Envío:</span>
+                    <span class="value">ENV-20241106-042</span>
+                </div>
+                <div class="shipment-row">
+                    <span class="label">Origen:</span>
+                    <span class="value">Calle 12 #23-45, Armenia, Quindío</span>
+                </div>
+                <div class="shipment-row">
+                    <span class="label">Destino:</span>
+                    <span class="value">Carrera 15 #30-20, Armenia, Quindío</span>
+                </div>
+                <div class="shipment-row">
+                    <span class="label">Estado:</span>
+                    <span class="value">✅ Pago Confirmado</span>
+                </div>
+                <div class="shipment-row">
+                    <span class="label">Fecha de Entrega Estimada:</span>
+                    <span class="value">6 de Noviembre de 2024 (Mismo día)</span>
+                </div>
+            </div>
+
+            <!-- Desglose de Costos -->
+            <div class="shipment-info">
+                <h3>💵 Desglose de Costos</h3>
+                <div class="shipment-row">
+                    <span class="label">Costo Base del Envío:</span>
+                    <span class="value">$28,000</span>
+                </div>
+                <div class="shipment-row">
+                    <span class="label">Cargo por Urgencia:</span>
+                    <span class="value">$5,000</span>
+                </div>
+                <div class="shipment-row">
+                    <span class="label">Seguro del Paquete:</span>
+                    <span class="value">$2,500</span>
+                </div>
+                <div class="shipment-row" style="border-top: 2px solid #10b981; margin-top: 10px; padding-top: 15px;">
+                    <span class="label" style="font-size: 1.2rem; color: #064e3b;"><strong>Total:</strong></span>
+                    <span class="value" style="font-size: 1.4rem; color: #10b981;"><strong>$35,500</strong></span>
+                </div>
+            </div>
+
+            <!-- Notas Adicionales -->
+            <div class="footer-notes">
+                <h4>📋 Información Importante</h4>
+                <p>Este recibo es válido como comprobante de pago. Por favor, conserve este documento para futuras referencias.</p>
+                <p>Si tiene alguna pregunta sobre este pago o su envío, no dude en contactarnos.</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p class="company-name">ShipmentsUQ SameDay</p>
+            <p>Sistema de Gestión de Envíos</p>
+            <p class="contact">📧 soporte@shipmentsuq.com | 📞 +57 (6) 745 0000</p>
+            <p style="margin-top: 15px; font-size: 0.85rem; color: #6b7280;">
+                © 2024 Universidad del Quindío. Todos los derechos reservados.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

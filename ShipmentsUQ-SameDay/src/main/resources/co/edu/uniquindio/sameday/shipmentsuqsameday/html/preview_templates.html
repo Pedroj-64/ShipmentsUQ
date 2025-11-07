@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Previa de Templates - ShipmentsUQ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .preview-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .template-card {
+            background: linear-gradient(135deg, #2d3561 0%, #1f2544 100%);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .template-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            border-color: #667eea;
+        }
+
+        .template-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .template-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .template-card p {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .btn-preview {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .instructions {
+            background: linear-gradient(135deg, #2d3561 0%, #1f2544 100%);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 40px;
+            border-left: 5px solid #667eea;
+        }
+
+        .instructions h3 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .instructions code {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            color: #a78bfa;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .color-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-daily { background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%); }
+        .color-general { background: linear-gradient(135deg, #1a73e8 0%, #4285f4 100%); }
+        .color-monthly { background: linear-gradient(135deg, #28a745 0%, #20c997 100%); }
+        .color-payment { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
+        .color-receipt { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 40px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-container">
+        <div class="header">
+            <h1>🎨 Vista Previa de Templates HTML</h1>
+            <p>ShipmentsUQ - Sistema de Gestión de Envíos</p>
+        </div>
+
+        <div class="templates-grid">
+            <div class="template-card">
+                <span class="template-icon">📋</span>
+                <h2>Reporte Diario</h2>
+                <p>Resumen de actividad del día con estadísticas y análisis por horarios</p>
+                <a href="daily_report_example.html" class="btn-preview">Ver Preview</a>
+            </div>
+
+            <div class="template-card">
+                <span class="template-icon">📊</span>
+                <h2>Reporte General</h2>
+                <p>Análisis completo de métricas y rendimiento del sistema</p>
+                <a href="general_report_example.html" class="btn-preview">Ver Preview</a>
+            </div>
+
+            <div class="template-card">
+                <span class="template-icon">📈</span>
+                <h2>Reporte Mensual</h2>
+                <p>Análisis de rendimiento mensual con insights y tendencias</p>
+                <a href="monthly_report_example.html" class="btn-preview">Ver Preview</a>
+            </div>
+
+            <div class="template-card">
+                <span class="template-icon">💳</span>
+                <h2>Reporte de Pagos</h2>
+                <p>Historial completo de transacciones y resumen financiero</p>
+                <a href="payment_report_example.html" class="btn-preview">Ver Preview</a>
+            </div>
+
+            <div class="template-card">
+                <span class="template-icon">🧾</span>
+                <h2>Comprobante de Pago</h2>
+                <p>Recibo oficial de pago con detalles del envío</p>
+                <a href="payment_receipt_example.html" class="btn-preview">Ver Preview</a>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>📚 Cómo Previsualizar los Templates</h3>
+            <ol>
+                <li>
+                    <strong>Método 1 - Archivos de Ejemplo:</strong><br>
+                    Los archivos de ejemplo ya tienen datos ficticios. Solo abre cualquiera de los links de arriba en tu navegador.
+                </li>
+                <li>
+                    <strong>Método 2 - Generar desde la App:</strong><br>
+                    Usa la funcionalidad de la aplicación para generar reportes reales con datos del sistema.
+                </li>
+                <li>
+                    <strong>Método 3 - Reemplazar Variables Manualmente:</strong><br>
+                    Abre cualquier archivo <code>*_template.html</code> y reemplaza las variables como <code>${date}</code> con valores reales.
+                </li>
+                <li>
+                    <strong>Método 4 - VS Code Live Preview:</strong><br>
+                    Instala la extensión "Live Preview" en VS Code y haz clic derecho en el archivo HTML → "Show Preview"
+                </li>
+            </ol>
+
+            <h3 style="margin-top: 30px;">🎨 Paleta de Colores</h3>
+            <div class="color-palette">
+                <div class="color-item color-daily">
+                    <strong>Reporte Diario</strong><br>
+                    Cyan/Teal<br>
+                    #17a2b8 → #20c997
+                </div>
+                <div class="color-item color-general">
+                    <strong>Reporte General</strong><br>
+                    Azul<br>
+                    #1a73e8 → #4285f4
+                </div>
+                <div class="color-item color-monthly">
+                    <strong>Reporte Mensual</strong><br>
+                    Verde<br>
+                    #28a745 → #20c997
+                </div>
+                <div class="color-item color-payment">
+                    <strong>Reporte de Pagos</strong><br>
+                    Morado<br>
+                    #6366f1 → #8b5cf6
+                </div>
+                <div class="color-item color-receipt">
+                    <strong>Comprobante</strong><br>
+                    Verde Esmeralda<br>
+                    #10b981 → #059669
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 ShipmentsUQ - Universidad del Quindío</p>
+        </div>
+    </div>
+</body>
+</html>

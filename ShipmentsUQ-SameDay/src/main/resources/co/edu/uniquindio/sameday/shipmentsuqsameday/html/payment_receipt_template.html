@@ -34,38 +34,49 @@
             padding: 40px 30px;
             text-align: center;
             position: relative;
+            overflow: hidden;
         }
 
         .header::before {
-            content: '✓';
+            content: '💳';
             position: absolute;
-            top: 20px;
-            right: 30px;
-            font-size: 4rem;
-            opacity: 0.2;
-            font-weight: bold;
+            top: -20px;
+            right: -20px;
+            font-size: 8rem;
+            opacity: 0.1;
+            transform: rotate(-15deg);
         }
 
         .header h1 {
-            font-size: 2.2rem;
-            margin-bottom: 8px;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
             font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
         }
 
         .header .subtitle {
-            font-size: 1rem;
+            font-size: 1.1rem;
             opacity: 0.95;
             font-weight: 300;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
         }
 
         .receipt-number {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.25);
             display: inline-block;
-            padding: 8px 20px;
-            border-radius: 20px;
+            padding: 10px 25px;
+            border-radius: 30px;
             margin-top: 15px;
             font-weight: 500;
             letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 1;
         }
 
         .payment-status {

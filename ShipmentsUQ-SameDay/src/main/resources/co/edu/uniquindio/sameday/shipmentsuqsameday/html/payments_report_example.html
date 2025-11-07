@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Pagos - ShipmentsUQ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            color: #4a148c;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(74, 20, 140, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '💰';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 8rem;
+            opacity: 0.1;
+            transform: rotate(-15deg);
+            z-index: 0;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        .header .period {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 10px 25px;
+            border-radius: 30px;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .report-info {
+            background: #f3e5f5;
+            padding: 20px 30px;
+            border-bottom: 1px solid #ce93d8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .report-info .info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 5px 0;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .financial-summary {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            border: 2px solid #9c27b0;
+            border-radius: 20px;
+            padding: 35px;
+            margin-bottom: 35px;
+            box-shadow: 0 8px 25px rgba(156, 39, 176, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .financial-summary::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.3; }
+        }
+
+        .financial-summary h3 {
+            color: #4a148c;
+            margin-bottom: 25px;
+            font-size: 1.8rem;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #9c27b0, #ba68c8);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(156, 39, 176, 0.25);
+        }
+
+        .summary-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #9c27b0;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .label {
+            font-size: 0.95rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            color: #4a148c;
+            margin: 30px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #9c27b0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #9c27b0 0%, #ba68c8 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tbody tr:hover {
+            background: #f3e5f5;
+            transform: scale(1.01);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .badge.completed { background: #d1f4e0; color: #0d6832; }
+        .badge.pending { background: #fff3cd; color: #856404; }
+        .badge.failed { background: #f8d7da; color: #721c24; }
+        .badge.credit_card { background: #e3f2fd; color: #0d47a1; }
+        .badge.debit_card { background: #fff3e0; color: #e65100; }
+        .badge.cash { background: #e8f5e9; color: #1b5e20; }
+
+        .payment-methods-chart {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .method-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .method-card:hover {
+            border-color: #9c27b0;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(156, 39, 176, 0.15);
+        }
+
+        .method-card .method-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .method-card .method-name {
+            font-size: 1.1rem;
+            color: #4a148c;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .method-card .method-count {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #9c27b0;
+            margin-bottom: 5px;
+        }
+
+        .method-card .method-amount {
+            font-size: 1.1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .footer {
+            background: #f3e5f5;
+            padding: 20px 30px;
+            text-align: center;
+            color: #4a148c;
+            border-top: 1px solid #ce93d8;
+        }
+
+        .footer .company-name {
+            font-weight: bold;
+            color: #4a148c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Reporte de Pagos</h1>
+            <p class="subtitle">Análisis financiero detallado</p>
+            <div class="period">1-6 de Noviembre de 2024</div>
+        </div>
+
+        <div class="report-info">
+            <div class="info-item">
+                <span class="icon">📅</span>
+                <span><strong>Fecha de generación:</strong> 6 de Noviembre de 2024 - 19:15</span>
+            </div>
+            <div class="info-item">
+                <span class="icon">🏢</span>
+                <span><strong>Sistema:</strong> ShipmentsUQ SameDay</span>
+            </div>
+            <div class="info-item">
+                <span class="icon">📊</span>
+                <span><strong>Período:</strong> 1-6 de Noviembre de 2024</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Resumen Financiero -->
+            <div class="financial-summary">
+                <h3>💎 Resumen Financiero</h3>
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="icon">💵</div>
+                        <div class="value">$4,578,900</div>
+                        <div class="label">Ingresos Totales</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="icon">✅</div>
+                        <div class="value">148</div>
+                        <div class="label">Pagos Completados</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="icon">🕐</div>
+                        <div class="value">6</div>
+                        <div class="label">Pagos Pendientes</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="icon">❌</div>
+                        <div class="value">2</div>
+                        <div class="label">Pagos Fallidos</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="icon">📈</div>
+                        <div class="value">$30,939</div>
+                        <div class="label">Ticket Promedio</div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="icon">⚡</div>
+                        <div class="value">94.9%</div>
+                        <div class="label">Tasa de Éxito</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Métodos de Pago -->
+            <h2 class="section-title">
+                <span>💳</span>
+                Distribución por Método de Pago
+            </h2>
+            <div class="payment-methods-chart">
+                <div class="method-card">
+                    <div class="method-icon">💳</div>
+                    <div class="method-name">Tarjeta de Crédito</div>
+                    <div class="method-count">86</div>
+                    <div class="method-amount">$2,658,540</div>
+                </div>
+                <div class="method-card">
+                    <div class="method-icon">💳</div>
+                    <div class="method-name">Tarjeta de Débito</div>
+                    <div class="method-count">42</div>
+                    <div class="method-amount">$1,299,438</div>
+                </div>
+                <div class="method-card">
+                    <div class="method-icon">💵</div>
+                    <div class="method-name">Efectivo</div>
+                    <div class="method-count">20</div>
+                    <div class="method-amount">$620,922</div>
+                </div>
+            </div>
+
+            <!-- Transacciones Recientes -->
+            <h2 class="section-title">
+                <span>📋</span>
+                Transacciones Recientes
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Pago</th>
+                        <th>Fecha</th>
+                        <th>Cliente</th>
+                        <th>Método</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>PAY-001</td>
+                        <td>6 Nov 2024 18:45</td>
+                        <td>Paula Moreno</td>
+                        <td><span class="badge credit_card">Crédito</span></td>
+                        <td>$35,500</td>
+                        <td><span class="badge completed">Completado</span></td>
+                    </tr>
+                    <tr>
+                        <td>PAY-002</td>
+                        <td>6 Nov 2024 17:30</td>
+                        <td>Carlos Sánchez</td>
+                        <td><span class="badge debit_card">Débito</span></td>
+                        <td>$28,900</td>
+                        <td><span class="badge completed">Completado</span></td>
+                    </tr>
+                    <tr>
+                        <td>PAY-003</td>
+                        <td>6 Nov 2024 16:15</td>
+                        <td>Ana López</td>
+                        <td><span class="badge cash">Efectivo</span></td>
+                        <td>$42,300</td>
+                        <td><span class="badge completed">Completado</span></td>
+                    </tr>
+                    <tr>
+                        <td>PAY-004</td>
+                        <td>6 Nov 2024 15:00</td>
+                        <td>Juan Pérez</td>
+                        <td><span class="badge credit_card">Crédito</span></td>
+                        <td>$31,200</td>
+                        <td><span class="badge pending">Pendiente</span></td>
+                    </tr>
+                    <tr>
+                        <td>PAY-005</td>
+                        <td>6 Nov 2024 14:20</td>
+                        <td>María García</td>
+                        <td><span class="badge debit_card">Débito</span></td>
+                        <td>$25,800</td>
+                        <td><span class="badge completed">Completado</span></td>
+                    </tr>
+                    <tr>
+                        <td>PAY-006</td>
+                        <td>6 Nov 2024 13:45</td>
+                        <td>Luis Ramírez</td>
+                        <td><span class="badge credit_card">Crédito</span></td>
+                        <td>$38,700</td>
+                        <td><span class="badge failed">Fallido</span></td>
+                    </tr>
+                    <tr>
+                        <td>PAY-007</td>
+                        <td>6 Nov 2024 12:30</td>
+                        <td>Diana Torres</td>
+                        <td><span class="badge cash">Efectivo</span></td>
+                        <td>$29,500</td>
+                        <td><span class="badge completed">Completado</span></td>
+                    </tr>
+                    <tr>
+                        <td>PAY-008</td>
+                        <td>6 Nov 2024 11:15</td>
+                        <td>Roberto Martínez</td>
+                        <td><span class="badge debit_card">Débito</span></td>
+                        <td>$33,900</td>
+                        <td><span class="badge completed">Completado</span></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Resumen Diario -->
+            <h2 class="section-title">
+                <span>📅</span>
+                Ingresos Diarios
+            </h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Día</th>
+                        <th>Pagos Procesados</th>
+                        <th>Exitosos</th>
+                        <th>Pendientes</th>
+                        <th>Ingresos</th>
+                        <th>Tasa de Éxito</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>📅 Lunes 1</td>
+                        <td>28</td>
+                        <td>27</td>
+                        <td>1</td>
+                        <td>$865,320</td>
+                        <td>96.4%</td>
+                    </tr>
+                    <tr>
+                        <td>📅 Martes 2</td>
+                        <td>32</td>
+                        <td>31</td>
+                        <td>1</td>
+                        <td>$990,080</td>
+                        <td>96.9%</td>
+                    </tr>
+                    <tr>
+                        <td>📅 Miércoles 3</td>
+                        <td>26</td>
+                        <td>24</td>
+                        <td>2</td>
+                        <td>$742,320</td>
+                        <td>92.3%</td>
+                    </tr>
+                    <tr>
+                        <td>📅 Jueves 4</td>
+                        <td>30</td>
+                        <td>29</td>
+                        <td>1</td>
+                        <td>$928,170</td>
+                        <td>96.7%</td>
+                    </tr>
+                    <tr>
+                        <td>📅 Viernes 5</td>
+                        <td>24</td>
+                        <td>23</td>
+                        <td>1</td>
+                        <td>$712,440</td>
+                        <td>95.8%</td>
+                    </tr>
+                    <tr>
+                        <td>📅 Sábado 6</td>
+                        <td>16</td>
+                        <td>14</td>
+                        <td>2</td>
+                        <td>$432,880</td>
+                        <td>87.5%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>Generado por <span class="company-name">ShipmentsUQ SameDay</span> - Sistema de Gestión de Envíos</p>
+            <p>© 2024 Universidad del Quindío. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
