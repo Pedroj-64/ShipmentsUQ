@@ -62,6 +62,30 @@ public class LoginController {
     }
     
     /**
+     * Busca a qué correo pertenece una contraseña dada.
+     * Útil para el sistema de recuperación de contraseña.
+     * 
+     * @param password La contraseña a buscar
+     * @return El correo electrónico del usuario que tiene esa contraseña, o null si no se encuentra
+     */
+    public String findEmailByPassword(String password) {
+        if (password == null || password.isEmpty()) {
+            return null;
+        }
+        
+        // Buscar en todos los usuarios
+        UserRepository repo = userService.getRepository();
+        List<User> allUsers = repo.findAll();
+        
+        // Buscar el primer usuario que tenga esa contraseña
+        return allUsers.stream()
+            .filter(user -> password.equals(user.getPassword()))
+            .map(User::getEmail)
+            .findFirst()
+            .orElse(null);
+    }
+    
+    /**
      * Método de depuración para mostrar todos los usuarios disponibles en el sistema.
      * Este método es útil para diagnosticar problemas de login.
      */

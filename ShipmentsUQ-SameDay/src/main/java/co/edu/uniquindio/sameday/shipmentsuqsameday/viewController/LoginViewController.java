@@ -232,6 +232,26 @@ public class LoginViewController implements Initializable {
      */
     private void handleForgotPassword() {
         String email = txt_email.getText().trim();
+        String password = txt_password.getText();
+
+        // Si hay una contraseña escrita, verificar a qué correo pertenece
+        if (!password.isEmpty()) {
+            String foundEmail = controller.findEmailByPassword(password);
+            
+            if (foundEmail != null) {
+                // La contraseña pertenece a un usuario registrado
+                if (email.isEmpty() || !email.equalsIgnoreCase(foundEmail)) {
+                    // Mostrar a qué correo pertenece
+                    showErrorMessage("Error: Esta contraseña ya pertenece al correo " + foundEmail);
+                    return;
+                } else {
+                    // El correo y contraseña coinciden, están correctos
+                    showSuccessMessage("El correo y contraseña son correctos. Puede iniciar sesión.");
+                    return;
+                }
+            }
+            // Si no se encuentra la contraseña, continuar con el flujo normal
+        }
 
         // Si el campo de email está vacío, pedimos que lo complete
         if (email.isEmpty()) {
@@ -240,12 +260,12 @@ public class LoginViewController implements Initializable {
         }
 
         try {
-            String password = controller.recoverPassword(email);
+            String recoveredPassword = controller.recoverPassword(email);
 
-            if (password != null) {
+            if (recoveredPassword != null) {
                 // Mostrar la contraseña en una alerta
                 AppUtils.showAlert("Recuperación de contraseña",
-                        "Su contraseña es: " + password,
+                        "Su contraseña es: " + recoveredPassword,
                         AlertType.INFORMATION);
 
                 showSuccessMessage("Contraseña recuperada exitosamente");
