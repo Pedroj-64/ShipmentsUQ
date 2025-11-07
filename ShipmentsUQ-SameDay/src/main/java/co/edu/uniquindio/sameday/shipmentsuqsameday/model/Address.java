@@ -19,6 +19,8 @@ import java.util.UUID;
 @Builder
 public class Address implements Serializable, IGridCoordinate {
 
+    //Como dato esto cuenta como Adapter por que se adapta una direccion a una coordenada en un plano cartesiano
+    // y como recomendacion la cancion de barberos es muy buena :D
     private static final long serialVersionUID = 1L;
     private UUID id;
     private String alias;

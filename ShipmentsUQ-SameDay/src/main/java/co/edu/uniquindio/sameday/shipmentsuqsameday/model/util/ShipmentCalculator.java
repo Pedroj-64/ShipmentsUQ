@@ -10,6 +10,9 @@ public class ShipmentCalculator {
     private static final int MINUTES_PER_UNIT = 2;  // 2 minutos por unidad de distancia base
     private static final double URGENT_TIME_MULTIPLIER = 0.7;  // 30% más rápido
     private static final double PRIORITY_TIME_MULTIPLIER = 0.85;  // 15% más rápido
+    //**
+    //*Esto teniendo en cuenta que el veneco no se quede en un trancon, mentira
+    //*/
 
     /**
      * Calcula el tiempo estimado de entrega en minutos basado en la distancia euclidiana y prioridad

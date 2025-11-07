@@ -111,4 +111,6 @@ public class AppState implements Serializable {
     public void setPaymentMethods(List<UserPaymentMethod> paymentMethods) {
         this.paymentMethods = paymentMethods;
     }
+
+    //Debimos usar Spring Boot estoy al 98% de que esto seria mas facil con JPA y demas pero bueh
 }
