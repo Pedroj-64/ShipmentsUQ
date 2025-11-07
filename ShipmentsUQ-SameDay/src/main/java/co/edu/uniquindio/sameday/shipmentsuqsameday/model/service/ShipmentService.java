@@ -163,6 +163,8 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
      * @param shipment el envío al que asignar un repartidor
      */
     private void assignNearestDeliverer(Shipment shipment) {
+        System.out.println("\n=== INICIO assignNearestDeliverer ===");
+        
         if (delivererService == null) {
             System.err.println("ERROR: DelivererService no inicializado en ShipmentService");
             return;
@@ -171,31 +173,54 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         try {
             // Encontrar repartidores disponibles
             List<Deliverer> availableDeliverers = delivererService.findAvailableDeliverers();
+            System.out.println("Repartidores disponibles encontrados: " + availableDeliverers.size());
             
             if (availableDeliverers.isEmpty()) {
                 System.err.println("No hay repartidores disponibles. El envío quedará pendiente.");
                 return;
             }
             
+            // Mostrar repartidores disponibles
+            for (Deliverer d : availableDeliverers) {
+                System.out.println("  - " + d.getName() + " en (" + d.getX() + ", " + d.getY() + ") - Estado: " + d.getStatus());
+            }
+            
             // Ordenar por distancia al origen
             IGridCoordinate originCoord = shipment.getOrigin();
             
-            // Encontrar el más cercano
+            if (originCoord == null) {
+                System.err.println("ERROR: El origen del envío es NULL!");
+                return;
+            }
+            
+            System.out.println("Origen del envío: (" + originCoord.getX() + ", " + originCoord.getY() + ")");
+            
+            // Encontrar el más cercano y mostrar distancias
+            System.out.println("Calculando distancias:");
             Optional<Deliverer> nearestDeliverer = availableDeliverers.stream()
+                    .peek(deliverer -> {
+                        double distance = deliverer.distanceTo(originCoord);
+                        System.out.println("  - " + deliverer.getName() + ": " + String.format("%.2f", distance) + " unidades");
+                    })
                     .min(Comparator.comparingDouble(deliverer -> 
                         deliverer.distanceTo(originCoord)));
             
             if (nearestDeliverer.isPresent()) {
                 Deliverer deliverer = nearestDeliverer.get();
+                double finalDistance = deliverer.distanceTo(originCoord);
+                System.out.println("✓ Repartidor más cercano: " + deliverer.getName() + " a " + String.format("%.2f", finalDistance) + " unidades");
                 
                 // Asignar el envío al repartidor
                 deliverer.getCurrentShipments().add(shipment);
+                System.out.println("  Envíos actuales del repartidor: " + deliverer.getCurrentShipments().size());
                 
                 // Si el repartidor tiene demasiados envíos, marcarlo como BUSY
                 if (deliverer.getCurrentShipments().size() >= 3) {
                     deliverer.setStatus(DelivererStatus.BUSY);
+                    System.out.println("  Estado cambiado a BUSY (>= 3 envíos)");
                 } else {
                     deliverer.setStatus(DelivererStatus.ACTIVE);
+                    System.out.println("  Estado cambiado a ACTIVE");
                 }
                 
                 // Actualizar el repartidor
@@ -205,6 +230,8 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 shipment.setDeliverer(deliverer);
                 shipment.setStatus(ShipmentStatus.ASSIGNED);
                 shipment.setAssignmentDate(LocalDateTime.now());
+                
+                System.out.println("✓ Envío asignado exitosamente a " + deliverer.getName());
             } else {
                 System.err.println("Error al calcular el repartidor más cercano.");
             }
@@ -212,6 +239,8 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
             System.err.println("Error al asignar repartidor: " + e.getMessage());
             e.printStackTrace();
         }
+        
+        System.out.println("=== FIN assignNearestDeliverer ===\n");
     }
 
     /**
