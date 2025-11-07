@@ -187,7 +187,7 @@ Este proyecto fue desarrollado como parte del programa de **Ingeniería de Siste
 
 <div align="center">
 
-**Hecho con 💚 en Armenia, Quindío, Colombia**
+**Hecho con 💚 en Armenia, Quindío, Colombia.**
 **Tirando parla chimba y relleno azaroso**
 
 *Universidad del Quindío - Facultad de Ingeniería*
