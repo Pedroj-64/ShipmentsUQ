@@ -3,9 +3,7 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.model.service;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Rate;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IRateCalculator;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IRateService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.RateRepository;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.StandardRateCalculator;
 
 /**
  * Servicio para el cálculo de tarifas.

@@ -105,7 +105,7 @@ public class DataInitializer {
             return;
         }
         
-        // Dirección 1 - Predeterminada
+        // Dirección 1 - Predeterminada por que si daahh
         Address address1 = Address.builder()
                 .id(UUID.randomUUID())
                 .alias("Casa")
@@ -119,7 +119,7 @@ public class DataInitializer {
                 .build();
         addressRepository.save(address1);
         
-        // Dirección 2
+        // El man vive en el norte mero parche (inviten a laures muchachos :v)
         Address address2 = Address.builder()
                 .id(UUID.randomUUID())
                 .alias("Oficina")
@@ -149,6 +149,11 @@ public class DataInitializer {
         System.out.println("Inicializando repartidores de prueba...");
         
         // Verificar si ya existen repartidores para evitar duplicados
+        /**
+         * Aclaracion para el poco entendido este if retorna nada y es simplemente para salir
+         * del metodo no es que este mal, se podria hacer algo mejor pero al ser cuestion de mapping
+         * y no de logica de negocio se deja asi ;D 
+         */
         if (!delivererRepository.findAll().isEmpty()) {
             System.out.println("Ya existen repartidores en el sistema. Omitiendo inicialización.");
             return;
@@ -198,4 +203,10 @@ public class DataInitializer {
         initializeAddresses(addressRepository, userRepository);
         initializeDeliverers(delivererRepository);
     }
+
+    /**
+     * Con sinceridad no se si esto este sirviendo por que siempre se creean 2 usuarios y 2 admin
+     * Si alguien tiene una mejor idea de como hacer esto, soy todo oidos y si no 
+     * pues ojala raulGOD no se de cuenta 
+     */
 }

@@ -19,7 +19,6 @@ public class CommandManager {
      * Constructor privado para patrón Singleton
      */
     private CommandManager() {
-        // Constructor privado
     }
     
     /**
@@ -40,7 +39,7 @@ public class CommandManager {
     public void executeCommand(Command command) {
         command.execute();
         undoStack.push(command);
-        redoStack.clear(); // Limpiar la pila de rehacer al ejecutar un nuevo comando
+        redoStack.clear(); 
     }
     
     /**
@@ -57,7 +56,6 @@ public class CommandManager {
         if (result) {
             redoStack.push(command);
         } else {
-            // Si no se pudo deshacer, devolvemos el comando a la pila
             undoStack.push(command);
         }
         return result;

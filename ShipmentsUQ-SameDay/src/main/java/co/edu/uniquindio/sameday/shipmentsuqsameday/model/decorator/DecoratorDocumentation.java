@@ -57,6 +57,6 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator;
 public class DecoratorDocumentation {
     // Esta clase es solo para documentación y no tiene implementación
     private DecoratorDocumentation() {
-        // Constructor privado para evitar instanciación
+        
     }
 }

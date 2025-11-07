@@ -14,7 +14,7 @@ public class Session {
      * Constructor privado para evitar instanciación externa
      */
     private Session() {
-        // Constructor privado para Singleton
+        
     }
     
     /**

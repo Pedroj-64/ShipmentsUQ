@@ -14,16 +14,13 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentPriority
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IDistanceCalculator;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IGridCoordinate;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.DelivererRepository;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.ShipmentRepository;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.EuclideanDistanceCalculator;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 /**

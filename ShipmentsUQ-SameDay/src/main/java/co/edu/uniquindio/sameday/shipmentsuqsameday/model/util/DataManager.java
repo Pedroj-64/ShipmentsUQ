@@ -9,11 +9,11 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.UserPaymentMethod;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping.DataInitializer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.*;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.*;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.DelivererService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.IncidentService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.RateService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService;
 
 /**
  * Administrador de datos para cargar y guardar el estado de la aplicación.
@@ -25,10 +25,8 @@ public class DataManager {
     
     // Instancia única (Singleton)
     private static DataManager instance;
-    
-    // Estado de la aplicación
     private AppState appState;
-    
+
     // Repositorios
     private UserRepository userRepository;
     private DelivererRepository delivererRepository;
@@ -44,7 +42,7 @@ public class DataManager {
     private IncidentService incidentService;
     private ShipmentService shipmentService;
     
-    // Flag para control de inicialización
+
     private boolean isInitialized = false;
     
     /**
@@ -61,7 +59,6 @@ public class DataManager {
             
             synchronized (DataManager.class) {
                 if (!isInitialized) {
-                    // Inicializar repositorios primero
                     initRepositoriesAndServices();
                     System.out.println("Repositorios inicializados");
                     
@@ -139,8 +136,7 @@ public class DataManager {
         
         // Inicializar servicios con los repositorios correctos
         try {
-            // Inicializar UserService con nuestro repositorio de usuarios
-            co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService.getInstance(userRepository);
+            UserService.getInstance(userRepository);
             System.out.println("Servicios inicializados correctamente con los repositorios");
         } catch (Exception e) {
             System.err.println("Error al inicializar servicios: " + e.getMessage());
@@ -162,11 +158,10 @@ public class DataManager {
             
             if (Serializer.existeArchivo(APP_STATE_FILE)) {
                 try {
-                    // Cargar estado desde el archivo
                     appState = (AppState) Serializer.cargarEstado(APP_STATE_FILE);
                     System.out.println("Estado de la aplicación cargado exitosamente.");
                     
-                    // Verificar si los datos se cargaron correctamente
+
                     if (appState.getUsers() != null && !appState.getUsers().isEmpty()) {
                         System.out.println("Usuarios encontrados en el estado cargado: " + appState.getUsers().size());
                         loadRepositories();
@@ -175,12 +170,11 @@ public class DataManager {
                     }
                 } catch (Exception e) {
                     System.err.println("Error al cargar el estado desde archivo: " + e.getMessage());
-                    // Continuamos con la creación de nuevos datos
+                
                 }
             }
             
             if (!dataInitialized) {
-                // Si llegamos aquí, necesitamos crear nuevos datos
                 appState = new AppState();
                 System.out.println("Creando nuevo estado con datos de prueba.");
                 initializeTestData();
@@ -225,14 +219,13 @@ public class DataManager {
         System.out.println("Inicializando datos de prueba...");
         
         try {
-            // Inicializar todos los datos de prueba de una vez
+
             DataInitializer.initializeAllTestData(
                 userRepository, 
                 addressRepository,
                 delivererRepository
             );
-            
-            // Actualizar el estado con los datos recién creados
+            // Actualizar el estado con los datos inicializados
             updateState();
             
             // Guardar los datos inmediatamente después de crearlos
@@ -240,7 +233,7 @@ public class DataManager {
             
             System.out.println("Datos de prueba creados y guardados exitosamente.");
             
-            // Imprimir usuarios para depuración
+            // Imprimir usuarios para pruebas
             System.out.println("Usuarios disponibles:");
             userRepository.findAll().forEach(user -> {
                 System.out.println("Usuario: " + user.getName() + ", Email: " + user.getEmail() + ", Rol: " + user.getRole());
@@ -265,11 +258,9 @@ public class DataManager {
                 return;
             }
             
-            // Guardar el estado en el archivo
             Serializer.guardarEstado(appState, APP_STATE_FILE);
             System.out.println("Estado de la aplicación guardado exitosamente.");
             
-            // Verificar que el archivo se guardó correctamente
             if (Serializer.existeArchivo(APP_STATE_FILE)) {
                 System.out.println("Archivo de estado verificado: existe en disco.");
             } else {
@@ -286,7 +277,6 @@ public class DataManager {
      * Actualiza el estado de la aplicación con los datos de los repositorios.
      */
     private void updateState() {
-        // Guardar todos los datos en el estado
         List<User> userList = userRepository.getEntitiesAsList();
         System.out.println("Actualizando estado - Total de usuarios a guardar: " + userList.size());
         
@@ -298,14 +288,12 @@ public class DataManager {
         appState.setRates(rateRepository.getEntitiesAsList());
         appState.setIncidents(incidentRepository.getEntitiesAsList());
         
-        // Extraer los métodos de pago de todos los usuarios
         List<UserPaymentMethod> allPaymentMethods = new ArrayList<>();
         for (User user : userList) {
             allPaymentMethods.addAll(user.getPaymentMethods());
         }
         appState.setPaymentMethods(allPaymentMethods);
         
-        // Verificación final
         if (appState.getUsers().isEmpty()) {
             System.err.println("ADVERTENCIA: La lista de usuarios está vacía después de updateState()");
         }

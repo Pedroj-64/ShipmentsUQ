@@ -15,7 +15,6 @@ public class ShipmentServiceDecoratorFactory {
      * Método privado para evitar instanciación
      */
     private ShipmentServiceDecoratorFactory() {
-        // Constructor privado para evitar instanciación
     }
     
     /**

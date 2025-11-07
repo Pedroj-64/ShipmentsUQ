@@ -17,8 +17,8 @@ public class AddressDTO implements IGridCoordinate {
     private String street;
     private String city;
     private String zone;
-    private double coordX;  // Coordenada X en el mapa de cuadrícula
-    private double coordY;  // Coordenada Y en el mapa de cuadrícula
+    private double coordX;  
+    private double coordY;  
     
     /**
      * Implementación de IGridCoordinate para obtener la coordenada X

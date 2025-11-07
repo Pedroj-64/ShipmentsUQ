@@ -1,6 +1,5 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.model.service;
 
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Payment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.PaymentRepository;
 import java.time.LocalDateTime;
 import java.util.Map;

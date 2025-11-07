@@ -7,19 +7,19 @@ import java.io.Serializable;
  */
 public interface Observable extends Serializable {
     /**
-     * Register a new observer
-     * @param observer observer to register
+     * Registrar un observerador
+     * @param observer observador a agregar
      */
     void registerObserver(Observer observer);
 
     /**
-     * Remove a registered observer
-     * @param observer observer to remove
+     * Eliminar un observador registrado
+     * @param observer observador a eliminar
      */
     void removeObserver(Observer observer);
 
     /**
-     * Notify all registered observers
+     * Notificar a todos los observadores registrados
      * @param evento tipo de evento ocurrido
      * @param data datos asociados al evento
      */

@@ -7,9 +7,9 @@ import java.io.Serializable;
  */
 public interface Observer extends Serializable {
     /**
-     * Method called when an event occurs in the observed object
-     * @param event type of event that occurred
-     * @param data data associated with the event
+     * Metodo para actualizar al observador sobre un evento ocurrido
+     * @param event tipo de evento que ocurrió
+     * @param data datos asociados al evento
      */
     void update(String event, Object data);
 }

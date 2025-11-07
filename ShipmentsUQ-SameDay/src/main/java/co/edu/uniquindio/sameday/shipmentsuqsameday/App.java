@@ -19,21 +19,11 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.Session;
  * aplicación JavaFX. Maneja la carga y guardado del estado de la aplicación.
  */
 public class App extends Application {
-
-    /** Dimensiones estándar para la ventana de la aplicación */
     public static final double WINDOW_WIDTH = 800;
     public static final double WINDOW_HEIGHT = 600;
-
-    /** Escena principal de la aplicación */
     private static Scene mainScene;
-
-    /** Administrador de datos para la persistencia */
-    private static DataManager dataManager; // Gestor de datos para persistencia
-    
-    /** Sesión actual del usuario */
+    private static DataManager dataManager; 
     private static Session currentSession;
-    
-    /** Servicios del host para abrir archivos */
     private static HostServices appHostServices;
 
     /**
@@ -42,30 +32,19 @@ public class App extends Application {
      */
     @Override
     public void init() throws Exception {
-        System.out.println("Inicializando la aplicación...");
-        // Obtener la instancia del DataManager para cargar los datos
         dataManager = DataManager.getInstance();
-        // Inicializar la sesión
         currentSession = Session.getInstance();
+        
     }
     
     @Override
     public void start(Stage stage) throws IOException {
-        // Inicializar hostServices para abrir archivos
         appHostServices = getHostServices();
-        
-        // Configurar la escena inicial con la pantalla de login
         Parent root = FXMLLoader.load(App.class.getResource("interfaces/Login.fxml"));
         mainScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-        // Configurar la ventana principal
         stage.setTitle("ShipmentsUQ - Inicio de Sesión");
         stage.setScene(mainScene);
-
-        // Inicializar la clase de utilidades con la escena actual
         AppUtils.setCurrentScene(mainScene);
-
-        // Mostrar la ventana
         stage.show();
     }
 
@@ -76,7 +55,6 @@ public class App extends Application {
     @Override
     public void stop() throws Exception {
         System.out.println("Cerrando la aplicación...");
-        // Guardar el estado actual antes de cerrar
         if (dataManager != null) {
             dataManager.saveState();
         }
@@ -101,8 +79,7 @@ public class App extends Application {
     public static boolean restartApp() {
         try {
             System.out.println("App.restartApp(): Delegando a AppUtils.restartApp()...");
-            
-            // Guardar el estado actual antes de reiniciar
+
             if (dataManager != null) {
                 dataManager.saveState();
             }
@@ -116,7 +93,7 @@ public class App extends Application {
         }
     }
     
-        /**
+    /**
      * Devuelve la sesión actual del usuario.
      * @return instancia de Session
      */
