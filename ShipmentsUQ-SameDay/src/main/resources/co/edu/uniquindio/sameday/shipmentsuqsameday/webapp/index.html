@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipmentsUQ - Mapa Interactivo</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        /* Main content */
+        .content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Map container */
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+
+        /* Side panel */
+        .side-panel {
+            width: 380px;
+            background: white;
+            overflow-y: auto;
+            box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+            z-index: 900;
+        }
+
+        .panel-section {
+            padding: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .panel-section h2 {
+            color: #1e293b;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .coord-group {
+            margin-bottom: 20px;
+        }
+
+        .coord-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+
+        .coord-value {
+            font-size: 14px;
+            color: #1e293b;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .coord-value.empty {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 15px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .metric-value.highlight {
+            color: #667eea;
+        }
+
+        /* Mode selector buttons */
+        .mode-selector {
+            position: absolute;
+            top: 20px;
+            left: 60px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .mode-btn {
+            padding: 12px 24px;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mode-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .mode-btn.active.origin {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .mode-btn.active.destination {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: #10b981;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            padding: 20px 25px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f0fdf4;
+            border: 1px solid #86efac;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #166534;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22c55e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Info text */
+        .info-text {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.6;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        /* Scrollbar styling */
+        .side-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .side-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .side-panel::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .side-panel::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🗺️ ShipmentsUQ - Mapa Interactivo</h1>
+            <p>Selecciona origen y destino para calcular distancia, tiempo y costo del envío</p>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+            <!-- Map -->
+            <div id="map"></div>
+
+            <!-- Mode selector (over map) -->
+            <div class="mode-selector">
+                <button class="mode-btn origin active" id="btn-origin">
+                    📍 Origen
+                </button>
+                <button class="mode-btn destination" id="btn-destination">
+                    🎯 Destino
+                </button>
+            </div>
+
+            <!-- Side panel -->
+            <div class="side-panel">
+                <!-- Connection status -->
+                <div class="panel-section">
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span>Conectado con Java Backend</span>
+                    </div>
+                </div>
+
+                <!-- Coordinates -->
+                <div class="panel-section">
+                    <h2>📍 Coordenadas</h2>
+                    
+                    <div class="coord-group">
+                        <div class="coord-label">Origen:</div>
+                        <div class="coord-value empty" id="origin-coords">
+                            No seleccionado - Haz clic en el mapa
+                        </div>
+                    </div>
+
+                    <div class="coord-group">
+                        <div class="coord-label">Destino:</div>
+                        <div class="coord-value empty" id="destination-coords">
+                            No seleccionado - Haz clic en el mapa
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calculations -->
+                <div class="panel-section">
+                    <h2>📊 Cálculos</h2>
+                    
+                    <div class="metric">
+                        <span class="metric-label">Distancia:</span>
+                        <span class="metric-value" id="distance">-</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="metric-label">Tiempo estimado:</span>
+                        <span class="metric-value" id="time">-</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="metric-label">Costo estimado:</span>
+                        <span class="metric-value highlight" id="cost">-</span>
+                    </div>
+
+                    <div class="metric">
+                        <span class="metric-label">Entrega mismo día:</span>
+                        <span class="metric-value" id="same-day">-</span>
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div class="panel-section">
+                    <h2>ℹ️ Información</h2>
+                    <div class="info-text">
+                        <strong>Área de servicio:</strong> 20 km desde Armenia, Quindío<br>
+                        <strong>Costo base:</strong> $5,000 COP + $2,500/km<br>
+                        <strong>Velocidad promedio:</strong> 30 km/h<br>
+                        <strong>Máximo mismo día:</strong> 30 km
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="action-buttons">
+                    <button class="btn btn-danger" id="btn-clear">
+                        🗑️ Limpiar
+                    </button>
+                    <button class="btn btn-primary" id="btn-center">
+                        📍 Centrar
+                    </button>
+                    <button class="btn btn-success" id="btn-send">
+                        💾 Enviar a Java
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- App Script -->
+    <script src="app.js"></script>
+</body>
+</html>

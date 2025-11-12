@@ -12,6 +12,7 @@ import java.util.UUID;
 /**
  * Clase que representa una dirección en el sistema
  * Utiliza coordenadas cartesianas (X, Y) en lugar de coordenadas geográficas
+ * Ahora también soporta coordenadas GPS reales (opcionales)
  */
 @Data
 @NoArgsConstructor
@@ -21,7 +22,7 @@ public class Address implements Serializable, IGridCoordinate {
 
     //Como dato esto cuenta como Adapter por que se adapta una direccion a una coordenada en un plano cartesiano
     // y como recomendacion la cancion de barberos es muy buena :D
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L; // Incrementado para migración
     private UUID id;
     private String alias;
     private String street;
@@ -32,6 +33,13 @@ public class Address implements Serializable, IGridCoordinate {
     private double coordX;
     private double coordY;
     private boolean isDefault;
+    
+    // Nuevos campos para coordenadas GPS reales (opcionales)
+    @Builder.Default
+    private Double gpsLatitude = null;
+    
+    @Builder.Default
+    private Double gpsLongitude = null;
 
     /**
      * Implementación de IGridCoordinate para obtener la coordenada X
@@ -90,5 +98,23 @@ public class Address implements Serializable, IGridCoordinate {
         }
 
         return sb.length() > 0 ? sb.toString() : "Dirección no especificada";
+    }
+    
+    /**
+     * Verifica si esta dirección tiene coordenadas GPS reales
+     * @return true si tiene GPS, false si solo tiene Grid
+     */
+    public boolean hasGpsCoordinates() {
+        return gpsLatitude != null && gpsLongitude != null;
+    }
+    
+    /**
+     * Establece las coordenadas GPS
+     * @param latitude latitud GPS
+     * @param longitude longitud GPS
+     */
+    public void setGpsCoordinates(double latitude, double longitude) {
+        this.gpsLatitude = latitude;
+        this.gpsLongitude = longitude;
     }
 }

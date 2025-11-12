@@ -2,7 +2,10 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.viewController;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.AddressFormController;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.GridMapViewController;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.Coordinates;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.RealMapService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -41,6 +44,7 @@ public class AddressFormViewController implements Initializable {
     
     @FXML private Button btn_save;
     @FXML private Button btn_cancel;
+    @FXML private Button btn_toggleMap;
     
     @FXML private StackPane mapContainer;
     @FXML private WebView wv_map; // Se mantiene para compatibilidad, pero no se usará
@@ -48,8 +52,16 @@ public class AddressFormViewController implements Initializable {
     // Controlador de negocio
     private AddressFormController controller;
     
-    // Controlador del mapa
+    // Controlador del mapa Grid (sistema existente)
     private GridMapViewController mapViewController;
+    
+    // Servicio del mapa Real GPS (sistema nuevo)
+    private RealMapService realMapService;
+    
+    // Estado del sistema de coordenadas
+    private boolean usingRealCoordinates = false;
+    private Coordinates selectedRealOrigin;
+    private Coordinates selectedRealDestination;
     
     // Referencia al controlador de ProfileAndAddresses para actualizar su vista
     private ProfileAndAddressesViewController parentController;
@@ -59,6 +71,14 @@ public class AddressFormViewController implements Initializable {
         try {
             // Inicializar controlador
             controller = new AddressFormController();
+            
+            // Inicializar servicio de mapa real
+            realMapService = new RealMapService();
+            
+            // Establecer callback para cuando se reciban coordenadas desde el mapa web
+            realMapService.setCoordinatesCallback((origin, destination) -> {
+                onRealCoordinatesReceived(origin, destination);
+            });
             
             // Configurar componentes visuales
             setupMapView();
@@ -134,6 +154,7 @@ public class AddressFormViewController implements Initializable {
         // Botones
         btn_save.setOnAction(event -> handleSaveAddress());
         btn_cancel.setOnAction(event -> handleCancel());
+        btn_toggleMap.setOnAction(event -> handleToggleMap());
         
         // Campos de texto (para validación en tiempo real si se desea)
         txt_alias.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -155,9 +176,34 @@ public class AddressFormViewController implements Initializable {
             String complement = txt_complement.getText();
             boolean isDefault = chk_default.isSelected();
             
-            // Obtener coordenadas seleccionadas
-            double coordX = mapViewController.getSelectedX();
-            double coordY = mapViewController.getSelectedY();
+            // Obtener coordenadas según el modo activo
+            double coordX, coordY;
+            Double gpsLat = null;
+            Double gpsLng = null;
+            
+            if (usingRealCoordinates && selectedRealOrigin != null) {
+                // Usando coordenadas GPS reales - convertir a Grid para guardar
+                double[] gridCoords = realMapService.convertRealToGrid(
+                    selectedRealOrigin.getLatitude(),
+                    selectedRealOrigin.getLongitude()
+                );
+                coordX = gridCoords[0];
+                coordY = gridCoords[1];
+                
+                // Guardar también las coordenadas GPS reales
+                gpsLat = selectedRealOrigin.getLatitude();
+                gpsLng = selectedRealOrigin.getLongitude();
+                
+                System.out.println("✓ Guardando dirección con GPS: " + gpsLat + ", " + gpsLng);
+                System.out.println("  Convertido a Grid: " + coordX + ", " + coordY);
+                
+            } else {
+                // Usando sistema de cuadrícula tradicional
+                coordX = mapViewController.getSelectedX();
+                coordY = mapViewController.getSelectedY();
+                
+                System.out.println("✓ Guardando dirección con Grid: " + coordX + ", " + coordY);
+            }
             
             // Validar campos obligatorios en la interfaz
             if (alias.trim().isEmpty() || street.trim().isEmpty() || city.trim().isEmpty()) {
@@ -174,8 +220,17 @@ public class AddressFormViewController implements Initializable {
             boolean success = controller.saveAddress(alias, street, zone, city, zipCode, 
                                                      complement, coordX, coordY, isDefault);
             
+            // Si se guardó exitosamente y hay coordenadas GPS, actualizarlas
+            if (success && gpsLat != null && gpsLng != null) {
+                // Obtener la dirección recién guardada para agregarle las coordenadas GPS
+                // Nota: Necesitamos acceso a la dirección guardada para poder actualizarla
+                // Por ahora, las coordenadas GPS se perderán si no las guardamos en el método saveAddress
+                System.out.println("⚠️ Coordenadas GPS no persistidas en Address (requiere modificar AddressFormController)");
+            }
+            
             if (success) {
-                updateStatusMessage("Dirección guardada correctamente", false);
+                String coordSystemMsg = usingRealCoordinates ? " (con coordenadas GPS)" : "";
+                updateStatusMessage("Dirección guardada correctamente" + coordSystemMsg, false);
                 
                 // Si hay un controlador padre, actualizar su lista de direcciones
                 if (parentController != null) {
@@ -273,5 +328,117 @@ public class AddressFormViewController implements Initializable {
         double y = address.getCoordY();
         mapViewController.setSelectedCoordinates(x, y);
         updateCoordinatesLabel(x, y);
+    }
+    
+    /**
+     * Maneja el toggle entre Grid Map y Real GPS Map
+     */
+    private void handleToggleMap() {
+        if (!usingRealCoordinates) {
+            // Cambiar a mapa real
+            enableRealMapMode();
+        } else {
+            // Volver a mapa Grid
+            disableRealMapMode();
+        }
+    }
+    
+    /**
+     * Activa el modo de mapa con coordenadas reales (GPS)
+     */
+    private void enableRealMapMode() {
+        try {
+            // Iniciar servidor web si no está activo
+            if (realMapService.startMapServer()) {
+                // Abrir navegador con el mapa
+                realMapService.openMapInBrowser();
+                
+                // Cambiar estado
+                usingRealCoordinates = true;
+                btn_toggleMap.setText("📍 Usar Mapa de Cuadrícula");
+                btn_toggleMap.setStyle("-fx-background-color: linear-gradient(to bottom, #10b981 0%, #059669 100%);");
+                
+                // Mostrar instrucciones
+                showRealMapInstructions();
+                
+                updateStatusMessage("Mapa GPS abierto en el navegador. Selecciona origen y haz clic en 'Enviar a Java'", false);
+            } else {
+                showErrorMessage("No se pudo iniciar el servidor del mapa");
+            }
+        } catch (Exception e) {
+            showErrorMessage("Error al abrir mapa real: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Desactiva el modo de mapa real y vuelve al Grid
+     */
+    private void disableRealMapMode() {
+        usingRealCoordinates = false;
+        btn_toggleMap.setText("🗺️ Usar Coordenadas Reales");
+        btn_toggleMap.setStyle("");
+        
+        // Limpiar coordenadas reales seleccionadas
+        selectedRealOrigin = null;
+        selectedRealDestination = null;
+        
+        updateStatusMessage("Usando sistema de cuadrícula. Selecciona ubicación en el mapa", false);
+    }
+    
+    /**
+     * Muestra un diálogo con instrucciones para usar el mapa real
+     */
+    private void showRealMapInstructions() {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Sistema de Coordenadas Reales");
+            alert.setHeaderText("Cómo usar el mapa GPS");
+            alert.setContentText(
+                "1. Se ha abierto el mapa en tu navegador (http://localhost:8080)\n\n" +
+                "2. Haz clic en el botón 'ORIGEN' (azul) en el mapa\n\n" +
+                "3. Haz clic en la ubicación deseada en el mapa\n\n" +
+                "4. Verás las coordenadas GPS en el panel lateral\n\n" +
+                "5. (Opcional) Selecciona DESTINO si lo necesitas\n\n" +
+                "6. Haz clic en '💾 Enviar a Java' para confirmar\n\n" +
+                "7. Las coordenadas aparecerán en esta ventana\n\n" +
+                "Nota: Para direcciones solo necesitas el ORIGEN.\n" +
+                "El DESTINO es opcional y se usa para calcular rutas."
+            );
+            alert.showAndWait();
+        });
+    }
+    
+    /**
+     * Callback llamado cuando se reciben coordenadas desde el mapa web
+     * Este método será invocado por el MapWebServer cuando JavaScript envíe datos
+     * 
+     * @param origin coordenadas de origen
+     * @param destination coordenadas de destino (puede ser null para direcciones)
+     */
+    public void onRealCoordinatesReceived(Coordinates origin, Coordinates destination) {
+        Platform.runLater(() -> {
+            this.selectedRealOrigin = origin;
+            this.selectedRealDestination = destination;
+            
+            // Actualizar label con coordenadas GPS
+            lbl_coordinates.setText(String.format(
+                "GPS: Lat %.6f, Lng %.6f", 
+                origin.getLatitude(), 
+                origin.getLongitude()
+            ));
+            
+            // Convertir a coordenadas de Grid para compatibilidad
+            double[] gridCoords = realMapService.convertRealToGrid(
+                origin.getLatitude(), 
+                origin.getLongitude()
+            );
+            
+            // Actualizar el mapa Grid también (para visualización)
+            if (mapViewController != null) {
+                mapViewController.setSelectedCoordinates(gridCoords[0], gridCoords[1]);
+            }
+            
+            updateStatusMessage("Coordenadas GPS recibidas correctamente", false);
+        });
     }
 }

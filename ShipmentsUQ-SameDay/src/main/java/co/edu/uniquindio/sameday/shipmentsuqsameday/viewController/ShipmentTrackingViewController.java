@@ -1,14 +1,18 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.viewController;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.GridMapViewController;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.Coordinates;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.RealMapService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.ShipmentDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.GridMap;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
@@ -44,9 +48,12 @@ public class ShipmentTrackingViewController implements Initializable {
     private ShipmentDTO shipmentDTO;
     private ShipmentService shipmentService;
     private GridMapViewController mapController;
+    private RealMapService realMapService;
     @SuppressWarnings("unused")
     private GridMap gridMap;  // Reservado para funcionalidad futura
     private final DecimalFormat decimalFormat = new DecimalFormat("#0.00");
+    
+    private boolean usingRealCoordinates = false;
     
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -61,6 +68,9 @@ public class ShipmentTrackingViewController implements Initializable {
         
         // Inicializar el mapa en el contenedor
         mapController.initialize(mapContainer);
+        
+        // Inicializar servicio de coordenadas GPS
+        realMapService = new RealMapService();
         
         // Configurar botones
         btn_refresh.setOnAction(event -> refreshTracking());
@@ -91,6 +101,8 @@ public class ShipmentTrackingViewController implements Initializable {
             if (shipmentOptional.isPresent()) {
                 Shipment shipment = shipmentOptional.get();
                 Deliverer deliverer = shipment.getDeliverer();
+                Address origin = shipment.getOrigin();
+                Address destination = shipment.getDestination();
                 
                 // Actualizar la información en la UI
                 lbl_shipmentId.setText(shipment.getId().toString());
@@ -99,33 +111,110 @@ public class ShipmentTrackingViewController implements Initializable {
                 if (deliverer != null) {
                     lbl_delivererName.setText(deliverer.getName());
                     
-                    // Obtener y mostrar las coordenadas actuales del repartidor
-                    double delivererX = deliverer.getX();
-                    double delivererY = deliverer.getY();
-                    lbl_coordinates.setText(String.format("(%.0f, %.0f)", delivererX, delivererY));
-                    
-                    // Establecer las coordenadas en el mapa
-                    mapController.setSelectedCoordinates(delivererX, delivererY);
-                    
-                    // Si hay dirección de destino, calcular la distancia
-                    Address destination = shipment.getDestination();
-                    if (destination != null) {
-                        // Calcular distancia desde la posición actual del repartidor al destino
-                        double destX = destination.getCoordX();
-                        double destY = destination.getCoordY();
+                    // Verificar si el repartidor tiene coordenadas GPS reales
+                    if (deliverer.hasRealCoordinates()) {
+                        // Usar coordenadas GPS
+                        usingRealCoordinates = true;
+                        double lat = deliverer.getRealLatitude();
+                        double lng = deliverer.getRealLongitude();
                         
-                        double distance = calculateDistance(delivererX, delivererY, destX, destY);
-                        lbl_distanceToDestination.setText(decimalFormat.format(distance) + " unidades");
+                        lbl_coordinates.setText(String.format("GPS: %.6f, %.6f", lat, lng));
+                        
+                        // Convertir a Grid para mostrar en el mapa
+                        double[] gridCoords = realMapService.convertRealToGrid(lat, lng);
+                        mapController.setSelectedCoordinates(gridCoords[0], gridCoords[1]);
+                        
+                        // Calcular distancia GPS al destino si existe
+                        if (destination != null) {
+                            Coordinates delivererCoords = new Coordinates(lat, lng);
+                            
+                            // Verificar si el destino también tiene GPS
+                            if (destination.getGpsLatitude() != null && destination.getGpsLongitude() != null) {
+                                Coordinates destCoords = new Coordinates(
+                                    destination.getGpsLatitude(), 
+                                    destination.getGpsLongitude()
+                                );
+                                double distanceKm = delivererCoords.distanceTo(destCoords);
+                                lbl_distanceToDestination.setText(
+                                    decimalFormat.format(distanceKm) + " km (GPS)"
+                                );
+                            } else {
+                                // Destino solo tiene Grid, estimar desde GPS
+                                double[] destGridCoords = {destination.getCoordX(), destination.getCoordY()};
+                                double[] destGPS = realMapService.convertGridToReal(
+                                    destGridCoords[0], destGridCoords[1]
+                                );
+                                Coordinates destCoords = new Coordinates(destGPS[0], destGPS[1]);
+                                double distanceKm = delivererCoords.distanceTo(destCoords);
+                                lbl_distanceToDestination.setText(
+                                    decimalFormat.format(distanceKm) + " km (estimado)"
+                                );
+                            }
+                        } else {
+                            lbl_distanceToDestination.setText("N/A");
+                        }
+                        
                     } else {
-                        lbl_distanceToDestination.setText("N/A");
+                        // Usar coordenadas Grid tradicionales
+                        usingRealCoordinates = false;
+                        double delivererX = deliverer.getCurrentX();
+                        double delivererY = deliverer.getCurrentY();
+                        lbl_coordinates.setText(String.format("Grid: (%.0f, %.0f)", delivererX, delivererY));
+                        
+                        // Establecer las coordenadas en el mapa
+                        mapController.setSelectedCoordinates(delivererX, delivererY);
+                        
+                        // Si hay dirección de destino, calcular la distancia Grid
+                        if (destination != null) {
+                            double destX = destination.getCoordX();
+                            double destY = destination.getCoordY();
+                            
+                            double distance = calculateDistance(delivererX, delivererY, destX, destY);
+                            lbl_distanceToDestination.setText(
+                                decimalFormat.format(distance) + " unidades (Grid)"
+                            );
+                        } else {
+                            lbl_distanceToDestination.setText("N/A");
+                        }
                     }
                 } else {
                     lbl_delivererName.setText("No asignado");
                     lbl_coordinates.setText("N/A");
                     lbl_distanceToDestination.setText("N/A");
                 }
+                
+                // Autorellenar información geográfica
+                if (origin != null) {
+                    String originInfo = buildLocationInfo("Origen", origin);
+                    System.out.println(originInfo);
+                }
+                
+                if (destination != null) {
+                    String destInfo = buildLocationInfo("Destino", destination);
+                    System.out.println(destInfo);
+                }
             }
         }
+    }
+    
+    /**
+     * Construye información legible de una ubicación
+     */
+    private String buildLocationInfo(String label, Address address) {
+        StringBuilder info = new StringBuilder();
+        info.append(label).append(": ");
+        info.append(address.getStreet()).append(", ");
+        info.append(address.getCity());
+        
+        if (address.getGpsLatitude() != null && address.getGpsLongitude() != null) {
+            info.append(String.format(" [GPS: %.6f, %.6f]", 
+                address.getGpsLatitude(), address.getGpsLongitude()));
+        } else {
+            info.append(String.format(" [Grid: %.0f, %.0f]", 
+                address.getCoordX(), address.getCoordY()));
+        }
+        
+        return info.toString();
     }
     
     /**

@@ -230,6 +230,37 @@
     background-color: #e2e6ea;
 }
 
+/* Botón de toggle mapa */
+.toggle-map-button {
+    -fx-background-color: linear-gradient(to bottom, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(to bottom, #667eea 0%, #764ba2 100%);
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: 600;
+    font-weight: 600;
+    -fx-font-size: 11px;
+    font-size: 11px;
+    -fx-padding: 6px 12px;
+    padding: 6px 12px;
+    -fx-background-radius: 6px;
+    border-radius: 6px;
+    -fx-cursor: hand;
+    cursor: pointer;
+    -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.3), 8, 0, 0, 2);
+}
+
+.toggle-map-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #5568d3 0%, #653a8b 100%);
+    background: linear-gradient(to bottom, #5568d3 0%, #653a8b 100%);
+    -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.5), 12, 0, 0, 3);
+    -fx-translate-y: -1px;
+}
+
+.toggle-map-button:pressed {
+    -fx-translate-y: 0px;
+    -fx-effect: dropshadow(gaussian, rgba(102, 126, 234, 0.2), 4, 0, 0, 1);
+}
+
 /* Contenedor de estado */
 .status-container {
     -fx-background-color: #f8f9fa;

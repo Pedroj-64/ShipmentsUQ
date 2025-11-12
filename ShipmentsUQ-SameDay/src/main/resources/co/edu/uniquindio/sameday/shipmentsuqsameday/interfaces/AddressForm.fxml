@@ -72,11 +72,15 @@
    <center>
       <VBox spacing="8.0" styleClass="map-container" BorderPane.alignment="CENTER">
          <children>
-            <Label styleClass="map-title" text="Ubicación en el mapa">
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label styleClass="map-title" text="Ubicación en el mapa" />
+                  <Button fx:id="btn_toggleMap" mnemonicParsing="false" styleClass="toggle-map-button" text="🗺️ Usar Coordenadas Reales" />
+               </children>
                <VBox.margin>
                   <Insets bottom="5.0" />
                </VBox.margin>
-            </Label>
+            </HBox>
             <StackPane fx:id="mapContainer" maxHeight="340.0" maxWidth="400.0" minHeight="300.0" minWidth="360.0" prefHeight="320.0" prefWidth="380.0" styleClass="grid-map-container">
                <VBox.margin>
                   <Insets />

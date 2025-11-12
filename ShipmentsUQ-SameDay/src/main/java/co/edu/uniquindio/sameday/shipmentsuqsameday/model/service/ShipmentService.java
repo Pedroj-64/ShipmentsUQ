@@ -381,31 +381,12 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         // Guardar el estado para persistencia
         co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager.getInstance().saveState();
         
-        // Intentar asignar automáticamente un repartidor
-        try {
-            Deliverer availableDeliverer = findAvailableDeliverer(shipment);
-            
-            if (availableDeliverer != null) {
-                // Asignar el repartidor al envío
-                shipment.setDeliverer(availableDeliverer);
-                shipment.setStatus(ShipmentStatus.ASSIGNED);
-                shipment.setAssignmentDate(LocalDateTime.now());
-                
-                // Actualizar el repartidor
-                delivererService.assignShipment(availableDeliverer, shipment);
-                
-                // Actualizar el envío en la base de datos
-                repository.update(shipment);
-                
-                System.out.println("Envío " + shipment.getId() + " asignado automáticamente al repartidor " 
-                        + availableDeliverer.getName());
-            } else {
-                System.out.println("No se pudo asignar un repartidor automáticamente al envío " + shipment.getId());
-            }
-        } catch (Exception e) {
-            System.err.println("Error al intentar asignar repartidor automáticamente: " + e.getMessage());
-            e.printStackTrace();
-        }
+        // ⚠️ NO asignar repartidor automáticamente
+        // La asignación debe hacerse SOLO después del pago exitoso
+        // Ver PaymentsController.processPayment() → shipmentService.tryAssignDeliverer()
+        
+        System.out.println("✓ Envío " + shipment.getId() + " creado en estado PENDING");
+        System.out.println("⏳ Esperando pago para asignar repartidor...");
         
         return shipment;
     }
