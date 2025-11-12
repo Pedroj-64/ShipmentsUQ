@@ -16,8 +16,6 @@ import java.util.UUID;
 public class DelivererService implements Service<Deliverer, DelivererRepository> {
     // Constantes
     private static final int MAX_CONCURRENT_SHIPMENTS = 3;
-    private static final double MIN_VALID_RATING = 1.0;
-    private static final double MAX_VALID_RATING = 5.0;
     
     private final DelivererRepository repository;
     

@@ -37,7 +37,7 @@ public class CancelShipmentCommand implements Command {
     
     /**
      * Deshace la cancelación, restaurando el estado anterior
-     * @return true si se pudo deshacer la cancelación, false en caso contrario
+     * @return true si se pudo deshacer la cancelación
      */
     @Override
     public boolean undo() {

@@ -2,7 +2,6 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.viewController;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.QuoteShipmentController;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.AddressDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.ShipmentDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentPriority;
@@ -203,7 +202,7 @@ public class QuoteShipmentViewController implements Initializable {
             }
             
             // Crear el envío
-            Shipment shipment = controller.createShipment(quotedShipment);
+            controller.createShipment(quotedShipment);
             
             // Mostrar mensaje de éxito
             showSuccessMessage("Envío creado exitosamente. Se ha asignado al repartidor más cercano.");

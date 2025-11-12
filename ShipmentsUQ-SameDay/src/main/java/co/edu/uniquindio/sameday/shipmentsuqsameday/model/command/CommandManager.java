@@ -34,12 +34,21 @@ public class CommandManager {
     
     /**
      * Ejecuta un comando y lo añade a la pila de deshacer
-     * @param command Comando a ejecutar
+     * @param command comando a ejecutar
      */
     public void executeCommand(Command command) {
+        System.out.println("\n>>> CommandManager.executeCommand() <<<");
+        System.out.println("Comando a ejecutar: " + command.getClass().getSimpleName());
+        System.out.println("Stack undo antes: " + undoStack.size() + " comandos");
+        System.out.println("Stack redo antes: " + redoStack.size() + " comandos");
+        
         command.execute();
         undoStack.push(command);
-        redoStack.clear(); 
+        redoStack.clear();
+        
+        System.out.println("Stack undo después: " + undoStack.size() + " comandos");
+        System.out.println("Stack redo después: " + redoStack.size() + " comandos");
+        System.out.println(">>> Fin executeCommand() <<<\n");
     }
     
     /**
@@ -53,6 +62,7 @@ public class CommandManager {
         
         Command command = undoStack.pop();
         boolean result = command.undo();
+        
         if (result) {
             redoStack.push(command);
         } else {
@@ -73,23 +83,28 @@ public class CommandManager {
         Command command = redoStack.pop();
         command.execute();
         undoStack.push(command);
+        
         return true;
     }
     
     /**
      * Verifica si hay comandos que se pueden deshacer
-     * @return true si hay comandos en la pila de deshacer, false en caso contrario
+     * @return true si hay comandos en la pila de deshacer
      */
     public boolean canUndo() {
-        return !undoStack.isEmpty();
+        boolean result = !undoStack.isEmpty();
+        System.out.println("CommandManager.canUndo() = " + result + " (stack size: " + undoStack.size() + ")");
+        return result;
     }
     
     /**
      * Verifica si hay comandos que se pueden rehacer
-     * @return true si hay comandos en la pila de rehacer, false en caso contrario
+     * @return true si hay comandos en la pila de rehacer
      */
     public boolean canRedo() {
-        return !redoStack.isEmpty();
+        boolean result = !redoStack.isEmpty();
+        System.out.println("CommandManager.canRedo() = " + result + " (stack size: " + redoStack.size() + ")");
+        return result;
     }
     
     /**

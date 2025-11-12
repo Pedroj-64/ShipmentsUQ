@@ -14,11 +14,9 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.ShipmentRep
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.DelivererService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.Service;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,13 +28,10 @@ import java.util.stream.Collectors;
  */
 public class UserShipmentsController {
 
-    // Servicio base sin decorar (para operaciones específicas)
     private final ShipmentService baseShipmentService;
     
-    // Servicio decorado con funcionalidades adicionales
     private final Service<Shipment, ShipmentRepository> decoratedShipmentService;
     
-    private final UserService userService;
     private final DelivererService delivererService;
     private UUID currentUserId;
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -51,7 +46,6 @@ public class UserShipmentsController {
         // Obtener el servicio decorado del registro
         this.decoratedShipmentService = ShipmentServiceRegistry.getDecoratedService();
         
-        this.userService = UserService.getInstance();
         this.delivererService = DelivererService.getInstance();
         
         // Obtener el ID del usuario actual
@@ -106,7 +100,6 @@ public class UserShipmentsController {
         }
         
         try {
-            // Validar que el envío pertenezca al usuario actual
             Optional<Shipment> shipmentOpt = decoratedShipmentService.findById(shipmentId);
             if (!shipmentOpt.isPresent()) {
                 return false;
@@ -114,21 +107,19 @@ public class UserShipmentsController {
             
             Shipment shipment = shipmentOpt.get();
             
-            // Verificar que el envío pertenece al usuario actual
             if (!shipment.getUser().getId().equals(currentUserId)) {
                 throw new IllegalStateException("No tiene permiso para cancelar este envío");
             }
             
-            // Verificar que el envío está en un estado cancelable
             if (shipment.getStatus() != ShipmentStatus.PENDING && 
                 shipment.getStatus() != ShipmentStatus.ASSIGNED) {
                 throw new IllegalStateException("Este envío no puede ser cancelado en su estado actual");
             }
             
-            // Cancelar el envío - usamos el servicio base porque tiene método específico
             return baseShipmentService.cancelShipment(shipmentId);
             
         } catch (Exception e) {
+            System.err.println("Error al cancelar envío: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error al cancelar el envío: " + e.getMessage());
         }

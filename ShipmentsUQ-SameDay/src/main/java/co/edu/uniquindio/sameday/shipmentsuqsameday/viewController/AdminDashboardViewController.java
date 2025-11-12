@@ -46,9 +46,6 @@ public class AdminDashboardViewController implements Initializable {
     private Parent usersView;
     private Parent shipmentsView;
     private Parent metricsView;
-    
-    // Usuario administrador actual
-    private User adminUser;
 
     /**
      * Inicializa el controlador de vista
@@ -70,7 +67,6 @@ public class AdminDashboardViewController implements Initializable {
      * @param user usuario administrador
      */
     public void setAdminUser(User user) {
-        this.adminUser = user;
         lbl_welcomeMessage.setText("Bienvenido/a, " + user.getName() + "!");
         lbl_statusMessage.setText("Conectado como: " + user.getEmail());
     }
@@ -107,10 +103,6 @@ public class AdminDashboardViewController implements Initializable {
             if (usersView == null) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/interfaces/AdminUsersCouriers.fxml"));
                 usersView = loader.load();
-                
-                // Obtener el controlador de vista
-                AdminUsersCouriersViewController viewController = loader.getController();
-                // Aquí podrías pasar datos adicionales al controlador si es necesario
             }
             
             // Limpiar y mostrar la vista
@@ -136,10 +128,6 @@ public class AdminDashboardViewController implements Initializable {
             if (shipmentsView == null) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/interfaces/AdminShipments.fxml"));
                 shipmentsView = loader.load();
-                
-                // Obtener el controlador de vista
-                AdminShipmentsViewController viewController = loader.getController();
-                // Aquí podrías pasar datos adicionales al controlador si es necesario
             }
             
             // Limpiar y mostrar la vista
@@ -160,15 +148,12 @@ public class AdminDashboardViewController implements Initializable {
     /**
      * Carga la vista de métricas y reportes
      */
+    @FXML
     private void loadMetricsView() {
         try {
             if (metricsView == null) {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/interfaces/AdminMetrics.fxml"));
                 metricsView = loader.load();
-                
-                // Obtener el controlador de vista
-                AdminMetricsViewController viewController = loader.getController();
-                // Aquí podrías pasar datos adicionales al controlador si es necesario
             }
             
             // Limpiar y mostrar la vista

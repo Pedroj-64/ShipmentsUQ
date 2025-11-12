@@ -294,15 +294,6 @@ public class ProfileAndAddressesViewController implements Initializable {
     }
     
     /**
-     * Muestra un mensaje informativo en la etiqueta de estado
-     * @param message Mensaje a mostrar
-     */
-    private void showInfoMessage(String message) {
-        lbl_status.setText(message);
-        lbl_status.setStyle("-fx-text-fill: blue;");
-    }
-    
-    /**
      * Abre el formulario de direcciones como un diálogo modal
      * @param address Dirección a editar o null para crear una nueva
      * @throws IOException Si ocurre un error al cargar la interfaz

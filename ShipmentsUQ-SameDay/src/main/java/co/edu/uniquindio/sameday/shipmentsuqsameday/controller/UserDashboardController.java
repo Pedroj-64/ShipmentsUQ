@@ -2,7 +2,6 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.controller;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.UserDTO;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService;
 
 import java.time.LocalDateTime;
 
@@ -12,18 +11,12 @@ import java.time.LocalDateTime;
  */
 public class UserDashboardController {
     
-    // Servicio de usuario (lo usaremos más adelante para otras funcionalidades)
-    private final UserService userService;
-    
-    // Variable estática para almacenar el usuario en sesión
     private static User currentUser;
     
     /**
-     * Constructor del controlador de dashboard.
-     * Inicializa los servicios necesarios.
+     * Constructor del controlador de dashboard
      */
     public UserDashboardController() {
-        this.userService = UserService.getInstance();
     }
     
     /**

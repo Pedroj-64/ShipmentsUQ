@@ -9,11 +9,7 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.UserPaymentMethod;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping.DataInitializer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.*;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.DelivererService;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.IncidentService;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.RateService;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.*;
 
 /**
  * Administrador de datos para cargar y guardar el estado de la aplicación.
@@ -35,13 +31,6 @@ public class DataManager {
     private PaymentRepository paymentRepository;
     private RateRepository rateRepository;
     private IncidentRepository incidentRepository;
-    
-    // Servicios
-    private RateService rateService;
-    private DelivererService delivererService;
-    private IncidentService incidentService;
-    private ShipmentService shipmentService;
-    
 
     private boolean isInitialized = false;
     
@@ -137,6 +126,12 @@ public class DataManager {
         // Inicializar servicios con los repositorios correctos
         try {
             UserService.getInstance(userRepository);
+            DelivererService delivererService = DelivererService.getInstance(delivererRepository);
+            IncidentService incidentService = IncidentService.getInstance();
+            ShipmentService.getInstance(shipmentRepository, delivererService, incidentService);
+            PaymentService.getInstance(paymentRepository, 
+                new PaymentProcessingService(paymentRepository, new MockPaymentGateway()),
+                new PaymentAnalyticsService(paymentRepository));
             System.out.println("Servicios inicializados correctamente con los repositorios");
         } catch (Exception e) {
             System.err.println("Error al inicializar servicios: " + e.getMessage());

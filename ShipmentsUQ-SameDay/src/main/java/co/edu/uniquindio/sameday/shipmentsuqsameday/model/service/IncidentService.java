@@ -13,11 +13,24 @@ import java.util.UUID;
  */
 public class IncidentService implements Service<Incident, IncidentRepository> {
     private final IncidentRepository repository;
-    private final ShipmentReassignmentService reassignmentService;
+    private static IncidentService instance;
 
-    public IncidentService(IncidentRepository repository, ShipmentReassignmentService reassignmentService) {
+    /**
+     * Constructor público para inyección de dependencias
+     */
+    public IncidentService(IncidentRepository repository) {
         this.repository = repository;
-        this.reassignmentService = reassignmentService;
+    }
+    
+    /**
+     * Obtiene la instancia única del servicio (lazy initialization)
+     * @return instancia del servicio
+     */
+    public static synchronized IncidentService getInstance() {
+        if (instance == null) {
+            instance = new IncidentService(new IncidentRepository());
+        }
+        return instance;
     }
 
     @Override
@@ -37,7 +50,9 @@ public class IncidentService implements Service<Incident, IncidentRepository> {
             incident.setSolution(solution);
 
             if (requiresReassignment(incidentId)) {
-                reassignmentService.handleReassignment(incidentId, solution);
+                // Usar lazy loading para evitar dependencia circular
+                ShipmentService shipmentService = ShipmentService.getInstance();
+                shipmentService.reassignShipment(incident.getShipment().getId(), solution);
             }
 
             repository.update(incident);

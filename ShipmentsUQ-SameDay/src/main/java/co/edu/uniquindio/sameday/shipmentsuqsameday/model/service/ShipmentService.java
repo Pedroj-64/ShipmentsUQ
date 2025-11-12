@@ -28,7 +28,6 @@ import java.util.UUID;
  */
 public class ShipmentService implements Service<Shipment, ShipmentRepository> {
     private final ShipmentRepository repository;
-    private final RateService rateService;
     private final DelivererService delivererService;
     private final IDistanceCalculator distanceCalculator;
     private final IncidentService incidentService;
@@ -37,11 +36,9 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
 
     public ShipmentService(
             ShipmentRepository repository,
-            RateService rateService,
             DelivererService delivererService,
             IncidentService incidentService) {
         this.repository = repository;
-        this.rateService = rateService;
         this.delivererService = delivererService;
         this.distanceCalculator = new EuclideanDistanceCalculator();
         this.incidentService = incidentService;
@@ -53,14 +50,17 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
      */
     public static synchronized ShipmentService getInstance() {
         if (instance == null) {
-            System.err.println("ERROR: ShipmentService no ha sido inicializado. Inicializando con configuración por defecto.");
-            // Crear versión simplificada para compatibilidad
+            System.out.println("Inicializando ShipmentService con configuración por defecto...");
+            
+            DelivererService delivererService = DelivererService.getInstance();
+            IncidentService incidentService = IncidentService.getInstance();
+            
             instance = new ShipmentService(
                 new ShipmentRepository(), 
-                null, // No inicializamos RateService 
-                null, // No inicializamos DelivererService
-                null  // No inicializamos IncidentService
+                delivererService,
+                incidentService
             );
+            System.out.println("✓ ShipmentService inicializado correctamente con todas las dependencias");
         }
         return instance;
     }
@@ -68,17 +68,15 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
     /**
      * Establece la instancia del servicio con las dependencias proporcionadas
      * @param repository Repositorio de envíos
-     * @param rateService Servicio de tarifas
      * @param delivererService Servicio de repartidores
      * @param incidentService Servicio de incidencias
      * @return instancia del servicio
      */
     public static synchronized ShipmentService getInstance(
             ShipmentRepository repository,
-            RateService rateService,
             DelivererService delivererService,
             IncidentService incidentService) {
-        instance = new ShipmentService(repository, rateService, delivererService, incidentService);
+        instance = new ShipmentService(repository, delivererService, incidentService);
         return instance;
     }
 
@@ -163,84 +161,55 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
      * @param shipment el envío al que asignar un repartidor
      */
     private void assignNearestDeliverer(Shipment shipment) {
-        System.out.println("\n=== INICIO assignNearestDeliverer ===");
-        
         if (delivererService == null) {
-            System.err.println("ERROR: DelivererService no inicializado en ShipmentService");
+            System.err.println("ERROR: DelivererService no inicializado");
             return;
         }
         
         try {
-            // Encontrar repartidores disponibles
             List<Deliverer> availableDeliverers = delivererService.findAvailableDeliverers();
-            System.out.println("Repartidores disponibles encontrados: " + availableDeliverers.size());
             
             if (availableDeliverers.isEmpty()) {
-                System.err.println("No hay repartidores disponibles. El envío quedará pendiente.");
+                System.err.println("No hay repartidores disponibles");
                 return;
             }
             
-            // Mostrar repartidores disponibles
-            for (Deliverer d : availableDeliverers) {
-                System.out.println("  - " + d.getName() + " en (" + d.getX() + ", " + d.getY() + ") - Estado: " + d.getStatus());
-            }
-            
-            // Ordenar por distancia al origen
             IGridCoordinate originCoord = shipment.getOrigin();
             
             if (originCoord == null) {
-                System.err.println("ERROR: El origen del envío es NULL!");
+                System.err.println("ERROR: El origen del envío es NULL");
                 return;
             }
             
-            System.out.println("Origen del envío: (" + originCoord.getX() + ", " + originCoord.getY() + ")");
-            
-            // Encontrar el más cercano y mostrar distancias
-            System.out.println("Calculando distancias:");
             Optional<Deliverer> nearestDeliverer = availableDeliverers.stream()
-                    .peek(deliverer -> {
-                        double distance = deliverer.distanceTo(originCoord);
-                        System.out.println("  - " + deliverer.getName() + ": " + String.format("%.2f", distance) + " unidades");
-                    })
                     .min(Comparator.comparingDouble(deliverer -> 
                         deliverer.distanceTo(originCoord)));
             
             if (nearestDeliverer.isPresent()) {
                 Deliverer deliverer = nearestDeliverer.get();
-                double finalDistance = deliverer.distanceTo(originCoord);
-                System.out.println("✓ Repartidor más cercano: " + deliverer.getName() + " a " + String.format("%.2f", finalDistance) + " unidades");
                 
-                // Asignar el envío al repartidor
                 deliverer.getCurrentShipments().add(shipment);
-                System.out.println("  Envíos actuales del repartidor: " + deliverer.getCurrentShipments().size());
                 
-                // Si el repartidor tiene demasiados envíos, marcarlo como BUSY
                 if (deliverer.getCurrentShipments().size() >= 3) {
                     deliverer.setStatus(DelivererStatus.BUSY);
-                    System.out.println("  Estado cambiado a BUSY (>= 3 envíos)");
                 } else {
                     deliverer.setStatus(DelivererStatus.ACTIVE);
-                    System.out.println("  Estado cambiado a ACTIVE");
                 }
                 
-                // Actualizar el repartidor
                 delivererService.update(deliverer);
                 
-                // Actualizar el envío con el repartidor asignado
                 shipment.setDeliverer(deliverer);
                 shipment.setStatus(ShipmentStatus.ASSIGNED);
                 shipment.setAssignmentDate(LocalDateTime.now());
                 
-                System.out.println("✓ Envío asignado exitosamente a " + deliverer.getName());
+                System.out.println("✓ Envío asignado a " + deliverer.getName());
             } else {
-                System.err.println("Error al calcular el repartidor más cercano.");
+                System.err.println("Error al calcular el repartidor más cercano");
             }
         } catch (Exception e) {
             System.err.println("Error al asignar repartidor: " + e.getMessage());
             e.printStackTrace();
         }
-        
-        System.out.println("=== FIN assignNearestDeliverer ===\n");
     }
 
     /**
@@ -321,33 +290,30 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         double originX = shipment.getOrigin().getCoordX();
         double originY = shipment.getOrigin().getCoordY();
         
+        System.out.println("Buscando repartidor para envío en zona: " + originZone + " (X:" + originX + ", Y:" + originY + ")");
+        
         // Primero intentamos encontrar el repartidor más cercano al origen
         Deliverer nearestDeliverer = delivererService.findNearestAvailableDeliverer(originX, originY, originZone);
         
         // Si encontramos un repartidor cercano, lo devolvemos
         if (nearestDeliverer != null) {
-            System.out.println("Repartidor asignado por proximidad: " + nearestDeliverer.getName() + 
-                            " - Distancia: " + nearestDeliverer.distanceTo(new IGridCoordinate() {
-                                @Override
-                                public double getX() {
-                                    return originX;
-                                }
-                                
-                                @Override
-                                public double getY() {
-                                    return originY;
-                                }
-                            }));
+            System.out.println("✓ Repartidor asignado por proximidad: " + nearestDeliverer.getName());
             return nearestDeliverer;
         }
+        
+        System.out.println("No se encontró repartidor cercano, buscando por zona...");
         
         // Plan B: buscar por zona y carga de trabajo (método anterior)
         List<Deliverer> availableDeliverers = delivererService.findAvailableDeliverersInZone(originZone);
         
+        System.out.println("Repartidores disponibles en zona " + originZone + ": " + availableDeliverers.size());
+        
         if (availableDeliverers.isEmpty()) {
             // Si no hay en la zona de origen, intentamos con cualquier repartidor disponible
             availableDeliverers = delivererService.getAvailableDeliverers();
+            System.out.println("Repartidores disponibles en total: " + availableDeliverers.size());
             if (availableDeliverers.isEmpty()) {
+                System.err.println("ERROR: No hay repartidores disponibles en el sistema");
                 return null;
             }
         }
@@ -372,6 +338,11 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 bestDeliverer = deliverer;
                 bestRating = rating;
             }
+        }
+        
+        if (bestDeliverer != null) {
+            System.out.println("✓ Repartidor seleccionado: " + bestDeliverer.getName() + 
+                             " (Envíos actuales: " + minShipments + ", Rating: " + bestRating + ")");
         }
         
         return bestDeliverer;
@@ -549,49 +520,60 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
      */
     public boolean tryAssignDeliverer(UUID shipmentId) {
         if (shipmentId == null) {
+            System.err.println("ERROR: shipmentId es null");
             return false;
         }
         
         Optional<Shipment> shipmentOpt = repository.findById(shipmentId);
         if (shipmentOpt.isEmpty()) {
+            System.err.println("ERROR: Envío no encontrado con ID: " + shipmentId);
             return false;
         }
         
         Shipment shipment = shipmentOpt.get();
         
-        // Solo se pueden asignar envíos pendientes
-        if (shipment.getStatus() != ShipmentStatus.PENDING) {
+        System.out.println("Estado actual del envío: " + shipment.getStatus());
+        System.out.println("Repartidor actual: " + (shipment.getDeliverer() != null ? shipment.getDeliverer().getName() : "ninguno"));
+        
+        // Verificar si el envío está en un estado que permite asignación
+        if (shipment.getStatus() != ShipmentStatus.PENDING && 
+            shipment.getStatus() != ShipmentStatus.ASSIGNED) {
+            System.err.println("ERROR: El envío está en estado " + shipment.getStatus() + ", no se puede asignar");
             return false;
         }
         
-        // Intentar asignar automáticamente un repartidor
+        // Si ya tiene repartidor asignado, no reasignar
+        if (shipment.getDeliverer() != null && shipment.getStatus() == ShipmentStatus.ASSIGNED) {
+            System.out.println("El envío ya tiene repartidor asignado: " + shipment.getDeliverer().getName());
+            return true;
+        }
+        
         try {
+            if (delivererService == null) {
+                System.err.println("ERROR: delivererService no inicializado");
+                return false;
+            }
+            
             Deliverer availableDeliverer = findAvailableDeliverer(shipment);
             
             if (availableDeliverer != null) {
-                // Asignar el repartidor al envío
                 shipment.setDeliverer(availableDeliverer);
                 shipment.setStatus(ShipmentStatus.ASSIGNED);
                 shipment.setAssignmentDate(LocalDateTime.now());
                 
-                // Actualizar el repartidor
                 delivererService.assignShipment(availableDeliverer, shipment);
-                
-                // Actualizar el envío en la base de datos
                 repository.update(shipment);
                 
-                // Guardar el estado para persistencia
                 co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager.getInstance().saveState();
                 
-                System.out.println("Envío " + shipment.getId() + " asignado automáticamente al repartidor " 
-                        + availableDeliverer.getName());
+                System.out.println("✓ Envío asignado exitosamente al repartidor " + availableDeliverer.getName());
                 return true;
             } else {
-                System.out.println("No se pudo asignar un repartidor automáticamente al envío " + shipment.getId());
+                System.err.println("No se encontró un repartidor disponible para el envío");
                 return false;
             }
         } catch (Exception e) {
-            System.err.println("Error al intentar asignar un repartidor al envío " + shipment.getId() + ": " + e.getMessage());
+            System.err.println("Error al intentar asignar repartidor: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
@@ -608,7 +590,6 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         }
         
         try {
-            // Encontrar el envío
             Optional<Shipment> shipmentOpt = repository.findById(shipmentId);
             if (!shipmentOpt.isPresent()) {
                 return false;
@@ -616,36 +597,29 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
             
             Shipment shipment = shipmentOpt.get();
             
-            // Verificar que el envío esté en un estado cancelable
             if (shipment.getStatus() != ShipmentStatus.PENDING && 
                 shipment.getStatus() != ShipmentStatus.ASSIGNED) {
                 return false;
             }
             
-            // Si tiene un repartidor asignado, actualizar su estado
             Deliverer deliverer = shipment.getDeliverer();
             if (deliverer != null) {
-                // Quitar el envío de la lista del repartidor
                 deliverer.getCurrentShipments().remove(shipment);
                 
-                // Actualizar estado del repartidor
                 if (deliverer.getCurrentShipments().isEmpty()) {
                     deliverer.setStatus(DelivererStatus.AVAILABLE);
                 } else {
                     deliverer.setStatus(DelivererStatus.ACTIVE);
                 }
                 
-                // Actualizar el repartidor
                 if (delivererService != null) {
                     delivererService.update(deliverer);
                 }
             }
             
-            // Usar el patrón Command para cancelar el envío
             CancelShipmentCommand cancelCommand = new CancelShipmentCommand(shipment);
             CommandManager.getInstance().executeCommand(cancelCommand);
             
-            // Actualizar el envío en el repositorio
             repository.update(shipment);
             
             return true;
@@ -662,8 +636,7 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
      */
     public boolean undoLastOperation() {
         try {
-            boolean result = CommandManager.getInstance().undoLastCommand();
-            return result;
+            return CommandManager.getInstance().undoLastCommand();
         } catch (Exception e) {
             System.err.println("Error al deshacer operación: " + e.getMessage());
             e.printStackTrace();
@@ -677,8 +650,7 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
      */
     public boolean redoLastOperation() {
         try {
-            boolean result = CommandManager.getInstance().redoLastCommand();
-            return result;
+            return CommandManager.getInstance().redoLastCommand();
         } catch (Exception e) {
             System.err.println("Error al rehacer operación: " + e.getMessage());
             e.printStackTrace();

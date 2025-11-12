@@ -133,6 +133,7 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     /**
      * Actualiza los datos de la tabla con paginación
      */
+    @SuppressWarnings("unchecked")
     private void refreshTableData() {
         try {
             DataLoadManager.<Object>loadDataAsync(
@@ -299,7 +300,8 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         // Manejar la selección de elementos en la tabla
         tbl_data.getSelectionModel().selectedItemProperty().addListener(
             (obs, oldSelection, newSelection) -> {
-                if (newSelection != null) {
+                // Solo actualizar el formulario si realmente cambió la selección
+                if (newSelection != null && newSelection != oldSelection) {
                     if (newSelection instanceof User) {
                         selectedUser = (User) newSelection;
                         selectedDeliverer = null;
@@ -397,8 +399,10 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
      */
     private void editItem() {
         boolean success = false;
+        Object selectedItem = null;
         
         if ("users".equals(controller.getMode()) && selectedUser != null) {
+            selectedItem = selectedUser;
             success = controller.editUser(
                 selectedUser,
                 txt_name.getText(),
@@ -406,6 +410,30 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
                 txt_phone.getText()
             );
         } else if (selectedDeliverer != null) {
+            selectedItem = selectedDeliverer;
+            
+            // Validar que todos los campos requeridos estén llenos
+            if (txt_courier_name.getText().trim().isEmpty()) {
+                showStatusMessage("El nombre no puede estar vacío", "error");
+                return;
+            }
+            if (txt_document.getText().trim().isEmpty()) {
+                showStatusMessage("El documento no puede estar vacío", "error");
+                return;
+            }
+            if (txt_courier_phone.getText().trim().isEmpty()) {
+                showStatusMessage("El teléfono no puede estar vacío", "error");
+                return;
+            }
+            if (txt_zone.getText().trim().isEmpty()) {
+                showStatusMessage("La zona no puede estar vacía", "error");
+                return;
+            }
+            if (chb_status.getValue() == null) {
+                showStatusMessage("El estado no puede estar vacío", "error");
+                return;
+            }
+            
             DelivererStatus status = DelivererStatus.valueOf(chb_status.getValue());
             success = controller.editDeliverer(
                 selectedDeliverer,
@@ -421,11 +449,15 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         
         if (success) {
             showStatusMessage("Elemento actualizado correctamente", "success");
-            // Recargar datos
+            // Recargar datos SIN perder la selección
             if ("users".equals(controller.getMode())) {
                 loadTableData(controller.getUsersList());
+                // Reseleccionar el elemento editado
+                tbl_data.getSelectionModel().select(selectedItem);
             } else {
                 loadTableData(controller.getDeliverersList());
+                // Reseleccionar el elemento editado
+                tbl_data.getSelectionModel().select(selectedItem);
             }
         } else {
             showStatusMessage("Error al actualizar elemento", "error");

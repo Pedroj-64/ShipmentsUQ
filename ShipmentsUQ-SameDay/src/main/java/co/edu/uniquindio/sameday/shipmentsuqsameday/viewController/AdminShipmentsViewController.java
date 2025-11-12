@@ -3,17 +3,13 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.viewController;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.AdminShipmentsController;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
 import java.net.URL;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -50,6 +46,7 @@ public class AdminShipmentsViewController implements Initializable, AdminShipmen
     // Referencias a los botones de acciones
     @FXML private Button btn_assignCourier;
     @FXML private Button btn_updateStatus;
+    @FXML private Button btn_cancelShipment;
     @FXML private Button btn_incident;
     @FXML private Button btn_deleteShipment;
 
@@ -235,6 +232,15 @@ public class AdminShipmentsViewController implements Initializable, AdminShipmen
             }
         });
         
+        // Botón para cancelar envío
+        btn_cancelShipment.setOnAction(e -> {
+            if (selectedShipment != null) {
+                controller.showCancelShipmentDialog(selectedShipment);
+            } else {
+                showStatusMessage("Debe seleccionar un envío primero", "warning");
+            }
+        });
+        
         // Botón para registrar incidencia
         btn_incident.setOnAction(e -> {
             if (selectedShipment != null) {
@@ -269,6 +275,7 @@ public class AdminShipmentsViewController implements Initializable, AdminShipmen
         if (selectedShipment == null) {
             btn_assignCourier.setDisable(true);
             btn_updateStatus.setDisable(true);
+            btn_cancelShipment.setDisable(true);
             btn_incident.setDisable(true);
             btn_deleteShipment.setDisable(true);
             return;
@@ -282,6 +289,11 @@ public class AdminShipmentsViewController implements Initializable, AdminShipmen
         
         // Se puede actualizar estado para cualquier envío que no esté DELIVERED o CANCELLED
         btn_updateStatus.setDisable(status == ShipmentStatus.DELIVERED || status == ShipmentStatus.CANCELLED);
+        
+        // Solo se pueden cancelar envíos en estado PENDING, ASSIGNED o IN_TRANSIT
+        btn_cancelShipment.setDisable(status == ShipmentStatus.DELIVERED || 
+                                      status == ShipmentStatus.CANCELLED ||
+                                      status == ShipmentStatus.INCIDENT);
         
         // Se puede registrar incidencia para cualquier envío que esté en proceso
         btn_incident.setDisable(status == ShipmentStatus.DELIVERED || status == ShipmentStatus.CANCELLED);

@@ -34,6 +34,22 @@ public class GridMap {
     }
     
     /**
+     * Obtiene el ancho del mapa
+     * @return ancho en celdas
+     */
+    public int getWidth() {
+        return width;
+    }
+    
+    /**
+     * Obtiene el alto del mapa
+     * @return alto en celdas
+     */
+    public int getHeight() {
+        return height;
+    }
+    
+    /**
      * Obtiene una celda en las coordenadas especificadas
      * @param x coordenada X
      * @param y coordenada Y

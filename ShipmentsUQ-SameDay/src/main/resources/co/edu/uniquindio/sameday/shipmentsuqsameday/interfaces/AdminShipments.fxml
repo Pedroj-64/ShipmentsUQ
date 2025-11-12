@@ -65,6 +65,7 @@
                <children>
                   <Button fx:id="btn_assignCourier" mnemonicParsing="false" styleClass="assign-button" text="Asignar Repartidor" />
                   <Button fx:id="btn_updateStatus" mnemonicParsing="false" styleClass="update-button" text="Actualizar Estado" />
+                  <Button fx:id="btn_cancelShipment" mnemonicParsing="false" styleClass="cancel-button" text="Cancelar Envío" />
                   <Button fx:id="btn_incident" mnemonicParsing="false" styleClass="incident-button" text="Registrar Incidencia" />
                   <Button fx:id="btn_deleteShipment" mnemonicParsing="false" styleClass="delete-button" text="Eliminar Envío" />
                </children>

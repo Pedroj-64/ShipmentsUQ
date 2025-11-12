@@ -12,10 +12,8 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.PaymentMethod;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.PaymentStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.PaymentService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -28,21 +26,17 @@ public class PaymentsController {
 
     private final PaymentService paymentService;
     private final ShipmentService shipmentService;
-    private final UserService userService;
     private User currentUser;
 
     /**
      * Constructor del controlador
      */
     public PaymentsController() {
-        // Inicializamos los servicios antes de usarlos
         ServiceInitializer.initializeServices();
         
         this.paymentService = PaymentService.getInstance();
         this.shipmentService = ShipmentService.getInstance();
-        this.userService = UserService.getInstance();
         
-        // Obtenemos el usuario actual
         this.currentUser = UserDashboardController.getCurrentUser();
     }
 
@@ -167,17 +161,6 @@ public class PaymentsController {
             
             Shipment shipment = shipmentOpt.get();
             
-            // Crear y procesar el pago
-            Payment payment = Payment.builder()
-                    .shipment(shipment)
-                    .user(currentUser)
-                    .amount(amount)
-                    .paymentMethod(paymentMethod)
-                    .status(PaymentStatus.PENDING)
-                    .creationDate(LocalDateTime.now())
-                    .transactionDetails(reference)
-                    .build();
-            
             Payment processedPayment = paymentService.processPayment(shipment, paymentMethod);
             
             boolean paymentSuccess = processedPayment.getStatus() == PaymentStatus.COMPLETED;
@@ -185,27 +168,30 @@ public class PaymentsController {
             // Si el pago fue exitoso, intentar asignar un repartidor
             if (paymentSuccess) {
                 try {
-                    // Intentar asignar repartidor
-                    boolean assignmentSuccess = shipmentService.tryAssignDeliverer(shipment.getId());
-                    
-                    if (assignmentSuccess) {
-                        System.out.println("Pago exitoso y repartidor asignado automáticamente para el envío: " 
-                            + shipment.getId());
-                    } else {
-                        System.out.println("Pago exitoso pero no se pudo asignar un repartidor automáticamente para el envío: " 
-                            + shipment.getId());
+                    // Recargar el shipment para tener el estado más reciente
+                    shipmentOpt = shipmentService.findById(shipment.getId());
+                    if (shipmentOpt.isPresent()) {
+                        shipment = shipmentOpt.get();
+                        
+                        // Intentar asignar repartidor
+                        boolean assignmentSuccess = shipmentService.tryAssignDeliverer(shipment.getId());
+                        
+                        if (assignmentSuccess) {
+                            System.out.println("✓ Pago exitoso y repartidor asignado automáticamente");
+                        } else {
+                            System.err.println("⚠ Pago exitoso pero no se pudo asignar un repartidor automáticamente");
+                        }
                     }
-                    
-                    // Guardar el estado actualizado después del pago y asignación
-                    co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager.getInstance().saveState();
                 } catch (Exception ex) {
                     System.err.println("Error al intentar asignar repartidor después del pago: " + ex.getMessage());
+                    ex.printStackTrace();
                     // No afectamos el resultado del pago si falla la asignación
                 }
             }
             
             return paymentSuccess;
         } catch (Exception e) {
+            System.err.println("ERROR en processPayment: " + e.getMessage());
             e.printStackTrace();
             return false;
         }

@@ -233,6 +233,27 @@
     background-color: #f57c00;
 }
 
+/* Botón de cancelar envío */
+.cancel-button {
+    -fx-background-color: #dc3545;
+    background-color: #dc3545;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-padding: 10px 15px;
+    padding: 10px 15px;
+    -fx-background-radius: 4px;
+    border-radius: 4px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.cancel-button:hover {
+    -fx-background-color: #c82333;
+    background-color: #c82333;
+}
+
 /* Botón de incidencia */
 .incident-button {
     -fx-background-color: #e53935;

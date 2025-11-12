@@ -3,10 +3,12 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.controller;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.DelivererService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.App;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
 
 import java.time.LocalDateTime;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -365,11 +367,18 @@ public class AdminMetricsController {
      */
     private String loadReportTemplate(String reportType) {
         try {
-            String templatePath = "co/edu/uniquindio/sameday/shipmentsuqsameday/html/" + reportType + "_report_template.html";
-            java.io.InputStream is = getClass().getClassLoader().getResourceAsStream(templatePath);
+            String templatePath = "html/" + reportType + "_report_template.html";
+            InputStream is = App.class.getResourceAsStream(templatePath);
             
             if (is == null) {
                 System.err.println("No se pudo encontrar la plantilla: " + templatePath);
+                System.err.println("Intentando con ruta completa...");
+                String fullPath = "/co/edu/uniquindio/sameday/shipmentsuqsameday/html/" + reportType + "_report_template.html";
+                is = getClass().getResourceAsStream(fullPath);
+            }
+            
+            if (is == null) {
+                System.err.println("No se pudo cargar la plantilla, usando plantilla por defecto");
                 return getDefaultTemplate(reportType);
             }
             
@@ -380,6 +389,7 @@ public class AdminMetricsController {
             
         } catch (Exception e) {
             System.err.println("Error al cargar plantilla: " + e.getMessage());
+            e.printStackTrace();
             return getDefaultTemplate(reportType);
         }
     }

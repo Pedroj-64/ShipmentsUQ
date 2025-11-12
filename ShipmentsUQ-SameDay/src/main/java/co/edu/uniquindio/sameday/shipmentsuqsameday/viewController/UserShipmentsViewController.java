@@ -2,7 +2,6 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.viewController;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.App;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.UserShipmentsController;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.ShipmentDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
@@ -26,7 +25,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.UUID;
@@ -687,6 +685,15 @@ public class UserShipmentsViewController implements Initializable {
      */
     private void updateUndoRedoButtons() {
         try {
+            System.out.println("DEBUG: updateUndoRedoButtons() llamado");
+            
+            if (controller == null) {
+                System.err.println("ERROR: controller es null en updateUndoRedoButtons");
+                btn_undoOperation.setDisable(true);
+                btn_redoOperation.setDisable(true);
+                return;
+            }
+            
             boolean canUndoNow = controller.canUndo();
             boolean canRedoNow = controller.canRedo();
             
@@ -694,6 +701,9 @@ public class UserShipmentsViewController implements Initializable {
             
             btn_undoOperation.setDisable(!canUndoNow);
             btn_redoOperation.setDisable(!canRedoNow);
+            
+            System.out.println("DEBUG: Botones actualizados - Undo disabled: " + btn_undoOperation.isDisabled() + 
+                              ", Redo disabled: " + btn_redoOperation.isDisabled());
         } catch (Exception e) {
             System.err.println("Error al actualizar botones undo/redo: " + e.getMessage());
             e.printStackTrace();

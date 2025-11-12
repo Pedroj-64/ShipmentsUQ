@@ -5,6 +5,8 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Rate;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IRateCalculator;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.RateRepository;
 
+import java.util.UUID;
+
 /**
  * Servicio para el cálculo de tarifas.
  * Delega los cálculos a un IRateCalculator y gestiona las tarifas.
@@ -12,15 +14,45 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository.RateReposit
 public class RateService implements Service<Rate, RateRepository> {
     private final RateRepository repository;
     private final IRateCalculator calculator;
-    private final ShipmentService shipmentService;
+    private static RateService instance;
     
-    public RateService(
-            RateRepository repository, 
-            IRateCalculator calculator,
-            ShipmentService shipmentService) {
+    /**
+     * Constructor público para inyección de dependencias
+     */
+    public RateService(RateRepository repository, IRateCalculator calculator) {
         this.repository = repository;
         this.calculator = calculator;
-        this.shipmentService = shipmentService;
+    }
+    
+    /**
+     * Obtiene la instancia única del servicio (lazy initialization)
+     * @return instancia del servicio
+     */
+    public static synchronized RateService getInstance() {
+        if (instance == null) {
+            RateRepository repo = new RateRepository();
+            // Obtener la tarifa actual del repositorio, o crear una por defecto
+            Rate currentRate = repo.findAll().stream()
+                .findFirst()
+                .orElse(createDefaultRate());
+            
+            instance = new RateService(
+                repo,
+                new co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.StandardRateCalculator(currentRate)
+            );
+        }
+        return instance;
+    }
+    
+    /**
+     * Crea una tarifa por defecto para el sistema
+     */
+    private static Rate createDefaultRate() {
+        return Rate.builder()
+            .id(UUID.randomUUID())
+            .effectiveFrom(java.time.LocalDateTime.now())
+            .isActive(true)
+            .build();
     }
     
     @Override
@@ -57,6 +89,8 @@ public class RateService implements Service<Rate, RateRepository> {
      * @return costo total calculado
      */
     public double calculateShipmentCost(Shipment shipment) {
+        // Usar lazy loading para obtener ShipmentService solo cuando se necesita
+        ShipmentService shipmentService = ShipmentService.getInstance();
         double distance = shipmentService.calculateShipmentDistance(shipment);
         
         double baseRate = calculator.calculateBaseRate(

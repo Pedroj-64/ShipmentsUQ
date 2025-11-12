@@ -434,6 +434,60 @@ public class AdminShipmentsController implements Initializable {
     }
 
     /**
+     * Muestra un diálogo de confirmación para cancelar un envío
+     * @param shipment envío a cancelar
+     */
+    public void showCancelShipmentDialog(Shipment shipment) {
+        try {
+            // Verificar que el envío pueda ser cancelado
+            ShipmentStatus currentStatus = shipment.getStatus();
+            if (currentStatus == ShipmentStatus.DELIVERED || currentStatus == ShipmentStatus.CANCELLED) {
+                if (viewController != null) {
+                    viewController.showStatusMessage("No se puede cancelar un envío que ya está entregado o cancelado", "warning");
+                }
+                return;
+            }
+            
+            // Crear el diálogo de confirmación
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Cancelar Envío");
+            alert.setHeaderText("¿Está seguro que desea cancelar este envío?");
+            alert.setContentText("Envío ID: " + shipment.getId() + 
+                                "\nEstado actual: " + currentStatus +
+                                "\n\nEsta acción cambiará el estado del envío a CANCELADO.");
+            
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // Usar el servicio para cancelar (que usa CommandManager)
+                boolean success = shipmentService.cancelShipment(shipment.getId());
+                
+                if (success) {
+                    System.out.println("Envío " + shipment.getId() + " cancelado exitosamente por admin");
+                    
+                    // Actualizar la UI
+                    if (viewController != null) {
+                        viewController.updateShipmentInTable(shipment);
+                        viewController.showStatusMessage("Envío cancelado exitosamente", "success");
+                    }
+                } else {
+                    System.err.println("Error al cancelar envío " + shipment.getId());
+                    
+                    if (viewController != null) {
+                        viewController.showStatusMessage("No se pudo cancelar el envío", "error");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error al cancelar envío: " + e.getMessage());
+            e.printStackTrace();
+            
+            if (viewController != null) {
+                viewController.showStatusMessage("Error al cancelar envío: " + e.getMessage(), "error");
+            }
+        }
+    }
+
+    /**
      * Muestra un diálogo para registrar una incidencia en un envío
      * @param shipment envío afectado
      */
