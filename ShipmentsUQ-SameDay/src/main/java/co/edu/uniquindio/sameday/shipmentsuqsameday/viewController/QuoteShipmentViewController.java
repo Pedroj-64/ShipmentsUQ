@@ -203,6 +203,7 @@ public class QuoteShipmentViewController implements Initializable {
             }
             
             // Crear el envío
+            @SuppressWarnings("unused")
             Shipment shipment = controller.createShipment(quotedShipment);
             
             // Mostrar mensaje de éxito

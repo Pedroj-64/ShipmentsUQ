@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.UserProfileController;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.UserDTO;
 
 import javafx.fxml.FXML;

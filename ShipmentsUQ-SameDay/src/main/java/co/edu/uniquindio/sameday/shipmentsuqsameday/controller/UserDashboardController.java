@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class UserDashboardController {
     
     // Servicio de usuario (lo usaremos más adelante para otras funcionalidades)
+    @SuppressWarnings("unused")
     private final UserService userService;
     
     // Variable estática para almacenar el usuario en sesión

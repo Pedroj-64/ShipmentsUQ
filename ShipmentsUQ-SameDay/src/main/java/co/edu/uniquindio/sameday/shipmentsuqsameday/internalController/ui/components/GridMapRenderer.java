@@ -12,11 +12,13 @@ import javafx.scene.layout.Pane;
  * visualmente las coordenadas seleccionadas.
  */
 public class GridMapRenderer {
+    @SuppressWarnings("unused")
     private final GridMap gridMap;
     private final Canvas canvas;
     private final double cellSize;
     private double coordX = -1;
     private double coordY = -1;
+    @SuppressWarnings("unused")
     private boolean clickable = true;  // Controla si el mapa es clickeable
     
     /**

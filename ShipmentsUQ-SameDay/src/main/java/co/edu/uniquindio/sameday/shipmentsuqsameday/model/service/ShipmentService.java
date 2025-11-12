@@ -28,6 +28,7 @@ import java.util.UUID;
  */
 public class ShipmentService implements Service<Shipment, ShipmentRepository> {
     private final ShipmentRepository repository;
+    @SuppressWarnings("unused")
     private final RateService rateService;
     private final DelivererService delivererService;
     private final IDistanceCalculator distanceCalculator;

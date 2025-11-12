@@ -297,6 +297,7 @@ public class ProfileAndAddressesViewController implements Initializable {
      * Muestra un mensaje informativo en la etiqueta de estado
      * @param message Mensaje a mostrar
      */
+    @SuppressWarnings("unused")
     private void showInfoMessage(String message) {
         lbl_status.setText(message);
         lbl_status.setStyle("-fx-text-fill: blue;");

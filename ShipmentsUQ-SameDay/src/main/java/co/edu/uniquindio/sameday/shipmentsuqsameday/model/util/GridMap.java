@@ -10,7 +10,9 @@ import java.util.*;
  * Reemplaza el sistema de coordenadas geográficas
  */
 public class GridMap {
+    @SuppressWarnings("unused")
     private final int width;
+    @SuppressWarnings("unused")
     private final int height;
     private final Map<String, GridCell> cells;
     

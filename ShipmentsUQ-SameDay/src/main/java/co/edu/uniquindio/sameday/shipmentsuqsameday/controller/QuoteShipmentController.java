@@ -7,7 +7,6 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.AddressDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.ShipmentDTO;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentPriority;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService;
 

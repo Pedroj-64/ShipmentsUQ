@@ -18,7 +18,6 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +35,7 @@ public class UserShipmentsController {
     // Servicio decorado con funcionalidades adicionales
     private final Service<Shipment, ShipmentRepository> decoratedShipmentService;
     
+    @SuppressWarnings("unused")
     private final UserService userService;
     private final DelivererService delivererService;
     private UUID currentUserId;

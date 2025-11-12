@@ -28,6 +28,7 @@ public class PaymentsController {
 
     private final PaymentService paymentService;
     private final ShipmentService shipmentService;
+    @SuppressWarnings("unused")
     private final UserService userService;
     private User currentUser;
 
@@ -168,6 +169,7 @@ public class PaymentsController {
             Shipment shipment = shipmentOpt.get();
             
             // Crear y procesar el pago
+            @SuppressWarnings("unused")
             Payment payment = Payment.builder()
                     .shipment(shipment)
                     .user(currentUser)

@@ -5,6 +5,7 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.DelivererServi
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.HtmlGenerator;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
@@ -346,40 +347,32 @@ public class AdminMetricsController {
             String template = loadReportTemplate(reportType);
             String html = processTemplate(template, data);
             
-            String fileName = String.format("reporte_%s_%s.html", 
+            String fileName = String.format("reporte_%s_%s.pdf", 
                     reportType, 
                     LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss")));
             
-            return saveToDownloads(html, fileName);
+            return HtmlGenerator.htmlToPdf(html, fileName);
             
         } catch (Exception e) {
-            System.err.println("Error al generar HTML del reporte: " + e.getMessage());
+            System.err.println("Error al generar PDF del reporte: " + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
     
     /**
      * Carga la plantilla HTML para el tipo de reporte
-     * @param reportType tipo de reporte
+     * @param reportType tipo de reporte (general, monthly, daily)
      * @return contenido de la plantilla
      */
     private String loadReportTemplate(String reportType) {
         try {
-            String templatePath = "co/edu/uniquindio/sameday/shipmentsuqsameday/html/" + reportType + "_report_template.html";
-            java.io.InputStream is = getClass().getClassLoader().getResourceAsStream(templatePath);
-            
-            if (is == null) {
-                System.err.println("No se pudo encontrar la plantilla: " + templatePath);
-                return getDefaultTemplate(reportType);
-            }
-            
-            try (java.io.BufferedReader reader = new java.io.BufferedReader(
-                    new java.io.InputStreamReader(is, java.nio.charset.StandardCharsets.UTF_8))) {
-                return reader.lines().collect(Collectors.joining("\n"));
-            }
-            
+            String templatePath = "html/" + reportType + "_report_template.html";
+            String template = HtmlGenerator.loadTemplate(templatePath);
+            System.out.println("Plantilla cargada correctamente: " + templatePath);
+            return template;
         } catch (Exception e) {
-            System.err.println("Error al cargar plantilla: " + e.getMessage());
+            System.err.println("Error al cargar plantilla '" + reportType + "': " + e.getMessage());
             return getDefaultTemplate(reportType);
         }
     }
@@ -778,31 +771,4 @@ public class AdminMetricsController {
         }
     }
     
-    /**
-     * Guarda el HTML en la carpeta de descargas
-     * @param html contenido HTML
-     * @param fileName nombre del archivo
-     * @return ruta completa del archivo
-     */
-    private String saveToDownloads(String html, String fileName) {
-        try {
-            String userHome = System.getProperty("user.home");
-            java.nio.file.Path downloadsPath = java.nio.file.Paths.get(userHome, "Downloads");
-            
-            if (!java.nio.file.Files.exists(downloadsPath)) {
-                downloadsPath = java.nio.file.Paths.get(userHome);
-            }
-            
-            java.io.File outputFile = new java.io.File(downloadsPath.toFile(), fileName);
-            try (java.io.FileWriter writer = new java.io.FileWriter(outputFile, java.nio.charset.StandardCharsets.UTF_8)) {
-                writer.write(html);
-            }
-            
-            return outputFile.getAbsolutePath();
-            
-        } catch (Exception e) {
-            System.err.println("Error al guardar archivo: " + e.getMessage());
-            return null;
-        }
-    }
 }

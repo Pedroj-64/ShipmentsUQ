@@ -48,6 +48,7 @@ public class AdminDashboardViewController implements Initializable {
     private Parent metricsView;
     
     // Usuario administrador actual
+    @SuppressWarnings("unused")
     private User adminUser;
 
     /**
@@ -109,6 +110,7 @@ public class AdminDashboardViewController implements Initializable {
                 usersView = loader.load();
                 
                 // Obtener el controlador de vista
+                @SuppressWarnings("unused")
                 AdminUsersCouriersViewController viewController = loader.getController();
                 // Aquí podrías pasar datos adicionales al controlador si es necesario
             }
@@ -138,6 +140,7 @@ public class AdminDashboardViewController implements Initializable {
                 shipmentsView = loader.load();
                 
                 // Obtener el controlador de vista
+                @SuppressWarnings("unused")
                 AdminShipmentsViewController viewController = loader.getController();
                 // Aquí podrías pasar datos adicionales al controlador si es necesario
             }
@@ -160,6 +163,7 @@ public class AdminDashboardViewController implements Initializable {
     /**
      * Carga la vista de métricas y reportes
      */
+    @SuppressWarnings("unused")
     private void loadMetricsView() {
         try {
             if (metricsView == null) {
@@ -167,6 +171,7 @@ public class AdminDashboardViewController implements Initializable {
                 metricsView = loader.load();
                 
                 // Obtener el controlador de vista
+                @SuppressWarnings("unused")
                 AdminMetricsViewController viewController = loader.getController();
                 // Aquí podrías pasar datos adicionales al controlador si es necesario
             }

@@ -15,6 +15,7 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     requires jdk.jsobject;
     requires javafx.base;
     requires java.desktop;
+    
 
     opens co.edu.uniquindio.sameday.shipmentsuqsameday to javafx.fxml;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.viewController to javafx.fxml;
@@ -40,6 +41,7 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.service;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository;
+
     
     // Exportar el paquete de decoradores
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator to javafx.base;

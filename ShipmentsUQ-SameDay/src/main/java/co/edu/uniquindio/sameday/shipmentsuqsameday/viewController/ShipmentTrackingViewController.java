@@ -44,6 +44,7 @@ public class ShipmentTrackingViewController implements Initializable {
     private ShipmentDTO shipmentDTO;
     private ShipmentService shipmentService;
     private GridMapViewController mapController;
+    @SuppressWarnings("unused")
     private GridMap gridMap;
     private final DecimalFormat decimalFormat = new DecimalFormat("#0.00");
     

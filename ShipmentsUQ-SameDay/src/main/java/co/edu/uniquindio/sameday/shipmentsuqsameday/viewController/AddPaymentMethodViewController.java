@@ -9,9 +9,7 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.AddPaymentMethodC
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.AddPaymentMethodController.MobileInfo;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.AddPaymentMethodController.PaymentMethodInfo;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.AddPaymentMethodController.PseInfo;
-import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.PaymentMethod;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;

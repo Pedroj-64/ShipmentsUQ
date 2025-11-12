@@ -37,9 +37,13 @@ public class DataManager {
     private IncidentRepository incidentRepository;
     
     // Servicios
+    @SuppressWarnings("unused")
     private RateService rateService;
+    @SuppressWarnings("unused")
     private DelivererService delivererService;
+    @SuppressWarnings("unused")
     private IncidentService incidentService;
+    @SuppressWarnings("unused")
     private ShipmentService shipmentService;
     
 

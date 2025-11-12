@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 public class DataLoadManager {
     
+    @SuppressWarnings("unused")
     private static final int DEFAULT_PAGE_SIZE = 20;
     
     public static <T> void loadDataAsync(TableView<T> tableView, List<T> data, int pageIndex, int pageSize) {

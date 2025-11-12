@@ -23,13 +23,6 @@
             <scope>provided</scope>
         </dependency>
         
-        <!-- Apache PDFBox para generación de PDFs -->
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>3.0.1</version>
-        </dependency>
-        
         <!-- Apache POI para manejo de Excel -->
         <dependency>
             <groupId>org.apache.poi</groupId>

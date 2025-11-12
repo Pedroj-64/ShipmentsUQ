@@ -135,9 +135,11 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
      */
     private void refreshTableData() {
         try {
+            @SuppressWarnings("unchecked")
+            List<Object> data = (List<Object>)controller.getCurrentData();
             DataLoadManager.<Object>loadDataAsync(
                 tbl_data,
-                (List<Object>)controller.getCurrentData(),
+                data,
                 currentPage,
                 pageSize
             );
