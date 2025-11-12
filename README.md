@@ -24,7 +24,7 @@ Este proyecto fue desarrollado con ❤️ por estudiantes de **Ingeniería de Si
 | Desarrollador | GitHub | Rol |
 |--------------|--------|-----|
 | **Pedro José Soto Rivera** | [@Pedroj-64](https://github.com/Pedroj-64) | Ingeniero en Proceso |
-| **María José Valencia** | - | Ingeniera en Proceso |
+| **María José Valencia** | NA/NA | Ingeniera en Proceso, Alias(**NEGRITA.DEV**) |
 
 ## 🏗️ Arquitectura y Patrones de Diseño
 
