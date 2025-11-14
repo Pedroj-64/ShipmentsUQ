@@ -207,24 +207,55 @@ document.getElementById('btn-save').addEventListener('click', async () => {
 
         if (response.ok) {
             const result = await response.json();
-            console.log('✅ Respuesta del servidor:', result);
+            console.log('Servidor respondió correctamente:', result);
             
             // Feedback visual
             const btn = document.getElementById('btn-save');
-            btn.textContent = '✅ ¡Ubicación Guardada!';
+            btn.textContent = 'Ubicación Guardada!';
             btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
             
+            // Mensaje de cierre
+            console.log('Cerrando pestaña en 1.5 segundos...');
+            document.getElementById('info-panel').innerHTML = 
+                '<div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 20px; border-radius: 10px; color: white; text-align: center; margin-top: 20px;">' +
+                '<h3 style="margin: 0 0 10px 0;">Ubicación guardada exitosamente</h3>' +
+                '<p style="margin: 0;">La pestaña se cerrará automáticamente...</p>' +
+                '</div>';
+            
+            // Cerrar pestaña automáticamente después de 1.5 segundos
             setTimeout(() => {
-                btn.textContent = '💾 Guardar Ubicación';
-                btn.style.background = '';
-            }, 2000);
+                console.log('Intentando cerrar pestaña del navegador...');
+                window.close();
+                
+                // Si window.close() no funciona (algunas restricciones del navegador)
+                setTimeout(() => {
+                    document.body.innerHTML = 
+                        '<div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-family: Arial, sans-serif;">' +
+                        '<div style="text-align: center;">' +
+                        '<h1 style="font-size: 3em; margin-bottom: 20px;">Ubicación Guardada</h1>' +
+                        '<p style="font-size: 1.2em;">Puedes cerrar esta pestaña manualmente</p>' +
+                        '<p style="margin-top: 30px; opacity: 0.8;">Esta ventana intentó cerrarse automáticamente</p>' +
+                        '</div>' +
+                        '</div>';
+                }, 100);
+            }, 1500);
         } else {
-            console.error('❌ Error al enviar coordenadas:', response.status);
-            alert('❌ Error al guardar ubicación. Verifica la conexión con Java.');
+            const errorText = await response.text().catch(() => 'Sin detalles');
+            console.error('Servidor respondió con error:', response.status, errorText);
+            alert(`Error del servidor (${response.status}). Por favor intenta nuevamente.`);
         }
     } catch (error) {
-        console.error('❌ Error de red:', error);
-        alert('❌ Error de conexión. ¿El servidor Java está activo?');
+        console.error('Error al comunicarse con el servidor:', error);
+        // Solo mostrar alerta si realmente no se puede conectar después de un reintento
+        setTimeout(async () => {
+            try {
+                await fetch('/api/coordinates', { method: 'HEAD' });
+                console.log('Servidor está activo, reintentando operación...');
+                alert('Hubo un error temporal. Por favor intenta guardar nuevamente.');
+            } catch {
+                alert('No se puede conectar al servidor. Por favor verifica que la aplicación esté en ejecución.');
+            }
+        }, 500);
     }
 });
 

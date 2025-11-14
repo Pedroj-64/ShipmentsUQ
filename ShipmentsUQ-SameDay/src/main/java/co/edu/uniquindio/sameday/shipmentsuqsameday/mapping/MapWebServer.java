@@ -22,6 +22,7 @@ public class MapWebServer {
     private HttpServer server;
     private static final int PORT = 8080;
     private CoordinatesCallback callback;
+    private boolean isRunning = false;
     
     public interface CoordinatesCallback {
         void onCoordinatesReceived(Coordinates origin, Coordinates destination);
@@ -36,26 +37,48 @@ public class MapWebServer {
     }
     
     /**
+     * Verifica si el servidor está activo
+     */
+    public boolean isRunning() {
+        return isRunning && server != null;
+    }
+    
+    /**
      * Inicia el servidor HTTP
      */
     public void start() throws IOException {
-        server = HttpServer.create(new InetSocketAddress(PORT), 0);
+        if (isRunning) {
+            System.out.println("[INFO] Servidor ya está activo en puerto " + PORT);
+            return;
+        }
         
-        // Rutas
-        server.createContext("/", new StaticFileHandler());
-        server.createContext("/api/coordinates", new CoordinatesHandler());
-        
-        server.setExecutor(null); // Usa el executor por defecto
-        server.start();
-        
-        System.out.println("============================================================");
-        System.out.println("  [INFO] ShipmentsUQ - Servidor de Mapas Iniciado");
-        System.out.println("============================================================");
-        System.out.println("  [INFO] Puerto: " + PORT);
-        System.out.println("  [INFO] URL: http://localhost:" + PORT);
-        System.out.println("  [INFO] Sirviendo: webapp/");
-        System.out.println("  [SUCCESS] Listo para recibir coordenadas desde JavaScript");
-        System.out.println("============================================================");
+        try {
+            server = HttpServer.create(new InetSocketAddress(PORT), 0);
+            
+            // Rutas
+            server.createContext("/", new StaticFileHandler());
+            server.createContext("/api/coordinates", new CoordinatesHandler());
+            
+            server.setExecutor(null); // Usa el executor por defecto
+            server.start();
+            isRunning = true;
+            
+            System.out.println("============================================================");
+            System.out.println("  [INFO] ShipmentsUQ - Servidor de Mapas Iniciado");
+            System.out.println("============================================================");
+            System.out.println("  [INFO] Puerto: " + PORT);
+            System.out.println("  [INFO] URL: http://localhost:" + PORT);
+            System.out.println("  [INFO] Sirviendo: webapp/");
+            System.out.println("  [SUCCESS] Listo para recibir coordenadas desde JavaScript");
+            System.out.println("============================================================");
+            
+        } catch (java.net.BindException e) {
+            isRunning = false;
+            System.out.println("[WARN] Puerto " + PORT + " ya está en uso");
+            System.out.println("[INFO] Se asume que hay un servidor de sesión anterior activo");
+            System.out.println("[INFO] El navegador se conectará al servidor existente");
+            // NO lanzar excepción - permitir que continúe
+        }
     }
     
     /**
@@ -63,8 +86,14 @@ public class MapWebServer {
      */
     public void stop() {
         if (server != null) {
-            server.stop(0);
-            System.out.println("Servidor detenido");
+            try {
+                server.stop(0);
+                isRunning = false;
+                System.out.println("[INFO] Servidor de mapas detenido correctamente");
+            } catch (Exception e) {
+                System.err.println("[WARN] Error al detener servidor: " + e.getMessage());
+            }
+            server = null;
         }
     }
     

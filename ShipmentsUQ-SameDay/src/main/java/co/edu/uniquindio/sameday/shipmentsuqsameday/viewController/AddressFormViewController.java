@@ -15,6 +15,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -238,6 +239,12 @@ public class AddressFormViewController implements Initializable {
                     parentController.loadUserAddresses();
                 }
                 
+                // Si se usaron coordenadas reales, cerrar el servidor del mapa
+                if (usingRealCoordinates && realMapService != null) {
+                    System.out.println("[INFO] Cerrando servidor de mapas después de guardar dirección");
+                    realMapService.stopMapServer();
+                }
+                
                 // Cerrar la ventana después de un breve retraso
                 new java.util.Timer().schedule(
                     new java.util.TimerTask() {
@@ -261,6 +268,11 @@ public class AddressFormViewController implements Initializable {
      * Maneja el evento de cancelar
      */
     private void handleCancel() {
+        // Si se estaba usando el mapa GPS, detener el servidor
+        if (usingRealCoordinates && realMapService != null) {
+            System.out.println("[INFO] Cancelando - Cerrando servidor de mapas");
+            realMapService.stopMapServer();
+        }
         closeWindow();
     }
     
@@ -467,159 +479,131 @@ public class AddressFormViewController implements Initializable {
      * Auto-rellena los campos de dirección usando geocodificación inversa
      */
     private void autoFillAddressFromGPS(double latitude, double longitude) {
-        System.out.println("[INFO] Auto-filling address from GPS");
-        System.out.println("  Latitude:  " + String.format("%.6f", latitude));
-        System.out.println("  Longitude: " + String.format("%.6f", longitude));
+        System.out.println("=".repeat(80));
+        System.out.println("[AUTO-FILL] Iniciando autorellenado desde coordenadas GPS");
+        System.out.println("  Latitud:  " + String.format("%.6f", latitude));
+        System.out.println("  Longitud: " + String.format("%.6f", longitude));
+        System.out.println("=".repeat(80));
+        
+        // Mostrar mensaje de carga
+        Platform.runLater(() -> {
+            updateStatusMessage("Buscando dirección para las coordenadas GPS...", false);
+        });
         
         // Ejecutar en hilo separado para no bloquear UI
         new Thread(() -> {
             try {
-                System.out.println("[INFO] Iniciando geocodificación inversa...");
-                
+                System.out.println("[1/3] Llamando a ReverseGeocoder...");
                 ReverseGeocoder geocoder = ReverseGeocoder.getInstance();
                 java.util.Map<String, String> addressComponents = geocoder.reverseGeocode(latitude, longitude);
                 
-                System.out.println("[INFO] Componentes recibidos: " + 
-                    (addressComponents != null ? addressComponents.size() + " items" : "null"));
-                
-                if (addressComponents != null && !addressComponents.isEmpty()) {
-                    System.out.println("[DEBUG] Address components:");
-                    addressComponents.forEach((key, value) -> 
-                        System.out.println("  " + key + ": " + value)
-                    );
-                    
-                    // Actualizar UI en el hilo de JavaFX
+                if (addressComponents == null || addressComponents.isEmpty()) {
+                    System.err.println("[ERROR] No se obtuvieron componentes de dirección");
                     Platform.runLater(() -> {
-                        System.out.println("[DEBUG] TextField verification:");
-                        System.out.println("  txt_street: " + (txt_street != null ? "exists" : "NULL"));
-                        System.out.println("  txt_city: " + (txt_city != null ? "exists" : "NULL"));
-                        System.out.println("  txt_zipCode: " + (txt_zipCode != null ? "exists" : "NULL"));
-                        System.out.println("  txt_zone: " + (txt_zone != null ? "exists" : "NULL"));
+                        updateStatusMessage("No se encontró dirección para estas coordenadas", true);
+                    });
+                    return;
+                }
+                
+                System.out.println("[2/3] Componentes recibidos (" + addressComponents.size() + "):");
+                addressComponents.forEach((key, value) -> 
+                    System.out.println("      " + key + " = " + value)
+                );
+                
+                // Extraer componentes relevantes con fallbacks
+                String street = getAddressComponent(addressComponents, "road", "street", "path");
+                String neighbourhood = getAddressComponent(addressComponents, "neighbourhood", "suburb", "district");
+                String city = getAddressComponent(addressComponents, "city", "town", "municipality");
+                String postcode = addressComponents.get("postcode");
+                
+                System.out.println("[3/3] Valores extraídos:");
+                System.out.println("      Calle: " + (street != null ? street : "(no disponible)"));
+                System.out.println("      Barrio: " + (neighbourhood != null ? neighbourhood : "(no disponible)"));
+                System.out.println("      Ciudad: " + (city != null ? city : "(no disponible)"));
+                System.out.println("      Código Postal: " + (postcode != null ? postcode : "(no disponible)"));
+                
+                // Actualizar UI en el hilo de JavaFX
+                Platform.runLater(() -> {
+                    try {
+                        System.out.println("[UI] Actualizando campos del formulario...");
                         
-                        if (txt_street == null || txt_city == null || txt_zipCode == null || txt_zone == null) {
-                            System.err.println("[ERROR] One or more TextField are NULL");
-                            updateStatusMessage("Error: Form fields not initialized", true);
-                            return;
-                        }
+                        int fieldsUpdated = 0;
                         
-                        // Verificar si son editables
-                        System.out.println("[DEBUG] Field editability check:");
-                        System.out.println("  txt_street.isEditable(): " + txt_street.isEditable());
-                        System.out.println("  txt_street.isDisabled(): " + txt_street.isDisabled());
-                        
-                        // Extraer componentes relevantes
-                        String street = addressComponents.get("road");
-                        String neighbourhood = addressComponents.get("neighbourhood");
-                        String city = addressComponents.get("city");
-                        String postcode = addressComponents.get("postcode");
-                        
-                        System.out.println("[INFO] Values to apply:");
-                        System.out.println("  street: " + street);
-                        System.out.println("  neighbourhood: " + neighbourhood);
-                        System.out.println("  city: " + city);
-                        System.out.println("  postcode: " + postcode);
-                        
-                        System.out.println("[INFO] Applying auto-fill:");
-                        
-                        // Rellenar TODOS los campos (no solo vacíos) para debugging
-                        boolean anyFieldFilled = false;
-                        
+                        // Actualizar cada campo si hay datos
                         if (street != null && !street.trim().isEmpty()) {
-                            String before = txt_street.getText();
                             txt_street.setText(street);
-                            String after = txt_street.getText();
-                            System.out.println("  [INFO] Field 'Street': '" + before + "' -> '" + after + "'");
-                            if (after.equals(street)) {
-                                System.out.println("  [SUCCESS] Field 'Street' filled correctly");
-                                anyFieldFilled = true;
-                            } else {
-                                System.err.println("  [ERROR] Field 'Street' NOT updated");
-                            }
-                        } else {
-                            System.out.println("  [WARN] No data for 'Street'");
+                            txt_street.positionCaret(street.length());
+                            fieldsUpdated++;
+                            System.out.println("  [OK] Calle actualizada: " + street);
                         }
                         
                         if (neighbourhood != null && !neighbourhood.trim().isEmpty()) {
-                            String before = txt_zone.getText();
                             txt_zone.setText(neighbourhood);
-                            String after = txt_zone.getText();
-                            System.out.println("  [INFO] Field 'Zone': '" + before + "' -> '" + after + "'");
-                            if (after.equals(neighbourhood)) {
-                                System.out.println("  [SUCCESS] Field 'Zone' filled correctly");
-                                anyFieldFilled = true;
-                            } else {
-                                System.err.println("  [ERROR] Field 'Zone' NOT updated");
-                            }
-                        } else {
-                            System.out.println("  [WARN] No data for 'Zone'");
+                            txt_zone.positionCaret(neighbourhood.length());
+                            fieldsUpdated++;
+                            System.out.println("  [OK] Barrio actualizado: " + neighbourhood);
                         }
                         
                         if (city != null && !city.trim().isEmpty()) {
-                            String before = txt_city.getText();
                             txt_city.setText(city);
-                            String after = txt_city.getText();
-                            System.out.println("  [INFO] Field 'City': '" + before + "' -> '" + after + "'");
-                            if (after.equals(city)) {
-                                System.out.println("  [SUCCESS] Field 'City' filled correctly");
-                                anyFieldFilled = true;
-                            } else {
-                                System.err.println("  [ERROR] Field 'City' NOT updated");
-                            }
-                        } else {
-                            System.out.println("  [WARN] No data for 'City'");
+                            txt_city.positionCaret(city.length());
+                            fieldsUpdated++;
+                            System.out.println("  [OK] Ciudad actualizada: " + city);
                         }
                         
                         if (postcode != null && !postcode.trim().isEmpty()) {
-                            String before = txt_zipCode.getText();
                             txt_zipCode.setText(postcode);
-                            String after = txt_zipCode.getText();
-                            System.out.println("  [INFO] Field 'Postal Code': '" + before + "' -> '" + after + "'");
-                            if (after.equals(postcode)) {
-                                System.out.println("  [SUCCESS] Field 'Postal Code' filled correctly");
-                                anyFieldFilled = true;
-                            } else {
-                                System.err.println("  [ERROR] Field 'Postal Code' NOT updated");
-                            }
-                        } else {
-                            System.out.println("  [WARN] No data for 'Postal Code'");
+                            txt_zipCode.positionCaret(postcode.length());
+                            fieldsUpdated++;
+                            System.out.println("  [OK] Código Postal actualizado: " + postcode);
                         }
                         
-                        // Forzar actualización visual de los campos
-                        txt_street.requestLayout();
-                        txt_zone.requestLayout();
-                        txt_city.requestLayout();
-                        txt_zipCode.requestLayout();
-                        
-                        // Mostrar dirección completa formateada
+                        // Construir dirección legible
                         String formatted = geocoder.formatColombianAddress(addressComponents);
-                        System.out.println("[INFO] Formatted address: " + formatted);
                         
-                        // Mostrar mensaje al usuario
-                        if (anyFieldFilled) {
-                            updateStatusMessage("Address auto-filled from GPS: " + formatted, false);
-                            System.out.println("[SUCCESS] Auto-fill completed successfully");
+                        if (fieldsUpdated > 0) {
+                            updateStatusMessage("Dirección autocompletada (" + fieldsUpdated + " campos): " + formatted, false);
+                            System.out.println("[SUCCESS] Autorellenado completado exitosamente");
+                            System.out.println("  Campos actualizados: " + fieldsUpdated);
+                            System.out.println("  Dirección formateada: " + formatted);
                         } else {
-                            updateStatusMessage("Could not extract address data", true);
-                            System.out.println("[WARN] No field could be filled");
+                            updateStatusMessage("No se pudo extraer información de dirección", true);
+                            System.err.println("[WARN] No se actualizó ningún campo");
                         }
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                        System.out.println("[WARN] Could not obtain address for these coordinates");
-                        updateStatusMessage("No address found for these GPS coordinates", true);
-                    });
-                }
+                        
+                        System.out.println("=".repeat(80));
+                        
+                    } catch (Exception uiError) {
+                        System.err.println("[ERROR] Error al actualizar UI:");
+                        uiError.printStackTrace();
+                        updateStatusMessage("Error al actualizar formulario", true);
+                    }
+                });
                 
             } catch (Exception e) {
-                System.err.println("[ERROR] Reverse geocoding error:");
-                System.err.println("  Message: " + e.getMessage());
-                System.err.println("  Type: " + e.getClass().getSimpleName());
+                System.err.println("[ERROR] Error en geocodificación inversa:");
+                System.err.println("  Tipo: " + e.getClass().getSimpleName());
+                System.err.println("  Mensaje: " + e.getMessage());
                 e.printStackTrace();
+                System.out.println("=".repeat(80));
                 
                 Platform.runLater(() -> {
-                    updateStatusMessage("Error obtaining address: " + e.getMessage(), true);
+                    updateStatusMessage("Error al obtener dirección: " + e.getMessage(), true);
                 });
             }
         }).start();
+    }
+    
+    /**
+     * Obtiene un componente de dirección con múltiples claves de fallback
+     */
+    private String getAddressComponent(Map<String, String> components, String... keys) {
+        for (String key : keys) {
+            String value = components.get(key);
+            if (value != null && !value.trim().isEmpty()) {
+                return value;
+            }
+        }
+        return null;
     }
 }
