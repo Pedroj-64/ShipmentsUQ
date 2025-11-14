@@ -8,7 +8,10 @@ ShipmentsUQ es una aplicación de escritorio desarrollada en **JavaFX** para la 
 
 ### ✨ Características Principales
 
-- 📍 **Rastreo en tiempo real** con sistema de coordenadas cartesianas
+- 📍 **Rastreo en tiempo real** con sistema de coordenadas cartesianas y GPS
+- 🗺️ **Sistema dual de coordenadas** (Grid cartesiano + GPS real)
+- 🌐 **Geocodificación inversa** para convertir coordenadas GPS en direcciones
+- 🔄 **Integración de mapas** con adaptador entre sistemas Grid y Real
 - 💰 **Cálculo automático de tarifas** basado en peso, volumen, distancia y prioridad
 - 👥 **Gestión de usuarios** (clientes, repartidores y administradores)
 - 📊 **Dashboard administrativo** con métricas y estadísticas
@@ -16,6 +19,7 @@ ShipmentsUQ es una aplicación de escritorio desarrollada en **JavaFX** para la 
 - 🔔 **Notificaciones** de cambios de estado
 - 📱 **Generación de comprobantes** en HTML
 - 🔄 **Sistema de deshacer/rehacer** operaciones críticas
+- 🧪 **Suite completa de pruebas unitarias** con JUnit 5
 
 ## 👨‍💻 Creadores
 
@@ -37,10 +41,10 @@ El proyecto implementa una arquitectura robusta basada en **patrones de diseño 
 
 ### 🏛️ Patrones Estructurales
 - **Decorator**: Extensión dinámica de funcionalidades de servicios (validación, logging, notificaciones)
-- **Adapter**: Adaptación de direcciones al sistema de coordenadas del mapa
+- **Adapter**: Adaptación de direcciones y coordenadas GPS al sistema Grid cartesiano
+- **Facade**: Unificación de sistemas de coordenadas (MapCoordinateIntegrationService)
 - **Composite**: Composición jerárquica de entidades de envío
 - **Repository**: Abstracción de la capa de persistencia de datos
-- **Facade**: Simplificación de operaciones complejas de UI
 
 ### 🎭 Patrones de Comportamiento
 - **Strategy**: Algoritmos intercambiables de cálculo (distancia, tarifas, pagos)
@@ -57,7 +61,10 @@ El proyecto implementa una arquitectura robusta basada en **patrones de diseño 
 🔨 Maven
 📝 Lombok
 💾 Persistencia en memoria (serialización)
-🗺️ Sistema de coordenadas cartesianas personalizadas
+🗺️ Sistema de coordenadas dual (Grid cartesiano + GPS)
+🌐 Geocodificación inversa (Nominatim OpenStreetMap)
+🧪 JUnit 5 para pruebas unitarias
+📐 Algoritmos: Manhattan (Grid), Haversine (GPS)
 ```
 
 ## 📁 Estructura del Proyecto
@@ -72,10 +79,16 @@ ShipmentsUQ-SameDay/
 │       │   ├── dto/           # Data Transfer Objects
 │       │   ├── enums/         # Enumeraciones (estados, roles, etc.)
 │       │   ├── interfaces/    # Interfaces de estrategias
-│       │   ├── mapping/       # Inicialización de datos
+│       │   ├── strategy/      # Estrategias de coordenadas (Grid, GPS)
 │       │   ├── repository/    # Capa de persistencia
 │       │   ├── service/       # Lógica de negocio
 │       │   └── util/          # Utilidades
+│       ├── mapping/           # Servicios de coordenadas y mapas
+│       │   ├── Coordinates.java           # Coordenadas GPS
+│       │   ├── Address.java               # Modelo de dirección
+│       │   ├── MapCoordinateIntegrationService.java  # Facade
+│       │   ├── RealMapService.java        # Adapter GPS↔Grid
+│       │   └── ReverseGeocoder.java       # Geocodificación
 │       ├── controller/        # Controladores de negocio
 │       ├── viewController/    # Controladores de vista (JavaFX)
 │       ├── internalController/ # Controladores internos y utilidades
@@ -85,6 +98,13 @@ ShipmentsUQ-SameDay/
 │       ├── interfaces/        # Archivos FXML
 │       ├── css/              # Hojas de estilo
 │       └── html/             # Templates HTML
+├── src/test/java/            # Pruebas unitarias (JUnit 5)
+│   └── co.edu.uniquindio.sameday.shipmentsuqsameday.test/
+│       ├── CoordinatesTest.java
+│       ├── AddressTest.java
+│       ├── DelivererTest.java
+│       ├── MapCoordinateIntegrationServiceTest.java
+│       └── ReverseGeocoderTest.java
 └── pom.xml
 ```
 
@@ -141,10 +161,34 @@ mvn javafx:run
 
 ## 📊 Características Técnicas Destacadas
 
-### Sistema de Coordenadas
+### Sistema de Coordenadas Dual
+
+El sistema implementa dos estrategias de coordenadas que coexisten mediante el **Patrón Facade**:
+
+#### 🔲 Sistema Grid (Cartesiano)
 - Mapa urbano basado en cuadrícula cartesiana (X, Y)
-- Cálculo de distancias euclidiano
+- Algoritmo de distancia Manhattan
 - Visualización en tiempo real de posiciones
+- Compatible con el sistema legacy
+
+#### 🌍 Sistema GPS Real
+- Coordenadas GPS (latitud, longitud)
+- Algoritmo de distancia Haversine
+- Geocodificación inversa con Nominatim OpenStreetMap
+- Conversión bidireccional Grid ↔ GPS
+
+**Integración mediante Facade:**
+```java
+MapCoordinateIntegrationService
+├─ GridCoordinateStrategy (Manhattan)
+├─ RealCoordinateStrategy (Haversine)
+└─ RealMapService (Adapter GPS↔Grid)
+```
+
+### Geocodificación Inversa
+- Conversión de coordenadas GPS a direcciones legibles
+- Integración con Nominatim (OpenStreetMap)
+- Soporte para localización de repartidores y puntos de entrega
 
 ### Gestión de Tarifas
 ```java
@@ -164,6 +208,33 @@ Servicio Base
   ↓
 + Notificaciones
 ```
+
+## 🧪 Testing y Calidad
+
+El proyecto incluye una suite completa de pruebas unitarias desarrolladas con **JUnit 5**:
+
+### Cobertura de Pruebas
+- ✅ **CoordinatesTest**: 12 pruebas - Validación del modelo GPS
+- ✅ **AddressTest**: 7 pruebas - Modelo de direcciones
+- ✅ **DelivererTest**: 10 pruebas - Gestión de repartidores con coordenadas duales
+- ✅ **MapCoordinateIntegrationServiceTest**: 6 pruebas - Integración Facade
+- ⚠️ **ReverseGeocoderTest**: Requiere conexión a internet (Nominatim API)
+
+### Patrones Probados
+- Patrón **Facade** (MapCoordinateIntegrationService)
+- Patrón **Adapter** (RealMapService)
+- Patrón **Strategy** (GridCoordinateStrategy, RealCoordinateStrategy)
+
+**Ejecutar pruebas:**
+```bash
+# Todas las pruebas
+mvn test
+
+# Pruebas específicas (sin API)
+mvn test -Dtest=CoordinatesTest,AddressTest,DelivererTest,MapCoordinateIntegrationServiceTest
+```
+
+Ver [Suite de Pruebas](ShipmentsUQ-SameDay/src/test/java/co/edu/uniquindio/sameday/shipmentsuqsameday/test/README.md) para documentación detallada.
 
 ## 🐛 Reportar Problemas
 
