@@ -42,6 +42,10 @@ public class App extends Application {
         appHostServices = getHostServices();
         Parent root = FXMLLoader.load(App.class.getResource("interfaces/Login.fxml"));
         mainScene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        
+        // Aplicar tema guardado
+        co.edu.uniquindio.sameday.shipmentsuqsameday.util.ThemeManager.getInstance().applyCurrentTheme(mainScene);
+        
         stage.setTitle("ShipmentsUQ - Inicio de Sesión");
         stage.setScene(mainScene);
         AppUtils.setCurrentScene(mainScene);

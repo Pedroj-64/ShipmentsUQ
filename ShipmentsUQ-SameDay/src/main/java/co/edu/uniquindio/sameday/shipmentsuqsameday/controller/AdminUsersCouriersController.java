@@ -204,19 +204,21 @@ public class AdminUsersCouriersController implements Initializable {
     }
 
     /**
-     * Agrega un nuevo repartidor
+     * Agrega un nuevo repartidor con soporte GPS
      * @param name nombre
      * @param document documento de identidad
      * @param phone teléfono
      * @param zone zona asignada
-     * @param coordX coordenada X
-     * @param coordY coordenada Y
+     * @param coordX coordenada X (Grid)
+     * @param coordY coordenada Y (Grid)
+     * @param gpsLatitude latitud GPS (opcional, puede ser null)
+     * @param gpsLongitude longitud GPS (opcional, puede ser null)
      * @return true si la operación fue exitosa
      */
-    public boolean addDeliverer(String name, String document, String phone, String zone, double coordX, double coordY) {
+    public boolean addDeliverer(String name, String document, String phone, String zone, 
+                                double coordX, double coordY, Double gpsLatitude, Double gpsLongitude) {
         try {
             // Verificar si ya existe un repartidor con el mismo documento
-            // En una implementación real, deberíamos usar un método del servicio que verifique esto
             boolean existeRepartidor = deliverersList.stream()
                 .anyMatch(d -> d.getDocument().equals(document));
                 
@@ -227,7 +229,7 @@ public class AdminUsersCouriersController implements Initializable {
                 return false;
             }
             
-            // Crear el repartidor
+            // Crear el repartidor con coordenadas Grid
             Deliverer newDeliverer = Deliverer.builder()
                 .id(UUID.randomUUID())
                 .name(name)
@@ -238,6 +240,15 @@ public class AdminUsersCouriersController implements Initializable {
                 .currentX(coordX)
                 .currentY(coordY)
                 .build();
+                
+            // NOTE: Assign GPS coordinates if provided
+            if (gpsLatitude != null && gpsLongitude != null) {
+                newDeliverer.setRealLatitude(gpsLatitude);
+                newDeliverer.setRealLongitude(gpsLongitude);
+                System.out.println("[INFO] Deliverer created with GPS: " + gpsLatitude + ", " + gpsLongitude);
+            } else {
+                System.out.println("[INFO] Deliverer created with Grid: (" + coordX + ", " + coordY + ")");
+            }
                 
             // Guardar en el servicio
             delivererService.create(newDeliverer);
@@ -250,6 +261,15 @@ public class AdminUsersCouriersController implements Initializable {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    /**
+     * Agrega un nuevo repartidor (versión legacy sin GPS)
+     * @deprecated Use {@link #addDeliverer(String, String, String, String, double, double, Double, Double)} instead
+     */
+    @Deprecated
+    public boolean addDeliverer(String name, String document, String phone, String zone, double coordX, double coordY) {
+        return addDeliverer(name, document, phone, zone, coordX, coordY, null, null);
     }
 
     /**

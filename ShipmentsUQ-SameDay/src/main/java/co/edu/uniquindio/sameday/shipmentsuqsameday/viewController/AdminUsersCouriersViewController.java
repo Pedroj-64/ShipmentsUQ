@@ -2,6 +2,8 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.viewController;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.AdminUsersCouriersController;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.DataLoadManager;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.Coordinates;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.RealMapService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
@@ -70,6 +72,8 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     // Referencias para el mapa
     @FXML private Pane pane_mapContainer;
     @FXML private Label lbl_coordDisplay;
+    @FXML private Label lbl_mapInstruction;
+    @FXML private ToggleButton btn_toggleMapMode;
     
     // Referencias para las tablas de envíos del repartidor
     @FXML private TableView<Shipment> tbl_currentShipments;
@@ -91,6 +95,12 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     private double selectedX = 0;
     private double selectedY = 0;
     
+    // NOTE: Variables GPS para repartidores
+    private Double selectedGpsLat = null;
+    private Double selectedGpsLng = null;
+    private boolean useRealMap = false;
+    private RealMapService realMapService;
+    
     private int currentPage = 0;
     private int pageSize = 20;
     private int totalItems = 0;
@@ -108,6 +118,9 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         if (itemsPerPage != null) {
             itemsPerPage.setValue("20");
         }
+        
+        // NOTE: Configurar toggle button GPS para repartidores
+        setupMapToggle();
         
         // Configurar botones de modo
         setupModeButtons();
@@ -370,13 +383,16 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
                 txt_phone.getText()
             );
         } else {
+            // NOTE: Enviar coordenadas GPS si se usó el mapa real
             success = controller.addDeliverer(
                 txt_courier_name.getText(),
                 txt_document.getText(),
                 txt_courier_phone.getText(),
                 txt_zone.getText(),
                 selectedX,
-                selectedY
+                selectedY,
+                selectedGpsLat,  // Puede ser null si no se usó GPS
+                selectedGpsLng   // Puede ser null si no se usó GPS
             );
         }
         
@@ -531,6 +547,21 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
             if (txt_zone == null || txt_zone.getText().trim().isEmpty()) {
                 showStatusMessage("La zona no puede estar vacía", "warning");
                 return false;
+            }
+            
+            // NOTE: Validar que se haya seleccionado una ubicación
+            if (useRealMap) {
+                // Si usa GPS, validar que se hayan capturado coordenadas GPS
+                if (selectedGpsLat == null || selectedGpsLng == null) {
+                    showStatusMessage("Debe seleccionar una ubicación en el mapa GPS", "warning");
+                    return false;
+                }
+            } else {
+                // Si usa Grid, validar que no sea (0,0) que es el valor por defecto
+                if (selectedX == 0 && selectedY == 0) {
+                    showStatusMessage("Debe seleccionar una ubicación en el mapa Grid", "warning");
+                    return false;
+                }
             }
         }
         
@@ -706,6 +737,133 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     /**
      * Limpia los campos del formulario
      */
+    public void clearForm() {
+        if ("users".equals(controller.getMode())) {
+            // Limpiar formulario de usuarios
+            if (txt_name != null) txt_name.clear();
+            if (txt_info != null) txt_info.clear();
+            if (txt_phone != null) txt_phone.clear();
+            if (txt_password != null) txt_password.clear();
+        } else {
+            // Limpiar formulario de repartidores
+            if (txt_courier_name != null) txt_courier_name.clear();
+            if (txt_document != null) txt_document.clear();
+            if (txt_courier_phone != null) txt_courier_phone.clear();
+            if (txt_zone != null) txt_zone.clear();
+            
+            // NOTE: Resetear todas las variables de coordenadas
+            selectedX = 0;
+            selectedY = 0;
+            selectedGpsLat = null;
+            selectedGpsLng = null;
+            
+            // Resetear el toggle si está activo
+            if (btn_toggleMapMode != null && btn_toggleMapMode.isSelected()) {
+                btn_toggleMapMode.setSelected(false);
+                useRealMap = false;
+            }
+            
+            // Limpiar mapa Grid
+            if (controller.getGridMapController() != null) {
+                controller.getGridMapController().clearSelection();
+            }
+            
+            // Actualizar display
+            if (lbl_coordDisplay != null) {
+                lbl_coordDisplay.setText("X: 0, Y: 0");
+            }
+            if (lbl_mapInstruction != null) {
+                lbl_mapInstruction.setText("Haga clic en el mapa para seleccionar la posición del repartidor:");
+            }
+        }
+        
+        // Limpiar selecciones
+        selectedUser = null;
+        selectedDeliverer = null;
+        
+        // Limpiar selección de tabla
+        if (tbl_data != null) {
+            tbl_data.getSelectionModel().clearSelection();
+        }
+    }
+    
+    /**
+     * Configura el comportamiento del toggle button para el mapa GPS
+     */
+    private void setupMapToggle() {
+        if (btn_toggleMapMode != null) {
+            // Inicializar servicio de mapa real
+            realMapService = new RealMapService();
+            
+            // Configurar callback para recibir coordenadas desde el mapa web
+            realMapService.setCoordinatesCallback((origin, destination) -> {
+                if (origin != null) {
+                    selectedGpsLat = origin.getLatitude();
+                    selectedGpsLng = origin.getLongitude();
+                    
+                    // NOTE: Convertir GPS a Grid automáticamente
+                    double[] gridCoords = realMapService.convertRealToGrid(selectedGpsLat, selectedGpsLng);
+                    selectedX = gridCoords[0];
+                    selectedY = gridCoords[1];
+                    
+                    // Actualizar display con ambas coordenadas
+                    lbl_coordDisplay.setText(String.format("GPS: %.6f, %.6f | Grid: (%.1f, %.1f)", 
+                        selectedGpsLat, selectedGpsLng, selectedX, selectedY));
+                    lbl_mapInstruction.setText("[SUCCESS] Coordenadas GPS y Grid sincronizadas");
+                    
+                    System.out.println("[INFO] GPS recibido: " + selectedGpsLat + ", " + selectedGpsLng);
+                    System.out.println("[INFO] Convertido a Grid: (" + selectedX + ", " + selectedY + ")");
+                    showStatusMessage("Ubicación GPS capturada y convertida a Grid", "success");
+                }
+            });
+            
+            btn_toggleMapMode.setOnAction(e -> {
+                useRealMap = btn_toggleMapMode.isSelected();
+                
+                if (useRealMap) {
+                    enableRealMapMode();
+                } else {
+                    disableRealMapMode();
+                }
+            });
+        }
+    }
+    
+    /**
+     * Habilita el modo de mapa real (GPS) y abre el navegador
+     */
+    private void enableRealMapMode() {
+        try {
+            // Iniciar servidor del mapa
+            if (realMapService.startMapServer()) {
+                // Abrir mapa ESPECIALIZADO para repartidores (1 punto)
+                realMapService.openMapInBrowser(RealMapService.MapType.DELIVERER);
+                
+                lbl_mapInstruction.setText("[INFO] Seleccione la ubicación GPS del repartidor en el mapa del navegador");
+                showStatusMessage("Mapa GPS abierto en navegador. Seleccione la ubicación del repartidor.", "info");
+            } else {
+                throw new Exception("No se pudo iniciar el servidor del mapa");
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error al abrir mapa GPS: " + e.getMessage());
+            showStatusMessage("Error al abrir mapa GPS: " + e.getMessage(), "error");
+            btn_toggleMapMode.setSelected(false);
+            useRealMap = false;
+        }
+    }
+    
+    /**
+     * Deshabilita el modo de mapa real y vuelve al Grid
+     */
+    private void disableRealMapMode() {
+        selectedGpsLat = null;
+        selectedGpsLng = null;
+        lbl_coordDisplay.setText(String.format("X: %.1f, Y: %.1f", selectedX, selectedY));
+        lbl_mapInstruction.setText("Haga clic en el mapa para seleccionar la posición del repartidor:");
+        showStatusMessage("Vuelto a modo Grid (mapa tradicional)", "info");
+    }
+    
     /**
      * Actualiza los controles de paginación
      */
@@ -742,39 +900,5 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
         btn_delete.setDisable(!itemSelected);
     }
 
-    private void clearForm() {
-        // Limpiar campos de usuarios
-        if (txt_name != null) txt_name.setText("");
-        if (txt_info != null) txt_info.setText("");
-        if (txt_phone != null) txt_phone.setText("");
-        if (txt_password != null) txt_password.setText("");
-        if (chb_role != null) chb_role.setValue(null);
-        
-        // Limpiar campos de repartidores
-        if (txt_courier_name != null) txt_courier_name.setText("");
-        if (txt_courier_phone != null) txt_courier_phone.setText("");
-        if (txt_document != null) txt_document.setText("");
-        if (txt_zone != null) txt_zone.setText("");
-        if (chb_status != null) chb_status.setValue(null);
-        if (txt_rating != null) txt_rating.setText("");
-        if (txt_avgRating != null) txt_avgRating.setText("");
-        if (txt_totalDeliveries != null) txt_totalDeliveries.setText("");
-        
-        // Limpiar coordenadas
-        selectedX = 0;
-        selectedY = 0;
-        if (lbl_coordDisplay != null) {
-            lbl_coordDisplay.setText("X: 0.0, Y: 0.0");
-        }
-        
-        // Limpiar tabla de envíos
-        if (tbl_currentShipments != null) {
-            tbl_currentShipments.getItems().clear();
-        }
-        
-        // Restablecer selección
-        selectedUser = null;
-        selectedDeliverer = null;
-        tbl_data.getSelectionModel().clearSelection();
-    }
+
 }

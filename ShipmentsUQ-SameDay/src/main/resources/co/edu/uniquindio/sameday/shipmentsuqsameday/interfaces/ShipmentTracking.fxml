@@ -69,8 +69,9 @@
                 <Insets top="15" right="15" bottom="15" left="15"/>
             </padding>
             
-            <Button fx:id="btn_refresh" text="Actualizar ubicación" styleClass="refresh-button"/>
-            <Button fx:id="btn_close" text="Cerrar" styleClass="close-button"/>
+            <Button fx:id="btn_openRealTimeMap" text="🗺️ Ver en Mapa Real" styleClass="realtime-map-button"/>
+            <Button fx:id="btn_refresh" text="🔄 Actualizar ubicación" styleClass="refresh-button"/>
+            <Button fx:id="btn_close" text="✖ Cerrar" styleClass="close-button"/>
         </HBox>
     </bottom>
     

@@ -10,10 +10,12 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.UserDTO;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Parent;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -214,11 +216,46 @@ public class UserDashboardViewController implements Initializable {
     }
     
     /**
-     * Maneja la acción del botón de configuración
+     * Handles the settings button action.
+     * Opens the settings dialog and refreshes the current scene theme after closing.
      */
     private void handleSettings() {
-        // Por ahora, simplemente muestra un mensaje
-        AppUtils.showInfo("Configuración", "Esta funcionalidad estará disponible próximamente.");
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/interfaces/Settings.fxml")
+            );
+            Parent root = loader.load();
+            
+            Scene scene = new Scene(root);
+            scene.getStylesheets().add(
+                getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/css/settings.css").toExternalForm()
+            );
+            
+            // Aplicar tema actual
+            co.edu.uniquindio.sameday.shipmentsuqsameday.util.ThemeManager.getInstance().applyCurrentTheme(scene);
+            
+            Stage stage = new Stage();
+            stage.setTitle("Configuración");
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            
+            // Refrescar el tema del dashboard cuando se cierre la ventana de configuración
+            stage.setOnHidden(event -> {
+                Scene currentScene = btn_settings.getScene();
+                if (currentScene != null) {
+                    co.edu.uniquindio.sameday.shipmentsuqsameday.util.ThemeManager
+                        .getInstance().applyCurrentTheme(currentScene);
+                }
+            });
+            
+            stage.showAndWait();
+            
+        } catch (Exception e) {
+            System.err.println("[ERROR] Failed to open settings: " + e.getMessage());
+            e.printStackTrace();
+            AppUtils.showError("Error", "No se pudo abrir la configuración: " + e.getMessage());
+        }
     }
     
     /**

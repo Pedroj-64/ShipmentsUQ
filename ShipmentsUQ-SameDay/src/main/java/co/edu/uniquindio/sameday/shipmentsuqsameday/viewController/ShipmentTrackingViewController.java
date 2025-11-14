@@ -44,6 +44,8 @@ public class ShipmentTrackingViewController implements Initializable {
     private Button btn_refresh;
     @FXML
     private Button btn_close;
+    @FXML
+    private Button btn_openRealTimeMap;
     
     private ShipmentDTO shipmentDTO;
     private ShipmentService shipmentService;
@@ -75,6 +77,11 @@ public class ShipmentTrackingViewController implements Initializable {
         // Configurar botones
         btn_refresh.setOnAction(event -> refreshTracking());
         btn_close.setOnAction(event -> ((Stage) btn_close.getScene().getWindow()).close());
+        
+        // NOTE: Botón para abrir mapa de tracking en tiempo real
+        if (btn_openRealTimeMap != null) {
+            btn_openRealTimeMap.setOnAction(event -> openRealTimeTrackingMap());
+        }
     }
     
     /**
@@ -227,5 +234,56 @@ public class ShipmentTrackingViewController implements Initializable {
      */
     private double calculateDistance(double x1, double y1, double x2, double y2) {
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    }
+    
+    /**
+     * NOTE: Abre el mapa de tracking en tiempo real en el navegador
+     * Muestra los 3 puntos: origen, repartidor, destino con animación
+     */
+    private void openRealTimeTrackingMap() {
+        try {
+            if (shipmentDTO == null) {
+                showAlert("Error", "No hay información de envío disponible", Alert.AlertType.ERROR);
+                return;
+            }
+            
+            // Verificar que el envío tenga repartidor asignado
+            Optional<Shipment> shipmentOpt = shipmentService.findById(shipmentDTO.getId());
+            if (shipmentOpt.isEmpty() || shipmentOpt.get().getDeliverer() == null) {
+                showAlert("Información", "Este envío aún no tiene repartidor asignado", Alert.AlertType.INFORMATION);
+                return;
+            }
+            
+            // Iniciar el servidor del mapa si no está activo
+            if (realMapService.startMapServer()) {
+                // Abrir el mapa de tracking especializado
+                realMapService.openMapInBrowser(RealMapService.MapType.TRACKING);
+                
+                showAlert("Mapa Abierto", 
+                    "Mapa de seguimiento en tiempo real abierto en el navegador.\\n" +
+                    "El mapa se actualizará automáticamente cada 30 segundos.",
+                    Alert.AlertType.INFORMATION);
+            } else {
+                showAlert("Error", "No se pudo iniciar el servidor del mapa", Alert.AlertType.ERROR);
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Error al abrir mapa de tracking: " + e.getMessage());
+            e.printStackTrace();
+            showAlert("Error", "Error al abrir el mapa: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+    
+    /**
+     * Muestra un diálogo de alerta
+     */
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(type);
+            alert.setTitle(title);
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        });
     }
 }

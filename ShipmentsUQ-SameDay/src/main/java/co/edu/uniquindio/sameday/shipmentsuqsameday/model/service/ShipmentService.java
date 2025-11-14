@@ -1,5 +1,7 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.model.service;
 
+import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.Coordinates;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.MapCoordinateIntegrationService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Incident;
@@ -31,6 +33,7 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
     private final DelivererService delivererService;
     private final IDistanceCalculator distanceCalculator;
     private final IncidentService incidentService;
+    private final MapCoordinateIntegrationService integrationService;
     
     private static ShipmentService instance;
 
@@ -42,6 +45,7 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         this.delivererService = delivererService;
         this.distanceCalculator = new EuclideanDistanceCalculator();
         this.incidentService = incidentService;
+        this.integrationService = new MapCoordinateIntegrationService();
     }
     
     /**
@@ -60,7 +64,7 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 delivererService,
                 incidentService
             );
-            System.out.println("✓ ShipmentService inicializado correctamente con todas las dependencias");
+            System.out.println("[SUCCESS] ShipmentService inicializado correctamente con todas las dependencias");
         }
         return instance;
     }
@@ -202,7 +206,7 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 shipment.setStatus(ShipmentStatus.ASSIGNED);
                 shipment.setAssignmentDate(LocalDateTime.now());
                 
-                System.out.println("✓ Envío asignado a " + deliverer.getName());
+                System.out.println("[SUCCESS] Envío asignado a " + deliverer.getName());
             } else {
                 System.err.println("Error al calcular el repartidor más cercano");
             }
@@ -276,7 +280,8 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
 
     /**
      * Busca un repartidor disponible para un envío
-     * 
+     * NOTE: Soporta GPS - Si el origen tiene coordenadas GPS, usa distancia real (Haversine)
+     * Si no, usa Grid tradicional (Manhattan)
      * @param shipment envío que necesita repartidor
      * @return repartidor disponible o null si no hay ninguno
      */
@@ -285,19 +290,58 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
             throw new IllegalArgumentException("El envío debe tener un origen definido");
         }
         
-        // Obtenemos la zona y las coordenadas de origen del envío
-        String originZone = shipment.getOrigin().getZone();
-        double originX = shipment.getOrigin().getCoordX();
-        double originY = shipment.getOrigin().getCoordY();
+        Address origin = shipment.getOrigin();
         
-        System.out.println("Buscando repartidor para envío en zona: " + originZone + " (X:" + originX + ", Y:" + originY + ")");
+        // NOTE: Detect if we have real GPS coordinates
+        if (origin.hasGpsCoordinates()) {
+            System.out.println("[INFO] Usando coordenadas GPS para asignación de repartidor");
+            System.out.println("   Origen GPS: (" + origin.getGpsLatitude() + ", " + origin.getGpsLongitude() + ")");
+            
+            Coordinates originGPS = new Coordinates(
+                origin.getGpsLatitude(), 
+                origin.getGpsLongitude()
+            );
+            
+            // Obtener repartidores disponibles
+            List<Deliverer> availableDeliverers = delivererService.findAvailableDeliverers();
+            
+            if (availableDeliverers.isEmpty()) {
+                System.err.println("[ERROR] No hay repartidores disponibles");
+                return null;
+            }
+            
+            // Usar MapCoordinateIntegrationService (Facade Pattern) para encontrar el más cercano
+            Optional<Deliverer> nearest = integrationService.findNearestDeliverer(
+                availableDeliverers, 
+                originGPS,  // Coordenadas GPS del origen
+                0, 0        // Grid no usado en este caso
+            );
+            
+            if (nearest.isPresent()) {
+                Deliverer deliverer = nearest.get();
+                String location = integrationService.getDelivererLocation(deliverer);
+                System.out.println("[SUCCESS] Repartidor asignado (GPS): " + deliverer.getName() + " en " + location);
+                return deliverer;
+            } else {
+                System.err.println("[ERROR] No se pudo encontrar repartidor cercano con GPS");
+                return null;
+            }
+        }
+        
+        // NOTE: FALLBACK - Traditional Grid system (backward compatible)
+        String originZone = origin.getZone();
+        double originX = origin.getCoordX();
+        double originY = origin.getCoordY();
+        
+        System.out.println("[INFO] Usando coordenadas Grid para asignación de repartidor");
+        System.out.println("   Zona: " + originZone + " (X:" + originX + ", Y:" + originY + ")");
         
         // Primero intentamos encontrar el repartidor más cercano al origen
         Deliverer nearestDeliverer = delivererService.findNearestAvailableDeliverer(originX, originY, originZone);
         
         // Si encontramos un repartidor cercano, lo devolvemos
         if (nearestDeliverer != null) {
-            System.out.println("✓ Repartidor asignado por proximidad: " + nearestDeliverer.getName());
+            System.out.println("[SUCCESS] Repartidor asignado por proximidad (Grid): " + nearestDeliverer.getName());
             return nearestDeliverer;
         }
         
@@ -341,8 +385,8 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         }
         
         if (bestDeliverer != null) {
-            System.out.println("✓ Repartidor seleccionado: " + bestDeliverer.getName() + 
-                             " (Envíos actuales: " + minShipments + ", Rating: " + bestRating + ")");
+            System.out.println("[SUCCESS] Deliverer selected: " + bestDeliverer.getName() + 
+                             " (Current shipments: " + minShipments + ", Rating: " + bestRating + ")");
         }
         
         return bestDeliverer;
@@ -381,12 +425,12 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
         // Guardar el estado para persistencia
         co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager.getInstance().saveState();
         
-        // ⚠️ NO asignar repartidor automáticamente
-        // La asignación debe hacerse SOLO después del pago exitoso
-        // Ver PaymentsController.processPayment() → shipmentService.tryAssignDeliverer()
+        // NOTE: DO NOT auto-assign deliverer
+        // Assignment should happen ONLY after successful payment
+        // See PaymentsController.processPayment() -> shipmentService.tryAssignDeliverer()
         
-        System.out.println("✓ Envío " + shipment.getId() + " creado en estado PENDING");
-        System.out.println("⏳ Esperando pago para asignar repartidor...");
+        System.out.println("[SUCCESS] Shipment " + shipment.getId() + " created in PENDING status");
+        System.out.println("[INFO] Waiting for payment to assign deliverer...");
         
         return shipment;
     }
@@ -547,7 +591,7 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 
                 co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.DataManager.getInstance().saveState();
                 
-                System.out.println("✓ Envío asignado exitosamente al repartidor " + availableDeliverer.getName());
+                System.out.println("[SUCCESS] Envío asignado exitosamente al repartidor " + availableDeliverer.getName());
                 return true;
             } else {
                 System.err.println("No se encontró un repartidor disponible para el envío");

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.SettingsViewController"
+            prefWidth="500" prefHeight="400"
+            styleClass="settings-container">
+    
+    <!-- Encabezado -->
+    <top>
+        <VBox spacing="10" styleClass="settings-header">
+            <padding>
+                <Insets top="20" right="20" bottom="15" left="20"/>
+            </padding>
+            
+            <Label text="Configuración" styleClass="settings-title"/>
+            <Separator/>
+        </VBox>
+    </top>
+    
+    <!-- Contenido principal -->
+    <center>
+        <VBox spacing="20" styleClass="settings-content">
+            <padding>
+                <Insets top="20" right="30" bottom="20" left="30"/>
+            </padding>
+            
+            <!-- Sección: Apariencia -->
+            <VBox spacing="10">
+                <Label text="Apariencia" styleClass="section-title"/>
+                
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Tema:" styleClass="setting-label"/>
+                    <RadioButton fx:id="rb_lightTheme" text="Claro" styleClass="theme-radio">
+                        <toggleGroup>
+                            <ToggleGroup fx:id="themeToggleGroup"/>
+                        </toggleGroup>
+                    </RadioButton>
+                    <RadioButton fx:id="rb_darkTheme" text="Oscuro" toggleGroup="$themeToggleGroup" styleClass="theme-radio"/>
+                </HBox>
+                
+                <Label text="Reinicia la sesión para aplicar completamente los cambios" 
+                       styleClass="info-text" wrapText="true"/>
+            </VBox>
+            
+            <Separator/>
+            
+            <!-- Sección: Notificaciones -->
+            <VBox spacing="10">
+                <Label text="Notificaciones" styleClass="section-title"/>
+                
+                <CheckBox fx:id="cb_emailNotifications" 
+                         text="Recibir notificaciones por correo electrónico"
+                         styleClass="setting-checkbox"/>
+                
+                <CheckBox fx:id="cb_smsNotifications" 
+                         text="Recibir notificaciones por SMS"
+                         styleClass="setting-checkbox"/>
+            </VBox>
+            
+            <Separator/>
+            
+            <!-- Sección: Privacidad -->
+            <VBox spacing="10">
+                <Label text="Privacidad" styleClass="section-title"/>
+                
+                <CheckBox fx:id="cb_shareLocation" 
+                         text="Compartir mi ubicación con el repartidor"
+                         styleClass="setting-checkbox"/>
+            </VBox>
+        </VBox>
+    </center>
+    
+    <!-- Botones de acción -->
+    <bottom>
+        <HBox alignment="CENTER" spacing="15" styleClass="settings-actions">
+            <padding>
+                <Insets top="15" right="20" bottom="20" left="20"/>
+            </padding>
+            
+            <Button fx:id="btn_save" text="Guardar Cambios" styleClass="save-button"/>
+            <Button fx:id="btn_cancel" text="Cancelar" styleClass="cancel-button"/>
+        </HBox>
+    </bottom>
+    
+</BorderPane>

@@ -152,7 +152,7 @@ public class AdminShipmentsController implements Initializable {
             System.out.println("Repartidores disponibles para asignación: " + availableDeliverers.size());
             
             if (availableDeliverers.isEmpty()) {
-                System.out.println("❌ No hay repartidores disponibles (estado AVAILABLE)");
+                System.out.println("[ERROR] No hay repartidores disponibles (estado AVAILABLE)");
                 
                 // Buscar también repartidores ACTIVE
                 List<Deliverer> activeDeliverers = delivererService.findAll().stream()
@@ -163,7 +163,7 @@ public class AdminShipmentsController implements Initializable {
                 
                 if (!activeDeliverers.isEmpty()) {
                     availableDeliverers = new ArrayList<>(activeDeliverers);
-                    System.out.println("✓ Usando repartidores ACTIVE en su lugar");
+                    System.out.println("[INFO] Using ACTIVE deliverers instead");
                 } else {
                     if (viewController != null) {
                         viewController.showStatusMessage("No hay repartidores disponibles ni activos en el sistema", "warning");

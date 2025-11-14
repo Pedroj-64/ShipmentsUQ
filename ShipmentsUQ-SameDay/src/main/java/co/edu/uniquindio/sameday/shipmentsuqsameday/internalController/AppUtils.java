@@ -56,6 +56,8 @@ public class AppUtils {
      */
     public static void setCurrentScene(Scene scene) {
         currentScene = scene;
+        // Aplicar tema actual a la nueva escena
+        co.edu.uniquindio.sameday.shipmentsuqsameday.util.ThemeManager.getInstance().applyCurrentTheme(scene);
     }
 
     /**

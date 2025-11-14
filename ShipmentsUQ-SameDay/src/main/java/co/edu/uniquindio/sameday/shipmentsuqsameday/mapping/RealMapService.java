@@ -74,11 +74,45 @@ public class RealMapService {
     }
     
     /**
-     * Abre el mapa en el navegador
+     * Abre el mapa en el navegador (versión predeterminada para direcciones)
      */
     public void openMapInBrowser() {
+        openMapInBrowser(MapType.ADDRESS);
+    }
+    
+    /**
+     * Abre un tipo específico de mapa en el navegador
+     * @param mapType tipo de mapa a abrir
+     */
+    public void openMapInBrowser(MapType mapType) {
         if (webServer != null) {
-            webServer.openInBrowser();
+            webServer.openInBrowser(mapType);
+        }
+    }
+    
+    /**
+     * Enum para especificar el tipo de mapa a abrir
+     */
+    public enum MapType {
+        ADDRESS("address-map.html", "Selección de Dirección"),
+        DELIVERER("deliverer-map.html", "Ubicación de Repartidor"),
+        TRACKING("tracking-map.html", "Seguimiento en Tiempo Real"),
+        DEFAULT("index.html", "Mapa General"); // El mapa original con origen/destino
+        
+        private final String filename;
+        private final String description;
+        
+        MapType(String filename, String description) {
+            this.filename = filename;
+            this.description = description;
+        }
+        
+        public String getFilename() {
+            return filename;
+        }
+        
+        public String getDescription() {
+            return description;
         }
     }
     

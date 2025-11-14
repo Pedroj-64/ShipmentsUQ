@@ -1,0 +1,80 @@
+/* Estilos para la pantalla de configuración */
+
+.settings-container {
+    -fx-background-color: #f8f9fa;
+}
+
+.settings-header {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 0 0 1 0;
+}
+
+.settings-title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #212529;
+}
+
+.settings-content {
+    -fx-background-color: #ffffff;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+}
+
+.setting-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: #6c757d;
+    -fx-min-width: 80px;
+}
+
+.theme-radio {
+    -fx-font-size: 14px;
+}
+
+.setting-checkbox {
+    -fx-font-size: 14px;
+    -fx-text-fill: #495057;
+}
+
+.info-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #6c757d;
+    -fx-font-style: italic;
+}
+
+.settings-actions {
+    -fx-background-color: #f8f9fa;
+    -fx-border-color: #dee2e6;
+    -fx-border-width: 1 0 0 0;
+}
+
+.save-button {
+    -fx-background-color: #198754;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.save-button:hover {
+    -fx-background-color: #157347;
+}
+
+.cancel-button {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.cancel-button:hover {
+    -fx-background-color: #5a6268;
+}

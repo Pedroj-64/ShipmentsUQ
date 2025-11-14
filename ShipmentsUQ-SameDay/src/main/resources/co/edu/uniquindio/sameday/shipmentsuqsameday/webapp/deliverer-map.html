@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipmentsUQ - Ubicación de Repartidor</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            padding: 20px 30px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* Main content */
+        .content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Map container */
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+
+        /* Side panel */
+        .side-panel {
+            width: 350px;
+            background: white;
+            overflow-y: auto;
+            box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-section {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .panel-section h2 {
+            color: #1e293b;
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Coordinates display */
+        .coord-display {
+            background: #fef3c7;
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .coord-display.empty {
+            background: #f8fafc;
+            border-left-color: #cbd5e1;
+        }
+
+        .coord-label {
+            font-size: 12px;
+            color: #92400e;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .coord-display.empty .coord-label {
+            color: #64748b;
+        }
+
+        .coord-value {
+            font-size: 14px;
+            color: #78350f;
+            font-family: 'Courier New', monospace;
+        }
+
+        .coord-value.empty {
+            color: #94a3b8;
+            font-style: italic;
+        }
+
+        /* Deliverer info */
+        .deliverer-info {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .deliverer-info-title {
+            font-size: 12px;
+            color: #075985;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .deliverer-info-text {
+            font-size: 13px;
+            color: #0c4a6e;
+            line-height: 1.5;
+        }
+
+        /* Instructions */
+        .instructions {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.6;
+            padding: 15px;
+            background: #fef3c7;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .instructions strong {
+            color: #92400e;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        /* Status */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #fef3c7;
+            border: 1px solid #fcd34d;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #92400e;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #f59e0b;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Service area circle helper */
+        .service-info {
+            font-size: 12px;
+            color: #64748b;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🚴 Ubicación GPS del Repartidor</h1>
+            <p>Selecciona la ubicación actual del repartidor para el seguimiento en tiempo real</p>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+            <!-- Map -->
+            <div id="map"></div>
+
+            <!-- Side panel -->
+            <div class="side-panel">
+                <!-- Status -->
+                <div class="panel-section">
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span>Modo Administrador - Asignar Ubicación</span>
+                    </div>
+                </div>
+
+                <!-- Deliverer info -->
+                <div class="panel-section">
+                    <h2>👤 Información del Repartidor</h2>
+                    <div class="deliverer-info">
+                        <div class="deliverer-info-title">ℹ️ Uso de esta ubicación:</div>
+                        <div class="deliverer-info-text">
+                            La ubicación GPS del repartidor permite:<br>
+                            • Seguimiento en tiempo real de pedidos<br>
+                            • Asignación inteligente de envíos cercanos<br>
+                            • Visualización en mapa de tracking<br><br>
+                            <strong>Nota:</strong> Esta es la ubicación inicial. Puede actualizarse desde el perfil del repartidor.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="panel-section">
+                    <h2>📋 Instrucciones</h2>
+                    <div class="instructions">
+                        <strong>1.</strong> Haz clic en el mapa donde está el repartidor<br>
+                        <strong>2.</strong> Puedes arrastrar el marcador para ajustar<br>
+                        <strong>3.</strong> Verifica las coordenadas GPS<br>
+                        <strong>4.</strong> Haz clic en "Asignar Ubicación" para guardar<br><br>
+                        <strong>⚠️ Importante:</strong> La ubicación debe estar dentro del área de cobertura
+                    </div>
+                </div>
+
+                <!-- Coordinates -->
+                <div class="panel-section">
+                    <h2>📍 Ubicación GPS Actual</h2>
+                    
+                    <div class="coord-display empty" id="coord-container">
+                        <div class="coord-label">Coordenadas del Repartidor:</div>
+                        <div class="coord-value empty" id="coords-display">
+                            Haz clic en el mapa para asignar ubicación
+                        </div>
+                    </div>
+
+                    <div class="service-info" id="service-status">
+                        ℹ️ Selecciona un punto en el mapa
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div class="panel-section">
+                    <h2>ℹ️ Área de Cobertura</h2>
+                    <div class="service-info">
+                        <strong>Centro:</strong> Armenia, Quindío<br>
+                        <strong>Radio máximo:</strong> 20 km<br>
+                        <strong>Cobertura:</strong> Zona urbana y alrededores
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="btn-clear">
+                        🗑️ Limpiar Selección
+                    </button>
+                    <button class="btn btn-primary" id="btn-center">
+                        🎯 Centrar en Armenia
+                    </button>
+                    <button class="btn btn-success" id="btn-save" disabled>
+                        💾 Asignar Ubicación
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- App Script -->
+    <script src="deliverer-map.js"></script>
+</body>
+</html>

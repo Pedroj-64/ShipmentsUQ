@@ -4,6 +4,7 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.AddressFormContro
 import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.GridMapViewController;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.Coordinates;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.RealMapService;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.mapping.ReverseGeocoder;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -194,7 +195,7 @@ public class AddressFormViewController implements Initializable {
                 gpsLat = selectedRealOrigin.getLatitude();
                 gpsLng = selectedRealOrigin.getLongitude();
                 
-                System.out.println("✓ Guardando dirección con GPS: " + gpsLat + ", " + gpsLng);
+                System.out.println("[SUCCESS] Guardando dirección con GPS: " + gpsLat + ", " + gpsLng);
                 System.out.println("  Convertido a Grid: " + coordX + ", " + coordY);
                 
             } else {
@@ -202,7 +203,7 @@ public class AddressFormViewController implements Initializable {
                 coordX = mapViewController.getSelectedX();
                 coordY = mapViewController.getSelectedY();
                 
-                System.out.println("✓ Guardando dirección con Grid: " + coordX + ", " + coordY);
+                System.out.println("[SUCCESS] Guardando dirección con Grid: " + coordX + ", " + coordY);
             }
             
             // Validar campos obligatorios en la interfaz
@@ -225,7 +226,7 @@ public class AddressFormViewController implements Initializable {
                 // Obtener la dirección recién guardada para agregarle las coordenadas GPS
                 // Nota: Necesitamos acceso a la dirección guardada para poder actualizarla
                 // Por ahora, las coordenadas GPS se perderán si no las guardamos en el método saveAddress
-                System.out.println("⚠️ Coordenadas GPS no persistidas en Address (requiere modificar AddressFormController)");
+                System.out.println("[WARN] Coordenadas GPS no persistidas en Address (requiere modificar AddressFormController)");
             }
             
             if (success) {
@@ -350,8 +351,8 @@ public class AddressFormViewController implements Initializable {
         try {
             // Iniciar servidor web si no está activo
             if (realMapService.startMapServer()) {
-                // Abrir navegador con el mapa
-                realMapService.openMapInBrowser();
+                // Abrir navegador con el mapa ESPECIALIZADO para direcciones (1 punto)
+                realMapService.openMapInBrowser(RealMapService.MapType.ADDRESS);
                 
                 // Cambiar estado
                 usingRealCoordinates = true;
@@ -361,7 +362,7 @@ public class AddressFormViewController implements Initializable {
                 // Mostrar instrucciones
                 showRealMapInstructions();
                 
-                updateStatusMessage("Mapa GPS abierto en el navegador. Selecciona origen y haz clic en 'Enviar a Java'", false);
+                updateStatusMessage("Mapa GPS abierto - Selecciona la ubicación de la dirección", false);
             } else {
                 showErrorMessage("No se pudo iniciar el servidor del mapa");
             }
@@ -375,7 +376,7 @@ public class AddressFormViewController implements Initializable {
      */
     private void disableRealMapMode() {
         usingRealCoordinates = false;
-        btn_toggleMap.setText("🗺️ Usar Coordenadas Reales");
+        btn_toggleMap.setText("Usar Coordenadas Reales");
         btn_toggleMap.setStyle("");
         
         // Limpiar coordenadas reales seleccionadas
@@ -391,18 +392,20 @@ public class AddressFormViewController implements Initializable {
     private void showRealMapInstructions() {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Sistema de Coordenadas Reales");
+            alert.setTitle("Seleccionar Ubicación de Dirección");
             alert.setHeaderText("Cómo usar el mapa GPS");
             alert.setContentText(
-                "1. Se ha abierto el mapa en tu navegador (http://localhost:8080)\n\n" +
-                "2. Haz clic en el botón 'ORIGEN' (azul) en el mapa\n\n" +
-                "3. Haz clic en la ubicación deseada en el mapa\n\n" +
+                "INSTRUCCIONES PARA DIRECCIONES:\n\n" +
+                "1. Se abrió el mapa en tu navegador (http://localhost:8080/address-map.html)\n\n" +
+                "2. Haz clic en el mapa en la ubicación exacta de la dirección\n\n" +
+                "3. Puedes arrastrar el marcador para ajustar la posición\n\n" +
                 "4. Verás las coordenadas GPS en el panel lateral\n\n" +
-                "5. (Opcional) Selecciona DESTINO si lo necesitas\n\n" +
-                "6. Haz clic en '💾 Enviar a Java' para confirmar\n\n" +
-                "7. Las coordenadas aparecerán en esta ventana\n\n" +
-                "Nota: Para direcciones solo necesitas el ORIGEN.\n" +
-                "El DESTINO es opcional y se usa para calcular rutas."
+                "5. Haz clic en 'Guardar Ubicación' para confirmar\n\n" +
+                "6. Las coordenadas y la dirección aparecerán aquí automáticamente\n\n" +
+                "IMPORTANTE:\n" +
+                "• Solo necesitas seleccionar 1 punto (la dirección)\n" +
+                "• Debe estar dentro del círculo morado (área de servicio)\n" +
+                "• Los campos de dirección se auto-rellenarán con los datos GPS"
             );
             alert.showAndWait();
         });
@@ -416,9 +419,23 @@ public class AddressFormViewController implements Initializable {
      * @param destination coordenadas de destino (puede ser null para direcciones)
      */
     public void onRealCoordinatesReceived(Coordinates origin, Coordinates destination) {
+        System.out.println("\n[INFO] Callback: onRealCoordinatesReceived() executed");
+        System.out.println("  Origin: " + (origin != null ? 
+            String.format("Lat %.6f, Lng %.6f", origin.getLatitude(), origin.getLongitude()) : "null"));
+        System.out.println("  Destination: " + (destination != null ? 
+            String.format("Lat %.6f, Lng %.6f", destination.getLatitude(), destination.getLongitude()) : "null (normal)"));
+        
         Platform.runLater(() -> {
             this.selectedRealOrigin = origin;
             this.selectedRealDestination = destination;
+            
+            // Auto-fill address from GPS coordinates
+            if (origin != null) {
+                System.out.println("[INFO] Calling autoFillAddressFromGPS()...");
+                autoFillAddressFromGPS(origin.getLatitude(), origin.getLongitude());
+            } else {
+                System.err.println("[ERROR] Origin is null, cannot auto-fill");
+            }
             
             // Actualizar label con coordenadas GPS
             lbl_coordinates.setText(String.format(
@@ -433,12 +450,176 @@ public class AddressFormViewController implements Initializable {
                 origin.getLongitude()
             );
             
+            System.out.println("[INFO] Coordenadas convertidas a Grid: [" + 
+                String.format("%.2f, %.2f", gridCoords[0], gridCoords[1]) + "]");
+            
             // Actualizar el mapa Grid también (para visualización)
             if (mapViewController != null) {
                 mapViewController.setSelectedCoordinates(gridCoords[0], gridCoords[1]);
+                System.out.println("[SUCCESS] Mapa Grid actualizado");
             }
             
             updateStatusMessage("Coordenadas GPS recibidas correctamente", false);
         });
+    }
+    
+    /**
+     * Auto-rellena los campos de dirección usando geocodificación inversa
+     */
+    private void autoFillAddressFromGPS(double latitude, double longitude) {
+        System.out.println("[INFO] Auto-filling address from GPS");
+        System.out.println("  Latitude:  " + String.format("%.6f", latitude));
+        System.out.println("  Longitude: " + String.format("%.6f", longitude));
+        
+        // Ejecutar en hilo separado para no bloquear UI
+        new Thread(() -> {
+            try {
+                System.out.println("[INFO] Iniciando geocodificación inversa...");
+                
+                ReverseGeocoder geocoder = ReverseGeocoder.getInstance();
+                java.util.Map<String, String> addressComponents = geocoder.reverseGeocode(latitude, longitude);
+                
+                System.out.println("[INFO] Componentes recibidos: " + 
+                    (addressComponents != null ? addressComponents.size() + " items" : "null"));
+                
+                if (addressComponents != null && !addressComponents.isEmpty()) {
+                    System.out.println("[DEBUG] Address components:");
+                    addressComponents.forEach((key, value) -> 
+                        System.out.println("  " + key + ": " + value)
+                    );
+                    
+                    // Actualizar UI en el hilo de JavaFX
+                    Platform.runLater(() -> {
+                        System.out.println("[DEBUG] TextField verification:");
+                        System.out.println("  txt_street: " + (txt_street != null ? "exists" : "NULL"));
+                        System.out.println("  txt_city: " + (txt_city != null ? "exists" : "NULL"));
+                        System.out.println("  txt_zipCode: " + (txt_zipCode != null ? "exists" : "NULL"));
+                        System.out.println("  txt_zone: " + (txt_zone != null ? "exists" : "NULL"));
+                        
+                        if (txt_street == null || txt_city == null || txt_zipCode == null || txt_zone == null) {
+                            System.err.println("[ERROR] One or more TextField are NULL");
+                            updateStatusMessage("Error: Form fields not initialized", true);
+                            return;
+                        }
+                        
+                        // Verificar si son editables
+                        System.out.println("[DEBUG] Field editability check:");
+                        System.out.println("  txt_street.isEditable(): " + txt_street.isEditable());
+                        System.out.println("  txt_street.isDisabled(): " + txt_street.isDisabled());
+                        
+                        // Extraer componentes relevantes
+                        String street = addressComponents.get("road");
+                        String neighbourhood = addressComponents.get("neighbourhood");
+                        String city = addressComponents.get("city");
+                        String postcode = addressComponents.get("postcode");
+                        
+                        System.out.println("[INFO] Values to apply:");
+                        System.out.println("  street: " + street);
+                        System.out.println("  neighbourhood: " + neighbourhood);
+                        System.out.println("  city: " + city);
+                        System.out.println("  postcode: " + postcode);
+                        
+                        System.out.println("[INFO] Applying auto-fill:");
+                        
+                        // Rellenar TODOS los campos (no solo vacíos) para debugging
+                        boolean anyFieldFilled = false;
+                        
+                        if (street != null && !street.trim().isEmpty()) {
+                            String before = txt_street.getText();
+                            txt_street.setText(street);
+                            String after = txt_street.getText();
+                            System.out.println("  [INFO] Field 'Street': '" + before + "' -> '" + after + "'");
+                            if (after.equals(street)) {
+                                System.out.println("  [SUCCESS] Field 'Street' filled correctly");
+                                anyFieldFilled = true;
+                            } else {
+                                System.err.println("  [ERROR] Field 'Street' NOT updated");
+                            }
+                        } else {
+                            System.out.println("  [WARN] No data for 'Street'");
+                        }
+                        
+                        if (neighbourhood != null && !neighbourhood.trim().isEmpty()) {
+                            String before = txt_zone.getText();
+                            txt_zone.setText(neighbourhood);
+                            String after = txt_zone.getText();
+                            System.out.println("  [INFO] Field 'Zone': '" + before + "' -> '" + after + "'");
+                            if (after.equals(neighbourhood)) {
+                                System.out.println("  [SUCCESS] Field 'Zone' filled correctly");
+                                anyFieldFilled = true;
+                            } else {
+                                System.err.println("  [ERROR] Field 'Zone' NOT updated");
+                            }
+                        } else {
+                            System.out.println("  [WARN] No data for 'Zone'");
+                        }
+                        
+                        if (city != null && !city.trim().isEmpty()) {
+                            String before = txt_city.getText();
+                            txt_city.setText(city);
+                            String after = txt_city.getText();
+                            System.out.println("  [INFO] Field 'City': '" + before + "' -> '" + after + "'");
+                            if (after.equals(city)) {
+                                System.out.println("  [SUCCESS] Field 'City' filled correctly");
+                                anyFieldFilled = true;
+                            } else {
+                                System.err.println("  [ERROR] Field 'City' NOT updated");
+                            }
+                        } else {
+                            System.out.println("  [WARN] No data for 'City'");
+                        }
+                        
+                        if (postcode != null && !postcode.trim().isEmpty()) {
+                            String before = txt_zipCode.getText();
+                            txt_zipCode.setText(postcode);
+                            String after = txt_zipCode.getText();
+                            System.out.println("  [INFO] Field 'Postal Code': '" + before + "' -> '" + after + "'");
+                            if (after.equals(postcode)) {
+                                System.out.println("  [SUCCESS] Field 'Postal Code' filled correctly");
+                                anyFieldFilled = true;
+                            } else {
+                                System.err.println("  [ERROR] Field 'Postal Code' NOT updated");
+                            }
+                        } else {
+                            System.out.println("  [WARN] No data for 'Postal Code'");
+                        }
+                        
+                        // Forzar actualización visual de los campos
+                        txt_street.requestLayout();
+                        txt_zone.requestLayout();
+                        txt_city.requestLayout();
+                        txt_zipCode.requestLayout();
+                        
+                        // Mostrar dirección completa formateada
+                        String formatted = geocoder.formatColombianAddress(addressComponents);
+                        System.out.println("[INFO] Formatted address: " + formatted);
+                        
+                        // Mostrar mensaje al usuario
+                        if (anyFieldFilled) {
+                            updateStatusMessage("Address auto-filled from GPS: " + formatted, false);
+                            System.out.println("[SUCCESS] Auto-fill completed successfully");
+                        } else {
+                            updateStatusMessage("Could not extract address data", true);
+                            System.out.println("[WARN] No field could be filled");
+                        }
+                    });
+                } else {
+                    Platform.runLater(() -> {
+                        System.out.println("[WARN] Could not obtain address for these coordinates");
+                        updateStatusMessage("No address found for these GPS coordinates", true);
+                    });
+                }
+                
+            } catch (Exception e) {
+                System.err.println("[ERROR] Reverse geocoding error:");
+                System.err.println("  Message: " + e.getMessage());
+                System.err.println("  Type: " + e.getClass().getSimpleName());
+                e.printStackTrace();
+                
+                Platform.runLater(() -> {
+                    updateStatusMessage("Error obtaining address: " + e.getMessage(), true);
+                });
+            }
+        }).start();
     }
 }

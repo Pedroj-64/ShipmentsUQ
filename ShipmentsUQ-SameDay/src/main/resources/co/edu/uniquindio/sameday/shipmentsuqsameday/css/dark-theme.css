@@ -1,0 +1,269 @@
+/* Tema Oscuro - Variables y estilos globales */
+
+/* === COLORES BASE === */
+.root {
+    -fx-base: #2b2b2b;
+    -fx-background: #1e1e1e;
+    -fx-control-inner-background: #3c3c3c;
+    -fx-accent: #4a9eff;
+}
+
+/* === CONTENEDORES === */
+.border-pane,
+.anchor-pane,
+.vbox,
+.hbox,
+.stack-pane {
+    -fx-background-color: #1e1e1e;
+}
+
+/* === LABELS === */
+.label {
+    -fx-text-fill: #e0e0e0;
+}
+
+.title-label,
+.settings-title,
+.tracking-title {
+    -fx-text-fill: #ffffff;
+}
+
+.section-title {
+    -fx-text-fill: #b0b0b0;
+}
+
+/* === TEXT FIELDS === */
+.text-field,
+.text-area {
+    -fx-background-color: #3c3c3c;
+    -fx-text-fill: #e0e0e0;
+    -fx-prompt-text-fill: #808080;
+    -fx-border-color: #555555;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.text-field:focused,
+.text-area:focused {
+    -fx-border-color: #4a9eff;
+    -fx-background-color: #424242;
+}
+
+/* === BOTONES === */
+.button {
+    -fx-background-color: #3c3c3c;
+    -fx-text-fill: #e0e0e0;
+    -fx-border-color: #555555;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.button:hover {
+    -fx-background-color: #4a4a4a;
+    -fx-border-color: #4a9eff;
+}
+
+.button:pressed {
+    -fx-background-color: #2a2a2a;
+}
+
+/* Botones primarios */
+.save-button,
+.submit-button,
+.primary-button,
+.realtime-map-button {
+    -fx-background-color: #198754;
+    -fx-text-fill: white;
+}
+
+.save-button:hover,
+.submit-button:hover,
+.primary-button:hover,
+.realtime-map-button:hover {
+    -fx-background-color: #20a05d;
+}
+
+/* Botones de acción */
+.refresh-button,
+.update-button {
+    -fx-background-color: #0d6efd;
+    -fx-text-fill: white;
+}
+
+.refresh-button:hover,
+.update-button:hover {
+    -fx-background-color: #3d8bfd;
+}
+
+/* Botones de cancelar/cerrar */
+.cancel-button,
+.close-button {
+    -fx-background-color: #6c757d;
+    -fx-text-fill: white;
+}
+
+.cancel-button:hover,
+.close-button:hover {
+    -fx-background-color: #7c858d;
+}
+
+/* === TABLA === */
+.table-view {
+    -fx-background-color: #2b2b2b;
+    -fx-border-color: #555555;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #3c3c3c;
+}
+
+.table-view .column-header {
+    -fx-background-color: #3c3c3c;
+    -fx-text-fill: #e0e0e0;
+    -fx-border-color: #555555;
+}
+
+.table-view .table-cell {
+    -fx-text-fill: #e0e0e0;
+    -fx-border-color: #3c3c3c;
+}
+
+.table-row-cell {
+    -fx-background-color: #2b2b2b;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #323232;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #4a9eff;
+    -fx-text-fill: white;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #3c3c3c;
+}
+
+/* === COMBOBOX === */
+.combo-box {
+    -fx-background-color: #3c3c3c;
+    -fx-border-color: #555555;
+}
+
+.combo-box .list-cell {
+    -fx-background-color: #3c3c3c;
+    -fx-text-fill: #e0e0e0;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: #3c3c3c;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #4a4a4a;
+}
+
+/* === CHECKBOX & RADIO === */
+.check-box,
+.radio-button {
+    -fx-text-fill: #e0e0e0;
+}
+
+.check-box .box,
+.radio-button .radio {
+    -fx-background-color: #3c3c3c;
+    -fx-border-color: #555555;
+}
+
+.check-box:selected .mark,
+.radio-button:selected .dot {
+    -fx-background-color: #4a9eff;
+}
+
+/* === SCROLL BAR === */
+.scroll-bar {
+    -fx-background-color: #2b2b2b;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #555555;
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #666666;
+}
+
+/* === SEPARADORES === */
+.separator .line {
+    -fx-border-color: #555555;
+}
+
+/* === HEADERS === */
+.settings-header,
+.tracking-header,
+.dashboard-header {
+    -fx-background-color: #2b2b2b;
+    -fx-border-color: #555555;
+}
+
+/* === CONTAINERS === */
+.settings-container,
+.tracking-container,
+.dashboard-container {
+    -fx-background-color: #1e1e1e;
+}
+
+.settings-content {
+    -fx-background-color: #2b2b2b;
+}
+
+/* === MENU BAR === */
+.menu-bar {
+    -fx-background-color: #2b2b2b;
+}
+
+.menu-bar .label {
+    -fx-text-fill: #e0e0e0;
+}
+
+.menu-item {
+    -fx-background-color: #3c3c3c;
+}
+
+.menu-item:hover,
+.menu-item:focused {
+    -fx-background-color: #4a4a4a;
+}
+
+/* === TOOLTIP === */
+.tooltip {
+    -fx-background-color: #3c3c3c;
+    -fx-text-fill: #e0e0e0;
+    -fx-border-color: #555555;
+}
+
+/* === MAPAS === */
+.map-container {
+    -fx-background-color: #2b2b2b;
+    -fx-border-color: #555555;
+}
+
+/* === TARJETAS === */
+.card {
+    -fx-background-color: #2b2b2b;
+    -fx-border-color: #555555;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+/* === VALORES Y COORDENADAS === */
+.tracking-value,
+.coordinates-value {
+    -fx-text-fill: #4a9eff;
+}
+
+.info-text {
+    -fx-text-fill: #808080;
+}

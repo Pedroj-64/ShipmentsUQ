@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipmentsUQ - Seguimiento en Tiempo Real</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: #f8fafc;
+        }
+
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            padding: 20px 30px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        /* Main content */
+        .content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Map container */
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+
+        /* Side panel */
+        .side-panel {
+            width: 350px;
+            background: white;
+            overflow-y: auto;
+            box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-section {
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .panel-section h2 {
+            color: #1e293b;
+            font-size: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Delivery status */
+        .delivery-status {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 8px;
+            padding: 15px;
+            border-left: 4px solid #3b82f6;
+            margin-bottom: 15px;
+        }
+
+        .delivery-status-title {
+            font-size: 12px;
+            color: #1e40af;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .delivery-status-text {
+            font-size: 14px;
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+
+        /* Deliverer info card */
+        .deliverer-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .deliverer-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .deliverer-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .deliverer-info {
+            flex: 1;
+        }
+
+        .deliverer-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .deliverer-status {
+            font-size: 12px;
+            color: #10b981;
+            font-weight: 500;
+        }
+
+        .deliverer-coords {
+            font-size: 12px;
+            color: #64748b;
+            font-family: 'Courier New', monospace;
+            background: #f8fafc;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+
+        /* Location info */
+        .location-info {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .location-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .location-value {
+            font-size: 13px;
+            color: #1e293b;
+        }
+
+        /* ETA */
+        .eta-display {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #86efac;
+        }
+
+        .eta-label {
+            font-size: 12px;
+            color: #166534;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .eta-value {
+            font-size: 24px;
+            color: #15803d;
+            font-weight: bold;
+        }
+
+        /* Instructions */
+        .tracking-info {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.6;
+            padding: 15px;
+            background: #dbeafe;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .tracking-info strong {
+            color: #1e40af;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #e2e8f0;
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #dbeafe;
+            border: 1px solid #93c5fd;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #1e40af;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -24px;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            background: #3b82f6;
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px #3b82f6;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: -19px;
+            top: 12px;
+            width: 2px;
+            height: calc(100% - 12px);
+            background: #e2e8f0;
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .timeline-item.completed::before {
+            background: #10b981;
+            box-shadow: 0 0 0 2px #10b981;
+        }
+
+        .timeline-time {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .timeline-title {
+            font-size: 13px;
+            color: #1e293b;
+            font-weight: 600;
+            margin: 4px 0;
+        }
+
+        .timeline-desc {
+            font-size: 12px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📦 Seguimiento en Tiempo Real</h1>
+            <p>Visualiza la ubicación actual de tu repartidor y el estado del pedido</p>
+        </div>
+
+        <!-- Main content -->
+        <div class="content">
+            <!-- Map -->
+            <div id="map"></div>
+
+            <!-- Side panel -->
+            <div class="side-panel">
+                <!-- Status -->
+                <div class="panel-section">
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span>Tracking Activo - Actualización en tiempo real</span>
+                    </div>
+                </div>
+
+                <!-- Delivery Status -->
+                <div class="panel-section">
+                    <h2>📋 Estado del Pedido</h2>
+                    <div class="delivery-status">
+                        <div class="delivery-status-title">Estado Actual:</div>
+                        <div class="delivery-status-text" id="delivery-status">
+                            🚴 En camino a tu ubicación
+                        </div>
+                    </div>
+
+                    <div class="eta-display">
+                        <div class="eta-label">Tiempo Estimado de Llegada</div>
+                        <div class="eta-value" id="eta-time">15 min</div>
+                    </div>
+                </div>
+
+                <!-- Deliverer Info -->
+                <div class="panel-section">
+                    <h2>🚴 Tu Repartidor</h2>
+                    <div class="deliverer-card">
+                        <div class="deliverer-header">
+                            <div class="deliverer-avatar">🚴</div>
+                            <div class="deliverer-info">
+                                <div class="deliverer-name" id="deliverer-name">Juan Pérez</div>
+                                <div class="deliverer-status">● En servicio</div>
+                            </div>
+                        </div>
+                        <div class="deliverer-coords" id="deliverer-coords">
+                            📍 Cargando ubicación...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Location Info -->
+                <div class="panel-section">
+                    <h2>📍 Ubicaciones</h2>
+                    
+                    <div class="location-info">
+                        <div class="location-label">Origen (Recogida):</div>
+                        <div class="location-value" id="origin-address">Cargando...</div>
+                    </div>
+
+                    <div class="location-info">
+                        <div class="location-label">Destino (Tu dirección):</div>
+                        <div class="location-value" id="destination-address">Cargando...</div>
+                    </div>
+                </div>
+
+                <!-- Timeline -->
+                <div class="panel-section">
+                    <h2>🕒 Historial del Pedido</h2>
+                    <div class="timeline" id="timeline">
+                        <div class="timeline-item completed">
+                            <div class="timeline-time">10:00 AM</div>
+                            <div class="timeline-title">✅ Pedido Creado</div>
+                            <div class="timeline-desc">Pedido confirmado y pagado</div>
+                        </div>
+                        <div class="timeline-item completed">
+                            <div class="timeline-time">10:15 AM</div>
+                            <div class="timeline-title">✅ Repartidor Asignado</div>
+                            <div class="timeline-desc">Juan Pérez aceptó el pedido</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-time">Ahora</div>
+                            <div class="timeline-title">🚴 En Camino</div>
+                            <div class="timeline-desc">El repartidor está en ruta</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div class="panel-section">
+                    <h2>ℹ️ Información</h2>
+                    <div class="tracking-info">
+                        <strong>📍 Ubicación en Tiempo Real:</strong><br>
+                        El marcador azul muestra la ubicación actual de tu repartidor.<br><br>
+                        <strong>🔄 Actualización:</strong><br>
+                        La ubicación se actualiza automáticamente cada 30 segundos.<br><br>
+                        <strong>💡 Tip:</strong><br>
+                        Puedes ampliar/reducir el mapa para mejor visualización.
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" id="btn-refresh">
+                        🔄 Actualizar Ubicación
+                    </button>
+                    <button class="btn btn-primary" id="btn-center">
+                        🎯 Centrar en Repartidor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- App Script -->
+    <script src="tracking-map.js"></script>
+</body>
+</html>

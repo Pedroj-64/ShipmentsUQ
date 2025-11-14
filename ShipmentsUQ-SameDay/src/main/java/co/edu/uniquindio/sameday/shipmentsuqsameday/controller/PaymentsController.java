@@ -177,9 +177,9 @@ public class PaymentsController {
                         boolean assignmentSuccess = shipmentService.tryAssignDeliverer(shipment.getId());
                         
                         if (assignmentSuccess) {
-                            System.out.println("✓ Pago exitoso y repartidor asignado automáticamente");
+                            System.out.println("[SUCCESS] Pago exitoso y repartidor asignado automáticamente");
                         } else {
-                            System.err.println("⚠ Pago exitoso pero no se pudo asignar un repartidor automáticamente");
+                            System.err.println("[WARN] Pago exitoso pero no se pudo asignar un repartidor automáticamente");
                         }
                     }
                 } catch (Exception ex) {

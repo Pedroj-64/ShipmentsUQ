@@ -48,14 +48,14 @@ public class MapWebServer {
         server.setExecutor(null); // Usa el executor por defecto
         server.start();
         
-        System.out.println("╔════════════════════════════════════════════════════════════╗");
-        System.out.println("║  🗺️  ShipmentsUQ - Servidor de Mapas Iniciado            ║");
-        System.out.println("╠════════════════════════════════════════════════════════════╣");
-        System.out.println("║  📍 Puerto: " + PORT + "                                          ║");
-        System.out.println("║  🌐 URL: http://localhost:" + PORT + "                          ║");
-        System.out.println("║  📂 Sirviendo: webapp/                                     ║");
-        System.out.println("║  ✓ Listo para recibir coordenadas desde JavaScript       ║");
-        System.out.println("╚════════════════════════════════════════════════════════════╝");
+        System.out.println("============================================================");
+        System.out.println("  [INFO] ShipmentsUQ - Servidor de Mapas Iniciado");
+        System.out.println("============================================================");
+        System.out.println("  [INFO] Puerto: " + PORT);
+        System.out.println("  [INFO] URL: http://localhost:" + PORT);
+        System.out.println("  [INFO] Sirviendo: webapp/");
+        System.out.println("  [SUCCESS] Listo para recibir coordenadas desde JavaScript");
+        System.out.println("============================================================");
     }
     
     /**
@@ -69,20 +69,38 @@ public class MapWebServer {
     }
     
     /**
-     * Abre el mapa en el navegador por defecto
+     * Abre el mapa en el navegador por defecto (index.html)
      */
     public void openInBrowser() {
+        openInBrowser("index.html", "Mapa General");
+    }
+    
+    /**
+     * Abre un mapa específico en el navegador
+     * @param mapType tipo de mapa desde RealMapService.MapType
+     */
+    public void openInBrowser(RealMapService.MapType mapType) {
+        openInBrowser(mapType.getFilename(), mapType.getDescription());
+    }
+    
+    /**
+     * Abre una página específica del mapa en el navegador
+     * @param filename nombre del archivo HTML (ej: "address-map.html")
+     * @param description descripción para el log
+     */
+    private void openInBrowser(String filename, String description) {
         try {
-            String url = "http://localhost:" + PORT;
+            String url = "http://localhost:" + PORT + "/" + filename;
             if (Desktop.isDesktopSupported()) {
                 Desktop.getDesktop().browse(new URI(url));
-                System.out.println("🌐 Abriendo mapa en el navegador...");
+                System.out.println("[INFO] Abriendo " + description + " en el navegador...");
+                System.out.println("   URL: " + url);
             } else {
                 System.out.println("Abre manualmente: " + url);
             }
         } catch (Exception e) {
             System.err.println("Error al abrir navegador: " + e.getMessage());
-            System.out.println("Abre manualmente: http://localhost:" + PORT);
+            System.out.println("Abre manualmente: http://localhost:" + PORT + "/" + filename);
         }
     }
     
@@ -175,7 +193,7 @@ public class MapWebServer {
             BufferedReader br = new BufferedReader(isr);
             String body = br.lines().collect(Collectors.joining("\n"));
             
-            System.out.println("📥 Coordenadas recibidas desde JavaScript:");
+            System.out.println("[INFO] Coordenadas recibidas desde JavaScript:");
             System.out.println(body);
             
             try {
@@ -187,12 +205,12 @@ public class MapWebServer {
                 try {
                     destination = parseCoordinate(body, "destination");
                 } catch (Exception e) {
-                    System.out.println("ℹ️  Destino no proporcionado (opcional)");
+                    System.out.println("[INFO] Destino no proporcionado (opcional)");
                 }
                 
-                System.out.println("✓ Origen: " + origin);
+                System.out.println("[SUCCESS] Origen: " + origin);
                 if (destination != null) {
-                    System.out.println("✓ Destino: " + destination);
+                    System.out.println("[SUCCESS] Destino: " + destination);
                 }
                 
                 // Calcular métricas solo si hay destino
@@ -203,10 +221,10 @@ public class MapWebServer {
                     String time = MapCalculator.formatEstimatedTime(origin, destination);
                     boolean sameDay = MapCalculator.isSameDayDeliveryPossible(origin, destination);
                     
-                    System.out.println("📊 Distancia: " + String.format("%.2f km", distance));
-                    System.out.println("💰 Costo: $" + String.format("%,.0f COP", cost));
-                    System.out.println("⏱️  Tiempo: " + time);
-                    System.out.println("📦 Same-day: " + (sameDay ? "Sí" : "No"));
+                    System.out.println("[INFO] Distancia: " + String.format("%.2f km", distance));
+                    System.out.println("[INFO] Costo: $" + String.format("%,.0f COP", cost));
+                    System.out.println("[INFO] Tiempo: " + time);
+                    System.out.println("[INFO] Same-day: " + (sameDay ? "Sí" : "No"));
                     
                     response = String.format(
                         "{\"success\": true, \"distance\": %.2f, \"cost\": %.2f, \"time\": \"%s\", \"sameDay\": %b}",
@@ -216,7 +234,7 @@ public class MapWebServer {
                     response = "{\"success\": true, \"message\": \"Origen recibido (destino opcional)\"}";
                 }
                 
-                System.out.println("────────────────────────────────────────");
+                System.out.println("--------------------------------------------");
                 
                 // Callback
                 if (callback != null) {
@@ -231,7 +249,7 @@ public class MapWebServer {
                 os.close();
                 
             } catch (Exception e) {
-                System.err.println("❌ Error al procesar coordenadas: " + e.getMessage());
+                System.err.println("[ERROR] Error al procesar coordenadas: " + e.getMessage());
                 e.printStackTrace();
                 String response = "{\"error\": \"" + e.getMessage().replace("\"", "'") + "\"}";
                 exchange.getResponseHeaders().set("Content-Type", "application/json");
@@ -290,7 +308,7 @@ public class MapWebServer {
     public static void main(String[] args) {
         try {
             MapWebServer server = new MapWebServer((origin, destination) -> {
-                System.out.println("\n🎯 CALLBACK EJECUTADO EN JAVA:");
+                System.out.println("\n[INFO] CALLBACK EJECUTADO EN JAVA:");
                 System.out.println("Origen: " + origin);
                 System.out.println("Destino: " + destination);
                 System.out.println("Aquí puedes integrar con tu lógica de negocio\n");
