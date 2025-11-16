@@ -29,14 +29,12 @@ public class ProfileAndAddressesController {
         System.out.println("DEBUG: Inicializando ProfileAndAddressesController");
         userService = UserService.getInstance();
         
-        // Obtener el ID del usuario de la sesión actual
         if (App.getCurrentSession() != null) {
             currentUserId = App.getCurrentSession().getUserId();
             System.out.println("DEBUG: ID de usuario obtenido de la sesión: " + currentUserId);
         } else {
             System.out.println("DEBUG: App.getCurrentSession() es null");
             
-            // Intentar obtener el usuario desde el UserDashboardController
             User dashboardUser = UserDashboardController.getCurrentUser();
             if (dashboardUser != null) {
                 currentUserId = dashboardUser.getId();
@@ -55,23 +53,19 @@ public class ProfileAndAddressesController {
     public UserDTO getCurrentUserData() throws Exception {
         System.out.println("DEBUG: Iniciando getCurrentUserData()");
         
-        // Verificar si App.getCurrentSession() es nulo
         if (App.getCurrentSession() == null) {
             System.out.println("DEBUG: App.getCurrentSession() es null");
         } else {
             System.out.println("DEBUG: App.getCurrentSession() está presente");
-            // Verificar si el userId de la sesión es nulo
             if (App.getCurrentSession().getUserId() == null) {
                 System.out.println("DEBUG: App.getCurrentSession().getUserId() es null");
             } else {
                 System.out.println("DEBUG: ID de usuario en sesión: " + App.getCurrentSession().getUserId());
-                // Actualizar currentUserId por si acaso
                 currentUserId = App.getCurrentSession().getUserId();
             }
         }
         
         if (currentUserId == null) {
-            // Si no tenemos un userId, intentamos con el usuario estático del controlador de dashboard
             User dashboardUser = UserDashboardController.getCurrentUser();
             if (dashboardUser != null) {
                 System.out.println("DEBUG: Usando el usuario del UserDashboardController");
@@ -167,7 +161,6 @@ public class ProfileAndAddressesController {
         System.out.println("DEBUG: Buscando usuario con ID: " + currentUserId);
         
         try {
-            // Obtener el usuario
             Optional<User> userOptional = userService.findById(currentUserId);
             if (!userOptional.isPresent()) {
                 System.out.println("DEBUG: No se encontró ningún usuario con el ID: " + currentUserId);
@@ -177,11 +170,9 @@ public class ProfileAndAddressesController {
             User user = userOptional.get();
             System.out.println("DEBUG: Usuario encontrado: " + user.getName() + " (Email: " + user.getEmail() + ")");
             
-            // Obtener las direcciones del usuario
             List<Address> addresses = user.getAddresses();
             System.out.println("DEBUG: El usuario tiene " + addresses.size() + " direcciones");
             
-            // Convertir a DTOs
             List<AddressDTO> addressDTOs = addresses.stream()
                 .map(addr -> AddressDTO.builder()
                     .id(addr.getId())
@@ -233,7 +224,6 @@ public class ProfileAndAddressesController {
             User user = userOptional.get();
             System.out.println("DEBUG: Usuario encontrado: " + user.getName());
             
-            // Buscar dirección por ID
             for (Address address : user.getAddresses()) {
                 if (address.getId().equals(addressId)) {
                     System.out.println("DEBUG: Dirección encontrada: " + address.getAlias());
@@ -265,7 +255,6 @@ public class ProfileAndAddressesController {
             throw new Exception("No hay un usuario con sesión activa.");
         }
         
-        // Validaciones básicas
         if (alias == null || alias.trim().isEmpty()) {
             throw new Exception("El alias de la dirección no puede estar vacío.");
         }
@@ -279,7 +268,6 @@ public class ProfileAndAddressesController {
         }
         
         try {
-            // Obtener usuario
             Optional<User> userOptional = userService.findById(currentUserId);
             if (!userOptional.isPresent()) {
                 throw new Exception("No se pudo encontrar al usuario en el sistema.");
@@ -287,7 +275,6 @@ public class ProfileAndAddressesController {
             
             User user = userOptional.get();
             
-            // Crear nueva dirección
             Address address = Address.builder()
                 .id(UUID.randomUUID())
                 .alias(alias.trim())
@@ -297,10 +284,8 @@ public class ProfileAndAddressesController {
                 .coordY(coordY)
                 .build();
             
-            // Añadir dirección al usuario
             user.getAddresses().add(address);
             
-            // Actualizar usuario
             userService.update(user);
             
             return true;
@@ -329,7 +314,6 @@ public class ProfileAndAddressesController {
             throw new Exception("ID de dirección inválido.");
         }
         
-        // Validaciones básicas
         if (alias == null || alias.trim().isEmpty()) {
             throw new Exception("El alias de la dirección no puede estar vacío.");
         }
@@ -343,7 +327,6 @@ public class ProfileAndAddressesController {
         }
         
         try {
-            // Obtener usuario
             Optional<User> userOptional = userService.findById(currentUserId);
             if (!userOptional.isPresent()) {
                 throw new Exception("No se pudo encontrar al usuario en el sistema.");
@@ -351,7 +334,6 @@ public class ProfileAndAddressesController {
             
             User user = userOptional.get();
             
-            // Buscar la dirección en la lista del usuario
             Address addressToUpdate = null;
             for (Address address : user.getAddresses()) {
                 if (address.getId().equals(addressId)) {
@@ -364,14 +346,12 @@ public class ProfileAndAddressesController {
                 throw new Exception("La dirección no existe o no pertenece al usuario.");
             }
             
-            // Actualizar datos
             addressToUpdate.setAlias(alias.trim());
             addressToUpdate.setStreet(street.trim());
             addressToUpdate.setCity(city.trim());
             addressToUpdate.setCoordX(coordX);
             addressToUpdate.setCoordY(coordY);
             
-            // Guardar cambios
             userService.update(user);
             
             return true;
@@ -396,7 +376,6 @@ public class ProfileAndAddressesController {
         }
         
         try {
-            // Obtener usuario
             Optional<User> userOptional = userService.findById(currentUserId);
             if (!userOptional.isPresent()) {
                 throw new Exception("No se pudo encontrar al usuario en el sistema.");
@@ -404,14 +383,12 @@ public class ProfileAndAddressesController {
             
             User user = userOptional.get();
             
-            // Buscar y eliminar la dirección
             boolean removed = user.getAddresses().removeIf(address -> address.getId().equals(addressId));
             
             if (!removed) {
                 throw new Exception("La dirección no existe o no pertenece al usuario.");
             }
             
-            // Guardar cambios
             userService.update(user);
             
             return true;

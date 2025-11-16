@@ -24,7 +24,6 @@ public class InteractiveMapView {
     private Coordinates selectedDestination;
     private BiConsumer<Coordinates, Coordinates> onCoordinatesSelected;
     
-    // Coordenadas por defecto (Armenia, Quindío)
     private static final double DEFAULT_LAT = 4.533889;
     private static final double DEFAULT_LNG = -75.681111;
     private static final int DEFAULT_ZOOM = 13;
@@ -49,12 +48,10 @@ public class InteractiveMapView {
      * Inicializa el mapa cargando el HTML con Leaflet
      */
     private void initializeMap() {
-        // Cargar el HTML del mapa desde resources
         try {
             String htmlContent = loadMapHTML();
             webEngine.loadContent(htmlContent);
             
-            // Esperar a que el mapa cargue para configurar el bridge Java-JavaScript
             webEngine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
                 if (newState == Worker.State.SUCCEEDED) {
                     setupJavaScriptBridge();
@@ -75,7 +72,6 @@ public class InteractiveMapView {
             JSObject window = (JSObject) webEngine.executeScript("window");
             window.setMember("javaApp", new JavaScriptBridge());
             
-            // Inicializar el mapa en Armenia
             centerMapOn(DEFAULT_LAT, DEFAULT_LNG, DEFAULT_ZOOM);
             
         } catch (Exception e) {

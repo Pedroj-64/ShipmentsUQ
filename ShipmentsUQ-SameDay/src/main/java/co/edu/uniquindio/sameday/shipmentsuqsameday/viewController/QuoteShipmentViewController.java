@@ -205,10 +205,10 @@ public class QuoteShipmentViewController implements Initializable {
             controller.createShipment(quotedShipment);
             
             // Mostrar mensaje de éxito
-            showSuccessMessage("Envío creado exitosamente. Se ha asignado al repartidor más cercano.");
+            showSuccessMessage("Envío creado exitosamente. Por favor proceda al pago para que sea asignado a un repartidor.");
             
             // Cerrar ventana después de un tiempo
-            closeWindowAfterDelay(2000);
+            closeWindowAfterDelay(3000);
             
         } catch (Exception e) {
             showErrorMessage("Error al crear envío: " + e.getMessage());

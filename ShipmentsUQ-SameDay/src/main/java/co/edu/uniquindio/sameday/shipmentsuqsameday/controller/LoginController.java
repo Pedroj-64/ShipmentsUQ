@@ -29,15 +29,12 @@ public class LoginController {
      * @return El objeto User si la autenticación es exitosa, null si falla
      */
     public User authenticateUser(String email, String password) {
-        // Validaciones básicas
         if (email == null || password == null || email.trim().isEmpty() || password.isEmpty()) {
             throw new IllegalArgumentException("El correo y la contraseña no pueden estar vacíos");
         }
         
-        // Normalizar el email (eliminar espacios y convertir a minúsculas)
         email = email.trim().toLowerCase();
         
-        // Intentar autenticar al usuario
         return userService.authenticate(email, password)
             .orElse(null); // Convertir Optional<User> a User o null
     }
@@ -55,7 +52,6 @@ public class LoginController {
         
         email = email.trim().toLowerCase();
         
-        // Buscar al usuario por email
         return userService.findByEmail(email)
             .map(User::getPassword)
             .orElse(null);

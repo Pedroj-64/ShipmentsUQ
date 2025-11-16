@@ -16,6 +16,10 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     requires javafx.base;
     requires java.desktop;
     requires jdk.httpserver; // Servidor HTTP para el mapa web
+    
+    // Nuevas dependencias para el sistema de routing y simulación
+    requires okhttp3;
+    requires com.google.gson;
 
     opens co.edu.uniquindio.sameday.shipmentsuqsameday to javafx.fxml;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.viewController to javafx.fxml;
@@ -47,4 +51,17 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     // Exportar el paquete de decoradores
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator to javafx.base;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator;
+    
+    // Exportar los nuevos paquetes de routing y simulación
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing.strategy;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing.service;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.simulation;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.simulation.event;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing to javafx.base;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.simulation to javafx.base;
+    
+    // Exportar el nuevo paquete de notificaciones
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.notification;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.notification to javafx.base;
 }

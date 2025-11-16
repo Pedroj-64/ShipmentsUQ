@@ -278,28 +278,40 @@ public class AdminShipmentsViewController implements Initializable, AdminShipmen
             btn_cancelShipment.setDisable(true);
             btn_incident.setDisable(true);
             btn_deleteShipment.setDisable(true);
+            System.out.println("[AdminShipments] No hay envío seleccionado - todos los botones deshabilitados");
             return;
         }
         
         // Habilitar los botones según el estado del envío
         ShipmentStatus status = selectedShipment.getStatus();
+        System.out.println("[AdminShipments] Envío seleccionado - Estado: " + status);
         
         // Solo se puede asignar repartidor a envíos en estado ASSIGNED o PENDING
-        btn_assignCourier.setDisable(status != ShipmentStatus.ASSIGNED && status != ShipmentStatus.PENDING);
+        boolean canAssign = (status == ShipmentStatus.ASSIGNED || status == ShipmentStatus.PENDING);
+        btn_assignCourier.setDisable(!canAssign);
+        System.out.println("[AdminShipments] btn_assignCourier: " + (canAssign ? "HABILITADO" : "deshabilitado"));
         
         // Se puede actualizar estado para cualquier envío que no esté DELIVERED o CANCELLED
-        btn_updateStatus.setDisable(status == ShipmentStatus.DELIVERED || status == ShipmentStatus.CANCELLED);
+        boolean canUpdateStatus = (status != ShipmentStatus.DELIVERED && status != ShipmentStatus.CANCELLED);
+        btn_updateStatus.setDisable(!canUpdateStatus);
+        System.out.println("[AdminShipments] btn_updateStatus: " + (canUpdateStatus ? "HABILITADO" : "deshabilitado"));
         
-        // Solo se pueden cancelar envíos en estado PENDING, ASSIGNED o IN_TRANSIT
-        btn_cancelShipment.setDisable(status == ShipmentStatus.DELIVERED || 
-                                      status == ShipmentStatus.CANCELLED ||
-                                      status == ShipmentStatus.INCIDENT);
+        // Se pueden cancelar envíos en estado PENDING, ASSIGNED o IN_TRANSIT
+        boolean canCancel = (status == ShipmentStatus.PENDING || 
+                            status == ShipmentStatus.ASSIGNED || 
+                            status == ShipmentStatus.IN_TRANSIT);
+        btn_cancelShipment.setDisable(!canCancel);
+        System.out.println("[AdminShipments] btn_cancelShipment: " + (canCancel ? "HABILITADO" : "deshabilitado"));
         
         // Se puede registrar incidencia para cualquier envío que esté en proceso
-        btn_incident.setDisable(status == ShipmentStatus.DELIVERED || status == ShipmentStatus.CANCELLED);
+        boolean canIncident = (status != ShipmentStatus.DELIVERED && status != ShipmentStatus.CANCELLED);
+        btn_incident.setDisable(!canIncident);
+        System.out.println("[AdminShipments] btn_incident: " + (canIncident ? "HABILITADO" : "deshabilitado"));
 
-        // Solo se pueden eliminar envíos en estado PENDING o CANCELLED
-        btn_deleteShipment.setDisable(status != ShipmentStatus.PENDING && status != ShipmentStatus.CANCELLED);
+        // Se pueden eliminar envíos en estado PENDING o CANCELLED
+        boolean canDelete = (status == ShipmentStatus.PENDING || status == ShipmentStatus.CANCELLED);
+        btn_deleteShipment.setDisable(!canDelete);
+        System.out.println("[AdminShipments] btn_deleteShipment: " + (canDelete ? "HABILITADO" : "deshabilitado"));
     }
 
     /**

@@ -27,7 +27,6 @@ import java.util.ResourceBundle;
  */
 public class ProfileAndAddressesViewController implements Initializable {
     
-    // Componentes FXML para el perfil
     @FXML
     private TextField txt_name;
     
@@ -43,7 +42,6 @@ public class ProfileAndAddressesViewController implements Initializable {
     @FXML
     private Button btn_cancelProfile;
     
-    // Componentes FXML para las direcciones
     @FXML
     private TableView<AddressDTO> tbl_address;
     

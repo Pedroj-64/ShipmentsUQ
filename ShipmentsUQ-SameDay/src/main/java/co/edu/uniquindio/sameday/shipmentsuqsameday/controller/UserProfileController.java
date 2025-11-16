@@ -18,9 +18,6 @@ public class UserProfileController {
      */
     public UserProfileController() {
         this.userService = UserService.getInstance();
-        
-        // Obtendremos el usuario actual a través de un método específico
-        // en lugar de obtenerlo en el constructor
         this.currentUser = UserDashboardController.getCurrentUser();
     }
 
@@ -55,12 +52,10 @@ public class UserProfileController {
         }
         
         try {
-            // Actualizar los datos del usuario
             currentUser.setName(name);
             currentUser.setEmail(email);
             currentUser.setPhone(phone);
             
-            // Guardar los cambios
             boolean success = userService.updateUser(currentUser);
             
             return success;
@@ -82,12 +77,10 @@ public class UserProfileController {
         }
         
         try {
-            // Validar la contraseña actual
             if (!userService.validatePassword(currentUser.getId(), currentPassword)) {
                 return false;
             }
             
-            // Cambiar la contraseña
             return userService.changePassword(currentUser.getId(), newPassword);
         } catch (Exception e) {
             e.printStackTrace();

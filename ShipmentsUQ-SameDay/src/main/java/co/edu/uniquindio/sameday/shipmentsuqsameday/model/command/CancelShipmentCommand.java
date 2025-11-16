@@ -31,8 +31,10 @@ public class CancelShipmentCommand implements Command {
      */
     @Override
     public void execute() {
+        System.out.println("[CancelShipmentCommand] Ejecutando - Estado anterior: " + shipment.getStatus());
         this.previousStatus = shipment.getStatus();
         shipment.setStatus(ShipmentStatus.CANCELLED);
+        System.out.println("[CancelShipmentCommand] Nuevo estado: " + shipment.getStatus());
     }
     
     /**
@@ -41,10 +43,15 @@ public class CancelShipmentCommand implements Command {
      */
     @Override
     public boolean undo() {
+        System.out.println("[CancelShipmentCommand] Deshaciendo - Estado actual: " + shipment.getStatus());
+        System.out.println("[CancelShipmentCommand] Estado a restaurar: " + previousStatus);
+        
         if (isUndoable()) {
             shipment.setStatus(previousStatus);
+            System.out.println("[CancelShipmentCommand] Undo exitoso - Estado restaurado: " + shipment.getStatus());
             return true;
         }
+        System.out.println("[CancelShipmentCommand] Undo no es posible");
         return false;
     }
     
@@ -56,7 +63,9 @@ public class CancelShipmentCommand implements Command {
     @Override
     public boolean isUndoable() {
         // Solo se puede deshacer si el envío no estaba entregado o en tránsito
-        return previousStatus != ShipmentStatus.DELIVERED 
+        boolean undoable = previousStatus != ShipmentStatus.DELIVERED 
             && previousStatus != ShipmentStatus.IN_TRANSIT;
+        System.out.println("[CancelShipmentCommand] isUndoable = " + undoable);
+        return undoable;
     }
 }

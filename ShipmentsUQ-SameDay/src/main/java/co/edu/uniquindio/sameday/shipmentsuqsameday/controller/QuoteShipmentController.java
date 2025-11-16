@@ -32,11 +32,9 @@ public class QuoteShipmentController {
         this.shipmentService = ShipmentService.getInstance();
         this.userService = UserService.getInstance();
         
-        // Obtener el ID del usuario actual
         if (App.getCurrentSession() != null) {
             currentUserId = App.getCurrentSession().getUserId();
         } else {
-            // Intentar obtener el usuario desde el UserDashboardController como fallback
             User dashboardUser = UserDashboardController.getCurrentUser();
             if (dashboardUser != null) {
                 currentUserId = dashboardUser.getId();
@@ -92,7 +90,6 @@ public class QuoteShipmentController {
      */
     public double calculateShipmentRate(AddressDTO origin, AddressDTO destination, 
                                         double weight, String dimensions, ShipmentPriority priority) {
-        // Convertir DTOs a entidades de dominio
         Address originAddress = findAddressByDTO(origin);
         Address destinationAddress = findAddressByDTO(destination);
         
@@ -100,7 +97,6 @@ public class QuoteShipmentController {
             throw new IllegalArgumentException("No se encontraron las direcciones especificadas");
         }
         
-        // Calcular tarifa usando el servicio
         return shipmentService.calculateShippingRate(originAddress, destinationAddress, weight, priority);
     }
     
@@ -114,14 +110,12 @@ public class QuoteShipmentController {
             throw new IllegalArgumentException("Los datos del envío no pueden ser nulos");
         }
         
-        // Obtener usuario actual
         Optional<User> userOptional = userService.findById(currentUserId);
         if (!userOptional.isPresent()) {
             throw new IllegalStateException("No se pudo encontrar el usuario actual");
         }
         User user = userOptional.get();
         
-        // Convertir DTOs a entidades de dominio
         Address originAddress = findAddressByDTO(shipmentDTO.getOriginAddress());
         Address destinationAddress = findAddressByDTO(shipmentDTO.getDestinationAddress());
         
@@ -129,7 +123,6 @@ public class QuoteShipmentController {
             throw new IllegalArgumentException("No se encontraron las direcciones especificadas");
         }
         
-        // Crear el envío (el servicio asignará automáticamente el repartidor más cercano)
         return shipmentService.createShipment(
                 user,
                 originAddress,

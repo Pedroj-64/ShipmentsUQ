@@ -65,6 +65,10 @@ public class AddressFormViewController implements Initializable {
     private Coordinates selectedRealOrigin;
     private Coordinates selectedRealDestination;
     
+    // Coordenadas pendientes de establecer en el mapa
+    private Double pendingCoordX;
+    private Double pendingCoordY;
+    
     // Referencia al controlador de ProfileAndAddresses para actualizar su vista
     private ProfileAndAddressesViewController parentController;
     
@@ -143,6 +147,13 @@ public class AddressFormViewController implements Initializable {
             mapViewController.setCoordinateListener((x, y) -> {
                 updateCoordinatesLabel(x, y);
             });
+            
+            // Si hay coordenadas pendientes, establecerlas ahora
+            if (pendingCoordX != null && pendingCoordY != null) {
+                mapViewController.setSelectedCoordinates(pendingCoordX, pendingCoordY);
+                pendingCoordX = null;
+                pendingCoordY = null;
+            }
             
         } catch (Exception e) {
             showErrorMessage("Error al inicializar el mapa: " + e.getMessage());
@@ -336,10 +347,20 @@ public class AddressFormViewController implements Initializable {
         txt_complement.setText(address.getComplement());
         chk_default.setSelected(address.isDefault());
         
-        // Seleccionar coordenadas en el mapa
+        // Obtener coordenadas
         double x = address.getCoordX();
         double y = address.getCoordY();
-        mapViewController.setSelectedCoordinates(x, y);
+        
+        // Si el mapa ya está inicializado, establecer coordenadas directamente
+        if (mapViewController != null) {
+            mapViewController.setSelectedCoordinates(x, y);
+        } else {
+            // Si no está inicializado, guardar para establecer después
+            pendingCoordX = x;
+            pendingCoordY = y;
+        }
+        
+        // Actualizar etiqueta de coordenadas
         updateCoordinatesLabel(x, y);
     }
     

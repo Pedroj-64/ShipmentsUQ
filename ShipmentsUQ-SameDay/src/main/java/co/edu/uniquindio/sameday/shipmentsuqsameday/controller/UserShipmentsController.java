@@ -40,19 +40,15 @@ public class UserShipmentsController {
      * Constructor del controlador de envíos del usuario
      */
     public UserShipmentsController() {
-        // Obtener el servicio base
         this.baseShipmentService = ShipmentService.getInstance();
         
-        // Obtener el servicio decorado del registro
         this.decoratedShipmentService = ShipmentServiceRegistry.getDecoratedService();
         
         this.delivererService = DelivererService.getInstance();
         
-        // Obtener el ID del usuario actual
         if (App.getCurrentSession() != null) {
             currentUserId = App.getCurrentSession().getUserId();
         } else {
-            // Intentar obtener el usuario desde el UserDashboardController como fallback
             User dashboardUser = UserDashboardController.getCurrentUser();
             if (dashboardUser != null) {
                 currentUserId = dashboardUser.getId();
@@ -69,16 +65,13 @@ public class UserShipmentsController {
      * @return lista de DTOs de envío
      */
     public List<ShipmentDTO> getUserShipments() {
-        // Verificar que hay un usuario activo
         if (currentUserId == null) {
             throw new IllegalStateException("No hay un usuario con sesión activa");
         }
         
         try {
-            // Obtener envíos del usuario desde el servicio
             List<Shipment> shipments = baseShipmentService.findByUserId(currentUserId);
             
-            // Convertir a DTOs para la vista
             return shipments.stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
@@ -96,12 +89,16 @@ public class UserShipmentsController {
      */
     public boolean cancelShipment(UUID shipmentId) {
         if (shipmentId == null) {
+            System.err.println("ERROR: shipmentId es null");
             return false;
         }
         
         try {
+            System.out.println("[INFO] Iniciando cancelación de envío: " + shipmentId);
+            
             Optional<Shipment> shipmentOpt = decoratedShipmentService.findById(shipmentId);
             if (!shipmentOpt.isPresent()) {
+                System.err.println("ERROR: Envío no encontrado");
                 return false;
             }
             
@@ -113,13 +110,13 @@ public class UserShipmentsController {
             
             if (shipment.getStatus() != ShipmentStatus.PENDING && 
                 shipment.getStatus() != ShipmentStatus.ASSIGNED) {
-                throw new IllegalStateException("Este envío no puede ser cancelado en su estado actual");
+                throw new IllegalStateException("Este envío no puede ser cancelado en su estado actual: " + shipment.getStatus());
             }
             
             return baseShipmentService.cancelShipment(shipmentId);
             
         } catch (Exception e) {
-            System.err.println("Error al cancelar envío: " + e.getMessage());
+            System.err.println("ERROR al cancelar envío: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Error al cancelar el envío: " + e.getMessage());
         }
@@ -136,7 +133,6 @@ public class UserShipmentsController {
         }
         
         try {
-            // Obtener el envío (usamos el decorado para tener logging)
             Optional<Shipment> shipmentOpt = decoratedShipmentService.findById(shipmentId);
             if (!shipmentOpt.isPresent()) {
                 return "Envío no encontrado";
@@ -144,15 +140,12 @@ public class UserShipmentsController {
             
             Shipment shipment = shipmentOpt.get();
             
-            // Construir información de rastreo
             StringBuilder info = new StringBuilder();
             
             info.append("ID de envío: ").append(shipment.getId()).append("\n\n");
             
-            // Estado actual
             info.append("Estado actual: ").append(shipment.getStatus()).append("\n\n");
             
-            // Fechas importantes
             info.append("Creado: ").append(formatDateTime(shipment.getCreationDate())).append("\n");
             
             if (shipment.getAssignmentDate() != null) {
@@ -165,7 +158,6 @@ public class UserShipmentsController {
             
             info.append("\n");
             
-            // Información del repartidor
             Deliverer deliverer = shipment.getDeliverer();
             if (deliverer != null) {
                 info.append("Repartidor: ").append(deliverer.getName()).append("\n");
@@ -175,14 +167,12 @@ public class UserShipmentsController {
                 info.append("Repartidor: No asignado\n\n");
             }
             
-            // Origen y destino
             Address origin = shipment.getOrigin();
             Address destination = shipment.getDestination();
             
             info.append("Origen: ").append(origin != null ? origin.getFullAddress() : "No especificado").append("\n");
             info.append("Destino: ").append(destination != null ? destination.getFullAddress() : "No especificado").append("\n\n");
             
-            // Información adicional según estado
             switch(shipment.getStatus()) {
                 case PENDING:
                     info.append("Su envío está pendiente de asignación a un repartidor.");
@@ -243,7 +233,6 @@ public class UserShipmentsController {
             return null;
         }
         
-        // Convertir direcciones a DTOs
         AddressDTO originDTO = convertAddressToDTO(shipment.getOrigin());
         AddressDTO destinationDTO = convertAddressToDTO(shipment.getDestination());
         

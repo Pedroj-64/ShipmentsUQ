@@ -32,7 +32,6 @@ public class AdminMetricsController {
      * Constructor del controlador
      */
     public AdminMetricsController() {
-        // Inicializar servicios
         this.shipmentService = ShipmentService.getInstance();
         this.delivererService = DelivererService.getInstance();
     }
@@ -106,12 +105,10 @@ public class AdminMetricsController {
             List<Shipment> allShipments = shipmentService.findAll();
             if (allShipments == null) return statusCount;
             
-            // Inicializar contadores
             for (ShipmentStatus status : ShipmentStatus.values()) {
                 statusCount.put(status, 0);
             }
             
-            // Contar envíos por estado
             for (Shipment shipment : allShipments) {
                 ShipmentStatus status = shipment.getStatus();
                 statusCount.put(status, statusCount.get(status) + 1);

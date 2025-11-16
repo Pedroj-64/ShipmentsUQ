@@ -6,6 +6,9 @@ import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Shipment;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.ShipmentStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.DelivererService;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.ShipmentService;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.simulation.DeliverySimulator;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.simulation.SimulationConfig;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing.strategy.RoutingException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
@@ -27,22 +30,19 @@ import java.util.*;
  */
 public class AdminShipmentsController implements Initializable {
 
-    // Referencia al View Controller para interacciones con la UI
     private ViewController viewController;
 
-    // Colección para almacenar los envíos
     private ObservableList<Shipment> shipmentsList = FXCollections.observableArrayList();
 
-    // Servicios para acceso a datos
     private ShipmentService shipmentService;
     private DelivererService delivererService;
+    private DeliverySimulator deliverySimulator;
 
     /**
      * Inicializa el controlador y configura las colecciones de datos
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        // Esta inicialización se completa cuando se establece el ViewController
     }
 
     /**
@@ -52,11 +52,10 @@ public class AdminShipmentsController implements Initializable {
     public void setViewController(ViewController viewController) {
         this.viewController = viewController;
 
-        // Inicializar servicios
         shipmentService = ShipmentService.getInstance();
         delivererService = DelivererService.getInstance();
+        deliverySimulator = DeliverySimulator.getInstance();
         
-        // Carga inicial de datos
         loadAllShipments();
     }
 
@@ -65,13 +64,10 @@ public class AdminShipmentsController implements Initializable {
      */
     public void loadAllShipments() {
         try {
-            // Limpiar lista actual
             shipmentsList.clear();
             
-            // Cargar envíos desde el servicio
             shipmentsList.addAll(shipmentService.findAll());
             
-            // Actualizar la UI
             if (viewController != null) {
                 viewController.loadTableData(shipmentsList);
             }
@@ -109,7 +105,6 @@ public class AdminShipmentsController implements Initializable {
                 }
             }
             
-            // Actualizar la lista observable y la UI
             shipmentsList.clear();
             shipmentsList.addAll(filteredList);
             
@@ -136,7 +131,6 @@ public class AdminShipmentsController implements Initializable {
             System.out.println("Envío ID: " + shipment.getId());
             System.out.println("Estado actual del envío: " + shipment.getStatus());
             
-            // Obtener TODOS los repartidores para debug
             List<Deliverer> allDeliverers = delivererService.findAll();
             System.out.println("Total de repartidores en el sistema: " + allDeliverers.size());
             
@@ -147,7 +141,6 @@ public class AdminShipmentsController implements Initializable {
                                    " | Zona: " + d.getZone());
             }
             
-            // Obtener la lista de repartidores disponibles
             List<Deliverer> availableDeliverers = delivererService.getAvailableDeliverers();
             System.out.println("Repartidores disponibles para asignación: " + availableDeliverers.size());
             
@@ -404,6 +397,48 @@ public class AdminShipmentsController implements Initializable {
                     // Actualizar el repartidor
                     delivererService.update(deliverer);
                 }
+            } else if (newStatus == ShipmentStatus.IN_TRANSIT) {
+                // ¡NUEVA FUNCIONALIDAD! Iniciar simulación automáticamente
+                try {
+                    // Verificar que el envío tenga repartidor con coordenadas GPS
+                    if (shipment.getDeliverer() != null && 
+                        shipment.getDeliverer().hasRealCoordinates() &&
+                        shipment.getDestination() != null &&
+                        shipment.getDestination().hasGpsCoordinates()) {
+                        
+                        System.out.println("[AdminShipmentsController] Iniciando simulación para envío " + shipment.getId());
+                        
+                        // Iniciar simulación con configuración de producción
+                        deliverySimulator.startSimulation(shipment, SimulationConfig.production());
+                        
+                        System.out.println("[AdminShipmentsController] ✓ Simulación iniciada exitosamente");
+                        
+                        if (viewController != null) {
+                            viewController.showStatusMessage(
+                                "Simulación de entrega iniciada. El envío se completará automáticamente.", 
+                                "success"
+                            );
+                        }
+                    } else {
+                        System.out.println("[AdminShipmentsController] No se puede iniciar simulación: faltan coordenadas GPS");
+                        
+                        if (viewController != null) {
+                            viewController.showStatusMessage(
+                                "Envío en tránsito (sin simulación - faltan coordenadas GPS)", 
+                                "warning"
+                            );
+                        }
+                    }
+                } catch (RoutingException e) {
+                    System.err.println("[AdminShipmentsController] Error al calcular ruta: " + e.getMessage());
+                    
+                    if (viewController != null) {
+                        viewController.showStatusMessage(
+                            "Envío en tránsito (simulación no disponible: " + e.getMessage() + ")", 
+                            "warning"
+                        );
+                    }
+                }
             } else if (newStatus == ShipmentStatus.CANCELLED && previousStatus != ShipmentStatus.CANCELLED) {
                 // Si se cancela y tiene repartidor, quitarlo de sus envíos actuales
                 if (shipment.getDeliverer() != null) {
@@ -412,6 +447,12 @@ public class AdminShipmentsController implements Initializable {
                     
                     // Actualizar el repartidor
                     delivererService.update(deliverer);
+                }
+                
+                // Cancelar simulación si existe
+                if (deliverySimulator.hasActiveSimulation(shipment.getId())) {
+                    deliverySimulator.cancelSimulation(shipment.getId());
+                    System.out.println("[AdminShipmentsController] Simulación cancelada");
                 }
             }
             

@@ -139,8 +139,9 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
             controller.initializeGridMap(pane_mapContainer);
         }
         
-        // Comenzar en modo usuarios
+        // Comenzar en modo usuarios y cargar datos iniciales
         controller.setMode("users");
+        loadTableData(controller.getUsersList());
     }
     
     /**
@@ -149,9 +150,21 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     @SuppressWarnings("unchecked")
     private void refreshTableData() {
         try {
+            if (controller == null) {
+                System.err.println("Controller es null en refreshTableData");
+                return;
+            }
+            
+            List<Object> currentData = (List<Object>)controller.getCurrentData();
+            if (currentData == null) {
+                System.err.println("getCurrentData() retornó null");
+                showStatusMessage("No hay datos para mostrar", "warning");
+                return;
+            }
+            
             DataLoadManager.<Object>loadDataAsync(
                 tbl_data,
-                (List<Object>)controller.getCurrentData(),
+                currentData,
                 currentPage,
                 pageSize
             );
@@ -204,8 +217,16 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
      * Configura los botones de selección de modo
      */
     private void setupModeButtons() {
-        btn_usersMode.setOnAction(e -> controller.setMode("users"));
-        btn_couriersMode.setOnAction(e -> controller.setMode("couriers"));
+        btn_usersMode.setOnAction(e -> {
+            controller.setMode("users");
+            loadTableData(controller.getUsersList());
+            clearForm();
+        });
+        btn_couriersMode.setOnAction(e -> {
+            controller.setMode("couriers");
+            loadTableData(controller.getDeliverersList());
+            clearForm();
+        });
     }
 
     /**
@@ -612,9 +633,19 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
     @Override
     public void loadTableData(ObservableList<?> data) {
         try {
+            if (data == null) {
+                System.err.println("[ERROR] loadTableData recibió data null");
+                showStatusMessage("No hay datos disponibles", "warning");
+                return;
+            }
+            
+            System.out.println("[INFO] Cargando " + data.size() + " elementos en la tabla");
+            
             // Resetear la paginación y selección
             currentPage = 0;
-            tbl_data.getSelectionModel().clearSelection();
+            if (tbl_data != null) {
+                tbl_data.getSelectionModel().clearSelection();
+            }
             
             // Limpiar el formulario y actualizar estado de botones
             clearForm();
@@ -627,7 +658,9 @@ public class AdminUsersCouriersViewController implements Initializable, AdminUse
             updatePaginationControls();
             
             // Mostrar mensaje de éxito
-            showStatusMessage("Datos cargados correctamente", "success");
+            String mode = controller.getMode();
+            String entityType = "users".equals(mode) ? "usuarios" : "repartidores";
+            showStatusMessage(data.size() + " " + entityType + " cargados correctamente", "success");
         } catch (Exception e) {
             e.printStackTrace();
             showStatusMessage("Error al cargar los datos: " + e.getMessage(), "error");

@@ -531,12 +531,12 @@ public class PaymentsViewController implements Initializable {
                     Deliverer deliverer = shipmentOpt.get().getDeliverer();
                     if (deliverer != null) {
                         message += "\n\nSu envío ha sido asignado automáticamente al repartidor " + 
-                                deliverer.getName() + ".";
+                                deliverer.getName() + " y está listo para ser entregado.";
                     } else {
                         message += "\n\nSu envío ha sido asignado y está listo para entrega.";
                     }
-                } else {
-                    message += "\n\nSu envío está siendo procesado. Pronto será asignado a un repartidor.";
+                } else if (shipmentOpt.isPresent() && shipmentOpt.get().getStatus() == ShipmentStatus.PENDING) {
+                    message += "\n\nNo hay repartidores disponibles en este momento. Su envío será asignado automáticamente cuando haya uno disponible.";
                 }
                 
                 showAlert("Éxito", "Pago procesado", message, Alert.AlertType.INFORMATION);

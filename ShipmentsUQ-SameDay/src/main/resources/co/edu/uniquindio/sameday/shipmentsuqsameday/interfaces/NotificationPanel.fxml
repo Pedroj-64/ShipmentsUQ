@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="notificationPanel" maxWidth="400.0" minWidth="350.0" prefWidth="380.0" 
+      styleClass="notification-panel" xmlns="http://javafx.com/javafx/17" 
+      xmlns:fx="http://javafx.com/fxml/1">
+   
+   <!-- Header del panel -->
+   <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="notification-header">
+      <children>
+         <Label text="Notificaciones" styleClass="notification-panel-title">
+            <font>
+               <Font name="System Bold" size="16.0" />
+            </font>
+         </Label>
+         <Region HBox.hgrow="ALWAYS" />
+         <Button fx:id="btn_markAllRead" text="Marcar todas como leídas" styleClass="link-button" />
+         <Button fx:id="btn_closePanel" text="✕" styleClass="close-button" />
+      </children>
+      <padding>
+         <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+      </padding>
+   </HBox>
+   
+   <Separator />
+   
+   <!-- Filtros -->
+   <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="notification-filters">
+      <children>
+         <Button fx:id="btn_filterAll" text="Todas" styleClass="filter-button, filter-active" />
+         <Button fx:id="btn_filterUnread" text="No leídas" styleClass="filter-button" />
+      </children>
+      <padding>
+         <Insets bottom="5.0" left="15.0" right="15.0" top="5.0" />
+      </padding>
+   </HBox>
+   
+   <Separator />
+   
+   <!-- Lista de notificaciones con scroll -->
+   <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS">
+      <VBox fx:id="notificationList" spacing="0.0" styleClass="notification-list">
+         <!-- Las notificaciones se agregarán dinámicamente aquí -->
+         <Label fx:id="lbl_emptyState" text="No tienes notificaciones" 
+                styleClass="empty-state-label" alignment="CENTER" 
+                maxWidth="Infinity" visible="true">
+            <font>
+               <Font size="14.0" />
+            </font>
+            <VBox.margin>
+               <Insets top="40.0" />
+            </VBox.margin>
+         </Label>
+      </VBox>
+   </ScrollPane>
+   
+   <!-- Footer con acciones -->
+   <Separator />
+   <HBox alignment="CENTER" spacing="10.0" styleClass="notification-footer">
+      <children>
+         <Button fx:id="btn_clearRead" text="Eliminar leídas" styleClass="secondary-button" />
+         <Button fx:id="btn_settings" text="Configuración" styleClass="secondary-button" />
+      </children>
+      <padding>
+         <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+      </padding>
+   </HBox>
+   
+</VBox>

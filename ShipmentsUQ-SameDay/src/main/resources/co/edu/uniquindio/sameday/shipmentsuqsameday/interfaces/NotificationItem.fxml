@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<HBox fx:id="notificationItem" alignment="CENTER_LEFT" spacing="10.0" 
+      styleClass="notification-item" xmlns="http://javafx.com/javafx/17" 
+      xmlns:fx="http://javafx.com/fxml/1">
+   
+   <padding>
+      <Insets bottom="10.0" left="15.0" right="15.0" top="10.0" />
+   </padding>
+   
+   <!-- Icono de tipo -->
+   <Label fx:id="lbl_icon" text="📦" styleClass="notification-icon">
+      <font>
+         <Font size="24.0" />
+      </font>
+   </Label>
+   
+   <!-- Contenido -->
+   <VBox spacing="4.0" HBox.hgrow="ALWAYS">
+      <children>
+         <!-- Título y tiempo -->
+         <HBox alignment="CENTER_LEFT" spacing="8.0">
+            <children>
+               <Label fx:id="lbl_title" text="Título de la notificación" styleClass="notification-title">
+                  <font>
+                     <Font name="System Bold" size="13.0" />
+                  </font>
+               </Label>
+               <Region HBox.hgrow="ALWAYS" />
+               <Label fx:id="lbl_time" text="hace 5 min" styleClass="notification-time">
+                  <font>
+                     <Font size="11.0" />
+                  </font>
+               </Label>
+            </children>
+         </HBox>
+         
+         <!-- Mensaje -->
+         <Label fx:id="lbl_message" text="Contenido del mensaje de la notificación" 
+                wrapText="true" styleClass="notification-message">
+            <font>
+               <Font size="12.0" />
+            </font>
+         </Label>
+         
+         <!-- Acciones opcionales -->
+         <HBox spacing="5.0" alignment="CENTER_LEFT" fx:id="hbox_actions" visible="false" managed="false">
+            <children>
+               <Button fx:id="btn_viewShipment" text="Ver envío" styleClass="notification-action-button" />
+            </children>
+            <VBox.margin>
+               <Insets top="5.0" />
+            </VBox.margin>
+         </HBox>
+      </children>
+   </VBox>
+   
+   <!-- Botón de eliminar -->
+   <Button fx:id="btn_delete" text="✕" styleClass="delete-notification-button" />
+   
+   <!-- Indicador de no leída -->
+   <Region fx:id="unreadIndicator" styleClass="unread-indicator" visible="false" 
+           minWidth="8.0" maxWidth="8.0" prefWidth="8.0" minHeight="8.0" maxHeight="8.0" prefHeight="8.0" />
+   
+</HBox>

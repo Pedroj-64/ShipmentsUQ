@@ -119,7 +119,6 @@ public class PaymentsController {
         
         List<Payment> payments = paymentService.findByUser(currentUser.getId());
         
-        // Aplicar filtros si están presentes
         if (date != null) {
             payments = payments.stream()
                     .filter(p -> p.getCreationDate().toLocalDate().equals(date))
@@ -153,7 +152,6 @@ public class PaymentsController {
                 return false;
             }
             
-            // Validar que el envío exista
             Optional<Shipment> shipmentOpt = shipmentService.findById(UUID.fromString(shipmentId));
             if (shipmentOpt.isEmpty()) {
                 return false;
@@ -168,12 +166,10 @@ public class PaymentsController {
             // Si el pago fue exitoso, intentar asignar un repartidor
             if (paymentSuccess) {
                 try {
-                    // Recargar el shipment para tener el estado más reciente
                     shipmentOpt = shipmentService.findById(shipment.getId());
                     if (shipmentOpt.isPresent()) {
                         shipment = shipmentOpt.get();
                         
-                        // Intentar asignar repartidor
                         boolean assignmentSuccess = shipmentService.tryAssignDeliverer(shipment.getId());
                         
                         if (assignmentSuccess) {
@@ -185,7 +181,6 @@ public class PaymentsController {
                 } catch (Exception ex) {
                     System.err.println("Error al intentar asignar repartidor después del pago: " + ex.getMessage());
                     ex.printStackTrace();
-                    // No afectamos el resultado del pago si falla la asignación
                 }
             }
             

@@ -112,3 +112,209 @@
     -fx-alignment: center-left;
     -fx-spacing: 5px;
 }
+
+/* ==================== ESTILOS DE NOTIFICACIONES ==================== */
+
+/* Botón de notificaciones en el header */
+.notification-button-container {
+    -fx-cursor: hand;
+}
+
+.notification-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-padding: 5px 10px;
+    -fx-cursor: hand;
+    -fx-background-radius: 50%;
+}
+
+.notification-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Badge de contador */
+.notification-badge {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 2px 6px;
+    -fx-background-radius: 10px;
+    -fx-min-width: 20px;
+    -fx-alignment: center;
+}
+
+/* Panel de notificaciones */
+.notification-panel {
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 15, 0, -5, 5);
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1px;
+}
+
+.notification-header {
+    -fx-background-color: #f5f5f5;
+}
+
+.notification-panel-title {
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+}
+
+.close-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666;
+    -fx-font-size: 18px;
+    -fx-cursor: hand;
+    -fx-padding: 2px 8px;
+}
+
+.close-button:hover {
+    -fx-background-color: #e0e0e0;
+    -fx-background-radius: 50%;
+}
+
+.link-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1a56a7;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-underline: false;
+}
+
+.link-button:hover {
+    -fx-text-fill: #0d3a6f;
+    -fx-underline: true;
+}
+
+/* Filtros */
+.notification-filters {
+    -fx-background-color: #fafafa;
+}
+
+.filter-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666;
+    -fx-font-size: 13px;
+    -fx-padding: 5px 15px;
+    -fx-cursor: hand;
+    -fx-background-radius: 15px;
+}
+
+.filter-button:hover {
+    -fx-background-color: #e0e0e0;
+}
+
+.filter-active {
+    -fx-background-color: #1a56a7;
+    -fx-text-fill: white;
+}
+
+.filter-active:hover {
+    -fx-background-color: #0d3a6f;
+}
+
+/* Lista de notificaciones */
+.notification-list {
+    -fx-background-color: white;
+}
+
+.empty-state-label {
+    -fx-text-fill: #999;
+    -fx-padding: 40px;
+}
+
+/* Item de notificación */
+.notification-item {
+    -fx-background-color: white;
+    -fx-border-color: transparent transparent #e0e0e0 transparent;
+    -fx-border-width: 1px;
+    -fx-padding: 12px 15px;
+    -fx-cursor: hand;
+}
+
+.notification-item:hover {
+    -fx-background-color: #f5f5f5;
+}
+
+.notification-item-unread {
+    -fx-background-color: #e3f2fd;
+}
+
+.notification-item-unread:hover {
+    -fx-background-color: #bbdefb;
+}
+
+.notification-icon {
+    -fx-text-fill: #666;
+}
+
+.notification-title {
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+}
+
+.notification-time {
+    -fx-text-fill: #999;
+}
+
+.notification-message {
+    -fx-text-fill: #555;
+    -fx-wrap-text: true;
+}
+
+.delete-notification-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #999;
+    -fx-font-size: 16px;
+    -fx-cursor: hand;
+    -fx-padding: 2px 6px;
+}
+
+.delete-notification-button:hover {
+    -fx-background-color: #ffebee;
+    -fx-text-fill: #f44336;
+    -fx-background-radius: 50%;
+}
+
+.unread-indicator {
+    -fx-background-color: #2196F3;
+    -fx-background-radius: 50%;
+}
+
+.notification-action-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #1a56a7;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-border-color: #1a56a7;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-padding: 3px 10px;
+}
+
+.notification-action-button:hover {
+    -fx-background-color: #1a56a7;
+    -fx-text-fill: white;
+}
+
+/* Footer */
+.notification-footer {
+    -fx-background-color: #fafafa;
+}
+
+.secondary-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: #666;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-border-color: #ccc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-padding: 5px 15px;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #e0e0e0;
+}

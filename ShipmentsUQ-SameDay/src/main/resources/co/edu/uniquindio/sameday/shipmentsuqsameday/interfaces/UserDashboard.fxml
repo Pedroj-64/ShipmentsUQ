@@ -17,8 +17,17 @@
       <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="top-bar">
          <children>
             <Label fx:id="lbl_welcomeUser" styleClass="top-bar-label" text="Bienvenido, [NombreUsuario]" HBox.hgrow="ALWAYS" />
-            <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+            <HBox alignment="CENTER_RIGHT" spacing="15.0" HBox.hgrow="ALWAYS">
                <children>
+                  <!-- Botón de notificaciones con badge -->
+                  <StackPane fx:id="stk_notificationButton" styleClass="notification-button-container">
+                     <Button fx:id="btn_notifications" mnemonicParsing="false" styleClass="notification-button" text="🔔" />
+                     <Label fx:id="lbl_notificationBadge" styleClass="notification-badge" text="0" visible="false" StackPane.alignment="TOP_RIGHT">
+                        <StackPane.margin>
+                           <Insets right="2.0" top="2.0" />
+                        </StackPane.margin>
+                     </Label>
+                  </StackPane>
                   <Button fx:id="btn_logout" mnemonicParsing="false" styleClass="logout-button" text="Cerrar Sesión" />
                </children>
             </HBox>

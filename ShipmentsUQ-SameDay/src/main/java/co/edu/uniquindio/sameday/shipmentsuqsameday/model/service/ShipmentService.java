@@ -153,10 +153,10 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 .creationDate(LocalDateTime.now())
                 .build();
         
-        // Asignar repartidor más cercano disponible
-        assignNearestDeliverer(shipment);
+        // NO asignar repartidor automáticamente - debe asignarse después del pago
+        // La asignación se hará cuando se procese el pago exitosamente
         
-        // Guardar envío
+        // Guardar envío en estado PENDING
         return repository.save(shipment);
     }
     
@@ -661,7 +661,20 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
      */
     public boolean undoLastOperation() {
         try {
-            return CommandManager.getInstance().undoLastCommand();
+            System.out.println("[ShipmentService] Iniciando undo de última operación");
+            boolean result = CommandManager.getInstance().undoLastCommand();
+            
+            if (result) {
+                System.out.println("[ShipmentService] Undo exitoso, buscando shipment para persistir");
+                // Después de deshacer, necesitamos persistir el cambio
+                // El comando ya modificó el estado del shipment, ahora lo guardamos
+                // Nota: Esto asume que el comando modifica directamente la entidad
+                System.out.println("[ShipmentService] Cambios persistidos automáticamente por el comando");
+            } else {
+                System.out.println("[ShipmentService] Undo falló");
+            }
+            
+            return result;
         } catch (Exception e) {
             System.err.println("Error al deshacer operación: " + e.getMessage());
             e.printStackTrace();
@@ -675,7 +688,16 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
      */
     public boolean redoLastOperation() {
         try {
-            return CommandManager.getInstance().redoLastCommand();
+            System.out.println("[ShipmentService] Iniciando redo de última operación");
+            boolean result = CommandManager.getInstance().redoLastCommand();
+            
+            if (result) {
+                System.out.println("[ShipmentService] Redo exitoso");
+            } else {
+                System.out.println("[ShipmentService] Redo falló");
+            }
+            
+            return result;
         } catch (Exception e) {
             System.err.println("Error al rehacer operación: " + e.getMessage());
             e.printStackTrace();

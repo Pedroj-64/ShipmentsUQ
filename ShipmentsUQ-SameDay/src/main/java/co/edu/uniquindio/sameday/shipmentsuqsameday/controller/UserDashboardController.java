@@ -10,15 +10,15 @@ import java.time.LocalDateTime;
  * Maneja la lógica relacionada con las funcionalidades del panel de control.
  */
 public class UserDashboardController {
-    
+
     private static User currentUser;
-    
+
     /**
      * Constructor del controlador de dashboard
      */
     public UserDashboardController() {
     }
-    
+
     /**
      * Establece el usuario actual de la sesión
      * @param user Usuario actual
@@ -26,7 +26,7 @@ public class UserDashboardController {
     public static void setCurrentUser(User user) {
         currentUser = user;
     }
-    
+
     /**
      * Obtiene el usuario actual de la sesión
      * @return Usuario actual o null si no hay sesión
@@ -34,7 +34,7 @@ public class UserDashboardController {
     public static User getCurrentUser() {
         return currentUser;
     }
-    
+
     /**
      * Obtiene los datos del usuario actual en formato DTO
      * @return DTO con los datos del usuario
@@ -44,8 +44,7 @@ public class UserDashboardController {
         if (currentUser == null) {
             throw new IllegalStateException("No hay un usuario en sesión");
         }
-        
-        // Convertir el modelo User a UserDTO para la vista
+
         return UserDTO.builder()
             .id(currentUser.getId())
             .name(currentUser.getName())
@@ -54,31 +53,30 @@ public class UserDashboardController {
             .role(currentUser.getRole())
             .build();
     }
-    
+
     /**
      * Registra el acceso a un módulo específico
      * @param moduleName Nombre del módulo accedido
      */
     public void logModuleAccess(String moduleName) {
         if (currentUser != null) {
-            // Aquí podría registrarse en un log o en una tabla de auditoría
-            System.out.println("[" + LocalDateTime.now() + "] Usuario " + 
+
+            System.out.println("[" + LocalDateTime.now() + "] Usuario " +
                 currentUser.getName() + " accedió al módulo: " + moduleName);
         }
     }
-    
+
     /**
      * Procesa el cierre de sesión
      */
     public void logout() {
-        // Aquí podría registrar la hora de cierre de sesión o limpiar datos temporales
-        System.out.println("[" + LocalDateTime.now() + "] Usuario " + 
+
+        System.out.println("[" + LocalDateTime.now() + "] Usuario " +
             (currentUser != null ? currentUser.getName() : "desconocido") + " cerró sesión");
-        
-        // Limpiar referencia al usuario actual
+
         currentUser = null;
     }
-    
+
     /**
      * Obtiene el número de envíos activos del usuario
      * @return Número de envíos activos
@@ -87,10 +85,9 @@ public class UserDashboardController {
         if (currentUser == null) {
             return 0;
         }
-        
-        // Contar los envíos activos (esto podría implementarse mejor con un servicio específico)
+
         return (int) currentUser.getShipmentHistory().stream()
-            .filter(s -> !s.getStatus().toString().equals("DELIVERED") && 
+            .filter(s -> !s.getStatus().toString().equals("DELIVERED") &&
                          !s.getStatus().toString().equals("CANCELLED"))
             .count();
     }

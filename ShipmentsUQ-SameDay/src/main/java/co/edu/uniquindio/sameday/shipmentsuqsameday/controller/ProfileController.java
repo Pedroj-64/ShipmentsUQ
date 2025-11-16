@@ -30,13 +30,11 @@ public class ProfileController {
      * @throws IllegalStateException si no hay un usuario en sesión
      */
     public UserDTO getCurrentUser() {
-        // Obtener el usuario actual desde el controlador del dashboard
         User currentUser = UserDashboardController.getCurrentUser();
         if (currentUser == null) {
             throw new IllegalStateException("No hay un usuario en sesión");
         }
         
-        // Convertir a DTO para la vista
         return UserDTO.builder()
             .id(currentUser.getId())
             .name(currentUser.getName())
@@ -57,7 +55,6 @@ public class ProfileController {
             throw new IllegalStateException("No hay un usuario en sesión");
         }
         
-        // Buscar la dirección predeterminada
         Optional<Address> defaultAddress = currentUser.getAddresses().stream()
             .filter(Address::isDefault)
             .findFirst();
@@ -92,15 +89,12 @@ public class ProfileController {
         }
         
         try {
-            // Actualizar los datos
             currentUser.setName(name);
             currentUser.setEmail(email);
             currentUser.setPhone(phone);
             
-            // Guardar cambios
             userService.getRepository().update(currentUser);
             
-            // Actualizar también la referencia estática
             UserDashboardController.setCurrentUser(currentUser);
             
             return true;
