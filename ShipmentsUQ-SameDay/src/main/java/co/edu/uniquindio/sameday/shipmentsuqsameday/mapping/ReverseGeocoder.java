@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,10 +15,7 @@ import java.util.regex.Pattern;
  * Servicio de geocodificación inversa usando Nominatim (OpenStreetMap)
  * Convierte coordenadas GPS (latitud, longitud) en direcciones legibles
  * 
- * LIMITACIONES:
- * - Máximo 1 petición por segundo (política de uso de Nominatim)
- * - Requiere conexión a internet
- * - Precisión puede variar según la zona
+ * 
  */
 public class ReverseGeocoder {
     
@@ -69,7 +66,7 @@ public class ReverseGeocoder {
             
             // Construir URL con formato Locale.US para evitar problemas con coma decimal
             String urlString = String.format(
-                java.util.Locale.US,
+                Locale.US,
                 "%s?lat=%.6f&lon=%.6f&format=json&addressdetails=1&accept-language=es",
                 NOMINATIM_API_URL,
                 latitude,

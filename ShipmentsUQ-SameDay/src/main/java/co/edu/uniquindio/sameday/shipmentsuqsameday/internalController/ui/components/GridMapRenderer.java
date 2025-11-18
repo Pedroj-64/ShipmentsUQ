@@ -53,7 +53,7 @@ public class GridMapRenderer {
                 coordY = (int)(e.getY() / cellSize);
                 renderMap(); // Volver a dibujar para mostrar la selección
                 
-                // Aquí se podría llamar a un listener para notificar la selección
+                
                 if (coordinateListener != null) {
                     coordinateListener.onCoordinateSelected(coordX, coordY);
                 }

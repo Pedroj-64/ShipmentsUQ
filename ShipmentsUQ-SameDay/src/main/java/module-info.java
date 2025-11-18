@@ -2,8 +2,9 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     requires static lombok;
     requires transitive javafx.controls;
     requires javafx.fxml;
-    requires javafx.web;
+    requires transitive javafx.web;
     requires transitive javafx.graphics;
+   
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
@@ -15,9 +16,9 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     requires jdk.jsobject;
     requires javafx.base;
     requires java.desktop;
-    requires jdk.httpserver; // Servidor HTTP para el mapa web
+    requires jdk.httpserver; 
     
-    // Nuevas dependencias para el sistema de routing y simulación
+  
     requires okhttp3;
     requires com.google.gson;
 
@@ -45,14 +46,14 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.service;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository;
-    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.strategy; // Strategy pattern para coordenadas
-    exports co.edu.uniquindio.sameday.shipmentsuqsameday.mapping; // Paquete del sistema de mapas
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.strategy; 
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.mapping; 
     
-    // Exportar el paquete de decoradores
+
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator to javafx.base;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator;
     
-    // Exportar los nuevos paquetes de routing y simulación
+
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing.strategy;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing.service;
@@ -61,7 +62,7 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing to javafx.base;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.simulation to javafx.base;
     
-    // Exportar el nuevo paquete de notificaciones
+
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.notification;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.notification to javafx.base;
 }

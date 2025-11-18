@@ -1,11 +1,17 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.mapping;
 
 import java.io.Serializable;
+import java.util.Objects;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Representa coordenadas geográficas (latitud y longitud)
  * para ubicaciones en el mapa real
  */
+@Getter
+@Setter
 public class Coordinates implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -81,23 +87,7 @@ public class Coordinates implements Serializable {
     
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(latitude, longitude);
+        return Objects.hash(latitude, longitude);
     }
     
-    // Getters y Setters
-    public double getLatitude() {
-        return latitude;
-    }
-    
-    public void setLatitude(double latitude) {
-        this.latitude = latitude;
-    }
-    
-    public double getLongitude() {
-        return longitude;
-    }
-    
-    public void setLongitude(double longitude) {
-        this.longitude = longitude;
-    }
 }

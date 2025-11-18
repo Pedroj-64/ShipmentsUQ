@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Servicio para integrar el sistema de coordenadas reales con el sistema existente
  * 
- * Patrón de Diseño: ADAPTER PATTERN
+ * Patrón de Diseño: ADAPTER 
  * Propósito: Adaptar el sistema de coordenadas GPS real al sistema de Grid existente,
  * permitiendo que ambos coexistan sin conflictos
  */

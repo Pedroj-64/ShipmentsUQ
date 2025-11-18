@@ -2,6 +2,7 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.internalController;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.App;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto.AddressDTO;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.util.ThemeManager;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -57,7 +58,7 @@ public class AppUtils {
     public static void setCurrentScene(Scene scene) {
         currentScene = scene;
         // Aplicar tema actual a la nueva escena
-        co.edu.uniquindio.sameday.shipmentsuqsameday.util.ThemeManager.getInstance().applyCurrentTheme(scene);
+        ThemeManager.getInstance().applyCurrentTheme(scene);
     }
 
     /**

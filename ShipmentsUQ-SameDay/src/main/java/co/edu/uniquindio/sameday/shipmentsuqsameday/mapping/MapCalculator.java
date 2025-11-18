@@ -117,6 +117,7 @@ public class MapCalculator {
      * @param destination Coordenadas de destino
      * @return String con información detallada del recorrido
      */
+    @SuppressWarnings("unused")
     public static String getRouteInfo(Coordinates origin, Coordinates destination) {
         double distance = origin.distanceTo(destination);
         long time = calculateEstimatedTimeMinutes(origin, destination);
