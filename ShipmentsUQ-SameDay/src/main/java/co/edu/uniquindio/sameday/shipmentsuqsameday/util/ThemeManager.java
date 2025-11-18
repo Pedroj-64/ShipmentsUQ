@@ -11,8 +11,8 @@ import java.util.List;
  * Manages theme application across multiple scenes and persists theme preference.
  * Implements singleton pattern.
  * 
- * @author ShipmentsUQ Team
- * @version 1.0
+ * @author Pedro Jose Soto Rivera
+ * @version 1.1
  */
 public class ThemeManager {
     

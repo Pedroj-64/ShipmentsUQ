@@ -1,4 +1,4 @@
-// 🚴 Mapa para Ubicación de Repartidor (Solo 1 Punto)
+
 // Armenia, Quindío como centro
 const ARMENIA_CENTER = [4.533889, -75.681111];
 const SERVICE_RADIUS_KM = 20;

@@ -11,7 +11,7 @@ import java.util.Properties;
  * Handles loading and saving of user configuration settings including theme, notifications, and privacy options.
  * Implements singleton pattern to ensure single instance across application.
  * 
- * @author ShipmentsUQ Team
+ * @author Maria Jose Valencia
  * @version 1.0
  */
 public class UserPreferences {

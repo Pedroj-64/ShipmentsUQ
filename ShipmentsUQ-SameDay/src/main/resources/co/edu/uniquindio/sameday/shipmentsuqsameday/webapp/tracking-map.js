@@ -1,4 +1,4 @@
-// 📦 Mapa de Tracking (Solo Visualización - No Interactivo)
+
 // Armenia, Quindío como centro
 const ARMENIA_CENTER = [4.533889, -75.681111];
 
