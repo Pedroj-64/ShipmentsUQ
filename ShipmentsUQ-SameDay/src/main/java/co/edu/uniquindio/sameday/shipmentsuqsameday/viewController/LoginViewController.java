@@ -6,7 +6,9 @@ import java.util.ResourceBundle;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.LoginController;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.internalController.AppUtils;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.UserRole;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.util.Session;
 
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -19,8 +21,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 /**
- * Controlador de vista para la pantalla de inicio de sesión.
- * Maneja la interacción del usuario con la interfaz de login.
+ * Controlador de vista para la pantalla de inicio de sesión unificado.
+ * Maneja la autenticación tanto de usuarios como de repartidores.
  */
 public class LoginViewController implements Initializable {
 
@@ -109,31 +111,36 @@ public class LoginViewController implements Initializable {
     }
 
     /**
-     * Maneja el evento de clic en el botón de inicio de sesión
+     * Maneja el evento de clic en el botón de inicio de sesión.
+     * Login unificado: detecta automáticamente si es usuario (email) o repartidor (documento).
      * 
      * @param event El evento de acción
      */
     private void handleLogin(ActionEvent event) {
         // Obtener datos del formulario
-        String email = txt_email.getText().trim();
+        String identifier = txt_email.getText().trim();
         String password = txt_password.getText();
 
         // Validar que los campos no estén vacíos
-        if (email.isEmpty() || password.isEmpty()) {
+        if (identifier.isEmpty() || password.isEmpty()) {
             showErrorMessage("Por favor complete todos los campos");
             return;
         }
 
         try {
-            // Intentar iniciar sesión
-            User authenticatedUser = controller.authenticateUser(email, password);
+            // Intentar autenticación unificada
+            Object authenticated = controller.authenticateAny(identifier, password);
 
-            if (authenticatedUser != null) {
+            if (authenticated != null) {
                 // Mostrar mensaje de éxito brevemente antes de navegar
                 showSuccessMessage("Inicio de sesión exitoso");
 
-                // Navegación según el rol del usuario
-                redirectUserBasedOnRole(authenticatedUser);
+                // Navegación según el tipo de usuario
+                if (authenticated instanceof User) {
+                    redirectUserBasedOnRole((User) authenticated);
+                } else if (authenticated instanceof Deliverer) {
+                    redirectDelivererToDashboard((Deliverer) authenticated);
+                }
             } else {
                 showErrorMessage("Credenciales incorrectas");
             }
@@ -176,6 +183,25 @@ public class LoginViewController implements Initializable {
             }
         } catch (Exception e) {
             showErrorMessage("Error al cambiar de ventana: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Redirige al repartidor a su dashboard
+     * 
+     * @param deliverer El repartidor autenticado
+     */
+    private void redirectDelivererToDashboard(Deliverer deliverer) {
+        try {
+            // Guardar en sesión
+            Session.getInstance().setCurrentDeliverer(deliverer);
+            System.out.println("✅ Repartidor autenticado: " + deliverer.getName());
+            
+            // Navegar al dashboard del repartidor
+            AppUtils.navigateTo("DelivererDashboard.fxml", btn_login);
+        } catch (Exception e) {
+            showErrorMessage("Error al cargar dashboard de repartidor: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -279,4 +305,5 @@ public class LoginViewController implements Initializable {
             e.printStackTrace();
         }
     }
+    
 }

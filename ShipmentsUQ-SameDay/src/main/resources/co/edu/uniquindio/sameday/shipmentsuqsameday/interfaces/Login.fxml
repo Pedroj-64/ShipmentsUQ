@@ -29,10 +29,10 @@
                   <Insets bottom="15.0" left="10.0" right="10.0" top="15.0" />
                </padding>
                
-               <!-- Fila para campo de correo -->
+               <!-- Fila para campo de identificador -->
                <children>
-                  <Label fx:id="lbl_email" styleClass="form-label" text="Correo" GridPane.columnIndex="0" GridPane.rowIndex="0" />
-                  <TextField fx:id="txt_email" promptText="Ingrese su correo electrónico" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                  <Label fx:id="lbl_email" styleClass="form-label" text="Email/Documento" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                  <TextField fx:id="txt_email" promptText="Email (usuarios) o Documento (repartidores)" GridPane.columnIndex="1" GridPane.rowIndex="0" />
                   
                   <!-- Fila para campo de contraseña -->
                   <Label fx:id="lbl_password" styleClass="form-label" text="Contraseña" GridPane.columnIndex="0" GridPane.rowIndex="1" />

@@ -15,7 +15,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
 
 /**
@@ -49,6 +51,12 @@ public class RegisterViewController implements Initializable {
     @FXML
     private Label lbl_phone;
     @FXML
+    private Label lbl_document;
+    @FXML
+    private Label lbl_zone;
+    @FXML
+    private Label lbl_userType;
+    @FXML
     private Label lbl_status;
     @FXML
     private Label lbl_title;
@@ -64,6 +72,16 @@ public class RegisterViewController implements Initializable {
     private TextField txt_name;
     @FXML
     private TextField txt_phone;
+    @FXML
+    private TextField txt_document;
+    @FXML
+    private TextField txt_zone;
+    @FXML
+    private RadioButton rb_user;
+    @FXML
+    private RadioButton rb_deliverer;
+    @FXML
+    private ToggleGroup tg_userType;
 
     // Controlador de negocio
     private RegisterController controller;
@@ -81,6 +99,7 @@ public class RegisterViewController implements Initializable {
         initController();
         initButtonListeners();
         initFormValidation();
+        initUserTypeListener();
 
         // Configuración inicial de la interfaz
         clearStatus();
@@ -110,6 +129,8 @@ public class RegisterViewController implements Initializable {
         txt_name.textProperty().addListener((observable, oldValue, newValue) -> clearStatus());
         txt_email.textProperty().addListener((observable, oldValue, newValue) -> clearStatus());
         txt_phone.textProperty().addListener((observable, oldValue, newValue) -> clearStatus());
+        txt_document.textProperty().addListener((observable, oldValue, newValue) -> clearStatus());
+        txt_zone.textProperty().addListener((observable, oldValue, newValue) -> clearStatus());
         txtp_password.textProperty().addListener((observable, oldValue, newValue) -> clearStatus());
         txtp_confirmPassword.textProperty().addListener((observable, oldValue, newValue) -> clearStatus());
         txt_city.textProperty().addListener((observable, oldValue, newValue) -> clearStatus());
@@ -124,12 +145,57 @@ public class RegisterViewController implements Initializable {
     }
 
     /**
+     * Configura el listener para el tipo de usuario (Usuario/Repartidor)
+     */
+    private void initUserTypeListener() {
+        tg_userType.selectedToggleProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == rb_deliverer) {
+                showDelivererFields();
+            } else {
+                hideDelivererFields();
+            }
+        });
+    }
+
+    /**
+     * Muestra los campos específicos para repartidores
+     */
+    private void showDelivererFields() {
+        lbl_document.setVisible(true);
+        lbl_document.setManaged(true);
+        txt_document.setVisible(true);
+        txt_document.setManaged(true);
+        
+        lbl_zone.setVisible(true);
+        lbl_zone.setManaged(true);
+        txt_zone.setVisible(true);
+        txt_zone.setManaged(true);
+    }
+
+    /**
+     * Oculta los campos específicos para repartidores
+     */
+    private void hideDelivererFields() {
+        lbl_document.setVisible(false);
+        lbl_document.setManaged(false);
+        txt_document.setVisible(false);
+        txt_document.setManaged(false);
+        txt_document.clear();
+        
+        lbl_zone.setVisible(false);
+        lbl_zone.setManaged(false);
+        txt_zone.setVisible(false);
+        txt_zone.setManaged(false);
+        txt_zone.clear();
+    }
+
+    /**
      * Maneja el evento de clic en el botón de registro
      * 
      * @param event El evento de acción
      */
     private void handleRegister(ActionEvent event) {
-        // Obtener datos del formulario
+        // Obtener datos comunes del formulario
         String name = txt_name.getText().trim();
         String email = txt_email.getText().trim();
         String phone = txt_phone.getText().trim();
@@ -137,12 +203,24 @@ public class RegisterViewController implements Initializable {
         String confirmPassword = txtp_confirmPassword.getText();
         String city = txt_city.getText().trim();
         boolean termsAccepted = chb_terms.isSelected();
+        boolean isDeliverer = rb_deliverer.isSelected();
 
-        // Validar que los campos no estén vacíos
+        // Validar campos comunes
         if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || password.isEmpty()
                 || confirmPassword.isEmpty() || city.isEmpty()) {
             showErrorStatus("Por favor complete todos los campos");
             return;
+        }
+
+        // Si es repartidor, validar campos adicionales
+        if (isDeliverer) {
+            String document = txt_document.getText().trim();
+            String zone = txt_zone.getText().trim();
+            
+            if (document.isEmpty() || zone.isEmpty()) {
+                showErrorStatus("Por favor complete el documento y zona de trabajo");
+                return;
+            }
         }
 
         // Validar que las contraseñas coincidan
@@ -158,18 +236,35 @@ public class RegisterViewController implements Initializable {
         }
 
         try {
-            // Intentar registrar al usuario
-            controller.registerUser(name, email, phone, password, city);
-
-            // Mostrar mensaje de éxito
-            showSuccessStatus("Usuario registrado exitosamente");
-
-            // Mostrar alerta y redirigir a la pantalla de inicio de sesión
-            AppUtils.showAlertAndRedirect(
-                    "Registro exitoso",
-                    "Su cuenta ha sido creada. Ahora puede iniciar sesión con sus credenciales.",
-                    AlertType.INFORMATION,
-                    "Login");
+            if (isDeliverer) {
+                // Registrar repartidor
+                String document = txt_document.getText().trim();
+                String zone = txt_zone.getText().trim();
+                controller.registerDeliverer(name, email, phone, password, city, document, zone);
+                
+                // Mostrar mensaje de éxito
+                showSuccessStatus("Repartidor registrado exitosamente");
+                
+                // Mostrar alerta y redirigir
+                AppUtils.showAlertAndRedirect(
+                        "Registro exitoso",
+                        "Tu cuenta de repartidor ha sido creada. Ahora puedes iniciar sesión en el portal de repartidores.",
+                        AlertType.INFORMATION,
+                        "Login");
+            } else {
+                // Registrar usuario normal
+                controller.registerUser(name, email, phone, password, city);
+                
+                // Mostrar mensaje de éxito
+                showSuccessStatus("Usuario registrado exitosamente");
+                
+                // Mostrar alerta y redirigir
+                AppUtils.showAlertAndRedirect(
+                        "Registro exitoso",
+                        "Tu cuenta ha sido creada. Ahora puedes iniciar sesión con tus credenciales.",
+                        AlertType.INFORMATION,
+                        "Login");
+            }
 
         } catch (IllegalArgumentException e) {
             // Error específico de validación

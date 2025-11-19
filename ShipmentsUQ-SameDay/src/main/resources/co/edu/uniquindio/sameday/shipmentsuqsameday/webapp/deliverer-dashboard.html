@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Repartidor | ShipmentsUQ</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            background: #f1f5f9;
+        }
+
+        #dashboard-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            padding: 20px 30px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-refresh {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-refresh:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-logout:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 380px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Metrics */
+        .metrics {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+        }
+
+        .metric-card.success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .metric-card.warning {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .metric-card.info {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* Shipments List */
+        .shipments-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px;
+            background: #f8fafc;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .section-header h2 {
+            font-size: 18px;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .section-header p {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .shipments-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .shipment-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .shipment-card:hover {
+            border-color: #f59e0b;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .shipment-card.selected {
+            border-color: #f59e0b;
+            background: #fef3c7;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+        }
+
+        .shipment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .shipment-id {
+            font-weight: 700;
+            color: #f59e0b;
+            font-size: 14px;
+        }
+
+        .shipment-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-in-transit {
+            background: #dbeafe;
+            color: #1e3a8a;
+        }
+
+        .shipment-info {
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .shipment-info strong {
+            color: #1e293b;
+        }
+
+        .shipment-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-route {
+            flex: 1;
+            background: #3b82f6;
+            color: white;
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .btn-route:hover {
+            background: #2563eb;
+        }
+
+        .btn-complete {
+            flex: 1;
+            background: #10b981;
+            color: white;
+            padding: 8px;
+            font-size: 12px;
+        }
+
+        .btn-complete:hover {
+            background: #059669;
+        }
+
+        /* Map Container */
+        .map-container {
+            flex: 1;
+            position: relative;
+            background: #e2e8f0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Route Info Panel */
+        .route-info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            min-width: 280px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .route-info-panel.visible {
+            display: block;
+        }
+
+        .route-info-panel h3 {
+            font-size: 16px;
+            color: #1e293b;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .route-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .route-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .route-stat-label {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .route-stat-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .btn-navigate {
+            width: 100%;
+            background: #10b981;
+            color: white;
+            margin-top: 15px;
+        }
+
+        .btn-navigate:hover {
+            background: #059669;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Scrollbar */
+        .shipments-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .shipments-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        .shipments-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .shipments-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Legend */
+        .map-legend {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+        }
+
+        .legend-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .legend-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="dashboard-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <h1 id="deliverer-name">🚴 Dashboard - Repartidor</h1>
+                <p id="deliverer-status">Estado: Activo</p>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-refresh" onclick="refreshData()">
+                    🔄 Actualizar
+                </button>
+                <button class="btn btn-logout" onclick="logout()">
+                    🚪 Cerrar Sesión
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Metrics -->
+                <div class="metrics">
+                    <div class="metric-card warning">
+                        <div class="metric-label">Envíos Activos</div>
+                        <div class="metric-value" id="active-shipments">0</div>
+                    </div>
+                    <div class="metric-card success">
+                        <div class="metric-label">Total Entregas</div>
+                        <div class="metric-value" id="total-deliveries">0</div>
+                    </div>
+                    <div class="metric-card info">
+                        <div class="metric-label">Calificación</div>
+                        <div class="metric-value" id="average-rating">0.0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Estado</div>
+                        <div class="metric-value" id="deliverer-status-metric">-</div>
+                    </div>
+                </div>
+
+                <!-- Shipments List -->
+                <div class="shipments-section">
+                    <div class="section-header">
+                        <h2>📦 Envíos Asignados</h2>
+                        <p>Selecciona un envío para calcular la ruta</p>
+                    </div>
+                    <div class="shipments-list" id="shipments-list">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <p>No hay envíos activos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="map-container">
+                <div id="map"></div>
+                
+                <!-- Route Info Panel -->
+                <div class="route-info-panel" id="route-info-panel">
+                    <h3>🗺️ Información de Ruta</h3>
+                    <div class="route-stats">
+                        <div class="route-stat">
+                            <span class="route-stat-label">Distancia</span>
+                            <span class="route-stat-value" id="route-distance">-- km</span>
+                        </div>
+                        <div class="route-stat">
+                            <span class="route-stat-label">Tiempo Estimado</span>
+                            <span class="route-stat-value" id="route-time">-- min</span>
+                        </div>
+                        <div class="route-stat">
+                            <span class="route-stat-label">Destino</span>
+                            <span class="route-stat-value" id="route-destination">--</span>
+                        </div>
+                    </div>
+                    <button class="btn btn-navigate" onclick="startNavigation()">
+                        🧭 Iniciar Navegación
+                    </button>
+                </div>
+
+                <!-- Legend -->
+                <div class="map-legend">
+                    <div class="legend-title">Leyenda</div>
+                    <div class="legend-item">
+                        <div class="legend-icon" style="background: #3b82f6; color: white;">🚴</div>
+                        <span>Tu ubicación</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-icon" style="background: #10b981; color: white;">📍</div>
+                        <span>Punto de recogida</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-icon" style="background: #ef4444; color: white;">🎯</div>
+                        <span>Destino de entrega</span>
+                    </div>
+                    <div class="legend-item">
+                        <div style="width: 20px; height: 3px; background: #f59e0b;"></div>
+                        <span>Ruta óptima</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Dashboard Logic -->
+    <script src="deliverer-dashboard.js"></script>
+</body>
+</html>

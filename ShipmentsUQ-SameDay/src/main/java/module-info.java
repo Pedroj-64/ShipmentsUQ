@@ -1,5 +1,6 @@
 module co.edu.uniquindio.sameday.shipmentsuqsameday {
     requires static lombok;
+    requires static java.compiler; // Para Lombok annotations
     requires transitive javafx.controls;
     requires javafx.fxml;
     requires transitive javafx.web;

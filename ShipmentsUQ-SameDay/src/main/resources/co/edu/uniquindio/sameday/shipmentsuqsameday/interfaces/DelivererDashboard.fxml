@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.RowConstraints?>
+
+<BorderPane styleClass="root" stylesheets="@../css/deliverer-dashboard.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.DelivererDashboardViewController">
+   
+   <!-- Barra superior -->
+   <top>
+      <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="header">
+         <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+         </padding>
+         <children>
+            <Label fx:id="lbl_title" styleClass="header-title" text="Dashboard - Repartidor" />
+            <HBox HBox.hgrow="ALWAYS" />
+            <Label fx:id="lbl_delivererName" styleClass="deliverer-name" text="Nombre del Repartidor" />
+            <Button fx:id="btn_logout" mnemonicParsing="false" styleClass="logout-button" text="Cerrar Sesión" />
+         </children>
+      </HBox>
+   </top>
+
+   <!-- Contenido principal -->
+   <center>
+      <ScrollPane fitToWidth="true" styleClass="scroll-pane">
+         <content>
+            <VBox spacing="20.0" styleClass="content-container">
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+               
+               <children>
+                  <!-- Métricas del repartidor -->
+                  <HBox spacing="15.0" styleClass="metrics-container">
+                     <children>
+                        <VBox alignment="CENTER" styleClass="metric-card">
+                           <children>
+                              <Label fx:id="lbl_activeShipmentsCount" styleClass="metric-value" text="0" />
+                              <Label styleClass="metric-label" text="Envíos Activos" />
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                           </padding>
+                        </VBox>
+                        
+                        <VBox alignment="CENTER" styleClass="metric-card">
+                           <children>
+                              <Label fx:id="lbl_totalDeliveries" styleClass="metric-value" text="0" />
+                              <Label styleClass="metric-label" text="Total Entregas" />
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                           </padding>
+                        </VBox>
+                        
+                        <VBox alignment="CENTER" styleClass="metric-card">
+                           <children>
+                              <Label fx:id="lbl_averageRating" styleClass="metric-value" text="0.0" />
+                              <Label styleClass="metric-label" text="Calificación Promedio" />
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                           </padding>
+                        </VBox>
+                        
+                        <VBox alignment="CENTER" styleClass="metric-card">
+                           <children>
+                              <Label fx:id="lbl_status" styleClass="metric-value" text="DISPONIBLE" />
+                              <Label styleClass="metric-label" text="Estado" />
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  
+                  <Separator />
+                  
+                  <!-- Contenedor de envíos y mapa -->
+                  <GridPane hgap="20.0" vgap="20.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="350" percentWidth="40.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="60.0" />
+                     </columnConstraints>
+                     
+                     <children>
+                        <!-- Lista de envíos activos -->
+                        <VBox spacing="10.0" styleClass="section" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                           <children>
+                              <Label styleClass="section-title" text="Envíos Activos" />
+                              <ListView fx:id="listView_shipments" prefHeight="400.0" styleClass="shipments-list" />
+                              <HBox alignment="CENTER" spacing="10.0">
+                                 <children>
+                                    <Button fx:id="btn_calculateRoute" mnemonicParsing="false" styleClass="route-button" text="🗺️ Calcular Ruta" />
+                                    <Button fx:id="btn_markDelivered" mnemonicParsing="false" styleClass="action-button" text="✅ Entregar" />
+                                 </children>
+                                 <padding>
+                                    <Insets top="10.0" />
+                                 </padding>
+                              </HBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                        </VBox>
+                        
+                        <!-- Información del envío seleccionado -->
+                        <VBox spacing="15.0" styleClass="section" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                           <children>
+                              <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                 <children>
+                                    <Label styleClass="section-title" text="Detalles del Envío" />
+                                    <HBox HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="btn_refresh" mnemonicParsing="false" styleClass="secondary-button" text="🔄 Actualizar" />
+                                 </children>
+                              </HBox>
+                              
+                              <VBox spacing="10.0" styleClass="shipment-details">
+                                 <children>
+                                    <Label fx:id="lbl_shipmentInfo" styleClass="info-text" text="Selecciona un envío de la lista para ver sus detalles" wrapText="true" />
+                                    
+                                    <VBox spacing="5.0" fx:id="vbox_shipmentDetails" visible="false" managed="false">
+                                       <children>
+                                          <Label fx:id="lbl_shipmentId" styleClass="detail-label" text="ID: -" />
+                                          <Label fx:id="lbl_customer" styleClass="detail-label" text="Cliente: -" />
+                                          <Label fx:id="lbl_origin" styleClass="detail-label" text="Origen: -" wrapText="true" />
+                                          <Label fx:id="lbl_destination" styleClass="detail-label" text="Destino: -" wrapText="true" />
+                                          <Label fx:id="lbl_shipmentStatus" styleClass="detail-label" text="Estado: -" />
+                                       </children>
+                                    </VBox>
+                                    
+                                    <Separator />
+                                    
+                                    <Label styleClass="info-text" text="🗺️ Visualización de Ruta" />
+                                    <Label styleClass="help-text" text="Presiona 'Calcular Ruta' para abrir el mapa con la ruta óptima en tu navegador" wrapText="true" />
+                                 </children>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                        </VBox>
+                     </children>
+                  </GridPane>
+                  
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </center>
+</BorderPane>

@@ -95,3 +95,15 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 2);
     -fx-padding: 30px;
 }
+
+/* Estilo para el enlace del portal de repartidores */
+.deliverer-link {
+    -fx-text-fill: #2a5298;
+    -fx-font-weight: 600;
+    -fx-padding: 10 0 0 0;
+}
+
+.deliverer-link:hover {
+    -fx-text-fill: #1e3c72;
+    -fx-underline: true;
+}

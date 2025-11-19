@@ -1,0 +1,193 @@
+/* deliverer-dashboard.css - Estilos para el dashboard de repartidores */
+
+/* Contenedor principal */
+.root {
+    -fx-background-color: #f5f7fa;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Barra superior */
+.header {
+    -fx-background-color: linear-gradient(to right, #1e3c72, #2a5298);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 8, 0, 0, 2);
+}
+
+.header-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.deliverer-name {
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+    -fx-font-weight: 500;
+}
+
+.logout-button {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-padding: 8 20;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.logout-button:hover {
+    -fx-background-color: #d32f2f;
+}
+
+/* Contenedor de contenido */
+.content-container {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+/* Métricas */
+.metrics-container {
+    -fx-alignment: CENTER;
+}
+
+.metric-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 8, 0, 0, 2);
+    -fx-min-width: 150px;
+    -fx-pref-width: 180px;
+}
+
+.metric-card:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 12, 0, 0, 3);
+    -fx-translate-y: -2px;
+}
+
+.metric-value {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2a5298;
+}
+
+.metric-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #666;
+    -fx-padding: 5 0 0 0;
+}
+
+/* Secciones */
+.section {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0, 0, 2);
+}
+
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+/* Lista de envíos */
+.shipments-list {
+    -fx-background-color: #fafafa;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.shipments-list .list-cell {
+    -fx-background-color: white;
+    -fx-border-color: #eeeeee;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 10;
+}
+
+.shipments-list .list-cell:selected {
+    -fx-background-color: #e3f2fd;
+    -fx-text-fill: #1976d2;
+}
+
+.shipments-list .list-cell:hover {
+    -fx-background-color: #f5f5f5;
+}
+
+/* Mapa */
+.map-canvas {
+    -fx-background-color: #e8eaf6;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0, 0, 0);
+}
+
+.route-info {
+    -fx-background-color: #f9f9f9;
+    -fx-padding: 10;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+}
+
+.route-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #333;
+}
+
+.route-detail {
+    -fx-font-size: 13px;
+    -fx-text-fill: #666;
+}
+
+/* Botones */
+.action-button {
+    -fx-background-color: #4caf50;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-padding: 10 25;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0, 0, 2);
+}
+
+.action-button:hover {
+    -fx-background-color: #45a049;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0, 0, 3);
+}
+
+.action-button:pressed {
+    -fx-translate-y: 1px;
+}
+
+.secondary-button {
+    -fx-background-color: #f5f5f5;
+    -fx-text-fill: #555;
+    -fx-font-size: 13px;
+    -fx-padding: 10 25;
+    -fx-background-radius: 5px;
+    -fx-border-color: #ccc;
+    -fx-border-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #e0e0e0;
+}
+
+.route-button {
+    -fx-background-color: #2196f3;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-padding: 8 20;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.route-button:hover {
+    -fx-background-color: #1976d2;
+}
+
+/* Separador */
+.separator {
+    -fx-background-color: #e0e0e0;
+}

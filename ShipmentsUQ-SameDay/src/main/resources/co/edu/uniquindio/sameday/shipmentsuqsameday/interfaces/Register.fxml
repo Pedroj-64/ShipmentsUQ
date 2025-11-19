@@ -5,7 +5,9 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -19,7 +21,7 @@
    <top>
       <HBox alignment="CENTER" styleClass="header-container" BorderPane.alignment="CENTER">
          <children>
-            <Label fx:id="lbl_title" styleClass="header-title" text="Registro de Usuario" />
+            <Label fx:id="lbl_title" styleClass="header-title" text="Registro en ShipmentsUQ" />
          </children>
          <padding>
             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -42,21 +44,41 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label fx:id="lbl_name" styleClass="form-label" text="Nombre completo:" />
-                  <Label fx:id="lbl_email" styleClass="form-label" text="Correo electrónico:" GridPane.rowIndex="1" />
-                  <Label fx:id="lbl_phone" styleClass="form-label" text="Teléfono:" GridPane.rowIndex="2" />
-                  <Label fx:id="lbl_password" styleClass="form-label" text="Contraseña:" GridPane.rowIndex="3" />
-                  <Label fx:id="lbl_confirmPassword" styleClass="form-label" text="Confirmar contraseña:" GridPane.rowIndex="4" />
-                  <Label fx:id="lbl_city" styleClass="form-label" text="Ciudad:" GridPane.rowIndex="5" />
-                  <TextField fx:id="txt_name" promptText="Ingrese su nombre completo" styleClass="form-field" GridPane.columnIndex="1" />
-                  <TextField fx:id="txt_email" promptText="ejemplo@correo.com" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <TextField fx:id="txt_phone" promptText="+57 300 123 4567" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <PasswordField fx:id="txtp_password" promptText="Mínimo 8 caracteres" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <PasswordField fx:id="txtp_confirmPassword" promptText="Repita su contraseña" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <TextField fx:id="txt_city" promptText="Ciudad de residencia" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <CheckBox fx:id="chb_terms" mnemonicParsing="false" styleClass="terms-checkbox" text="He leído y acepto los términos y condiciones." GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <Label fx:id="lbl_userType" styleClass="form-label" text="Tipo de registro:" />
+                  <HBox spacing="20.0" GridPane.columnIndex="1">
+                     <children>
+                        <RadioButton fx:id="rb_user" mnemonicParsing="false" selected="true" styleClass="user-type-radio" text="👤 Usuario">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="tg_userType" />
+                           </toggleGroup>
+                        </RadioButton>
+                        <RadioButton fx:id="rb_deliverer" mnemonicParsing="false" styleClass="user-type-radio" text="🚴 Repartidor" toggleGroup="$tg_userType" />
+                     </children>
+                  </HBox>
+                  
+                  <Label fx:id="lbl_name" styleClass="form-label" text="Nombre completo:" GridPane.rowIndex="1" />
+                  <Label fx:id="lbl_email" styleClass="form-label" text="Correo electrónico:" GridPane.rowIndex="2" />
+                  <Label fx:id="lbl_phone" styleClass="form-label" text="Teléfono:" GridPane.rowIndex="3" />
+                  <Label fx:id="lbl_document" styleClass="form-label" text="Documento:" GridPane.rowIndex="4" managed="false" visible="false" />
+                  <Label fx:id="lbl_zone" styleClass="form-label" text="Zona de trabajo:" GridPane.rowIndex="5" managed="false" visible="false" />
+                  <Label fx:id="lbl_password" styleClass="form-label" text="Contraseña:" GridPane.rowIndex="6" />
+                  <Label fx:id="lbl_confirmPassword" styleClass="form-label" text="Confirmar contraseña:" GridPane.rowIndex="7" />
+                  <Label fx:id="lbl_city" styleClass="form-label" text="Ciudad:" GridPane.rowIndex="8" />
+                  
+                  <TextField fx:id="txt_name" promptText="Ingrese su nombre completo" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="txt_email" promptText="ejemplo@correo.com" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <TextField fx:id="txt_phone" promptText="+57 300 123 4567" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <TextField fx:id="txt_document" promptText="Número de documento" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="4" managed="false" visible="false" />
+                  <TextField fx:id="txt_zone" promptText="Ej: Norte, Sur, Centro" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="5" managed="false" visible="false" />
+                  <PasswordField fx:id="txtp_password" promptText="Mínimo 8 caracteres" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                  <PasswordField fx:id="txtp_confirmPassword" promptText="Repita su contraseña" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <TextField fx:id="txt_city" promptText="Ciudad de residencia" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                  <CheckBox fx:id="chb_terms" mnemonicParsing="false" styleClass="terms-checkbox" text="He leído y acepto los términos y condiciones." GridPane.columnIndex="1" GridPane.rowIndex="9" />
                </children>
                <padding>
                   <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />

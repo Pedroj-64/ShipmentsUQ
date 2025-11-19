@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruta de Entrega | ShipmentsUQ</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+
+        .info-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            max-width: 350px;
+        }
+
+        .info-panel h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #1f2937;
+            border-bottom: 2px solid #f59e0b;
+            padding-bottom: 10px;
+        }
+
+        .info-item {
+            margin-bottom: 12px;
+            display: flex;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #6b7280;
+            min-width: 80px;
+        }
+
+        .info-value {
+            color: #1f2937;
+        }
+
+        .route-stats {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .route-stats h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #92400e;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            background: white;
+            padding: 30px 50px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .loading.hidden {
+            display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #f59e0b;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Calculando ruta óptima...</p>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="info-panel">
+        <h2>🚚 Detalles de la Ruta</h2>
+        <div class="info-item">
+            <span class="info-label">📦 Envío:</span>
+            <span class="info-value" id="shipment-id">-</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">👤 Cliente:</span>
+            <span class="info-value" id="customer-name">-</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">📍 Origen:</span>
+            <span class="info-value" id="origin-address">-</span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">🎯 Destino:</span>
+            <span class="info-value" id="destination-address">-</span>
+        </div>
+        
+        <div class="route-stats">
+            <h3>📊 Estadísticas de Ruta</h3>
+            <div class="stat-item">
+                <span>Distancia:</span>
+                <strong id="route-distance">-</strong>
+            </div>
+            <div class="stat-item">
+                <span>Tiempo estimado:</span>
+                <strong id="route-time">-</strong>
+            </div>
+            <div class="stat-item">
+                <span>Nodos en ruta:</span>
+                <strong id="route-nodes">-</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // ========================
+        // ALGORITMO DE DIJKSTRA
+        // ========================
+
+        class Graph {
+            constructor() {
+                this.nodes = new Map();
+                this.edges = new Map();
+            }
+
+            addNode(id, lat, lng, name = '') {
+                this.nodes.set(id, { id, lat, lng, name });
+            }
+
+            addEdge(from, to, weight) {
+                if (!this.edges.has(from)) {
+                    this.edges.set(from, []);
+                }
+                this.edges.get(from).push({ to, weight });
+                
+                // Agregar edge bidireccional
+                if (!this.edges.has(to)) {
+                    this.edges.set(to, []);
+                }
+                this.edges.get(to).push({ to: from, weight });
+            }
+
+            dijkstra(startId, endId) {
+                const distances = new Map();
+                const previous = new Map();
+                const unvisited = new Set(this.nodes.keys());
+
+                // Inicializar distancias
+                this.nodes.forEach((_, nodeId) => {
+                    distances.set(nodeId, nodeId === startId ? 0 : Infinity);
+                    previous.set(nodeId, null);
+                });
+
+                while (unvisited.size > 0) {
+                    // Encontrar nodo no visitado con menor distancia
+                    let currentNode = null;
+                    let minDistance = Infinity;
+                    
+                    for (const nodeId of unvisited) {
+                        const dist = distances.get(nodeId);
+                        if (dist < minDistance) {
+                            minDistance = dist;
+                            currentNode = nodeId;
+                        }
+                    }
+
+                    if (currentNode === null || minDistance === Infinity) break;
+                    if (currentNode === endId) break;
+
+                    unvisited.delete(currentNode);
+
+                    // Actualizar distancias de vecinos
+                    const neighbors = this.edges.get(currentNode) || [];
+                    for (const { to, weight } of neighbors) {
+                        if (!unvisited.has(to)) continue;
+
+                        const newDist = distances.get(currentNode) + weight;
+                        if (newDist < distances.get(to)) {
+                            distances.set(to, newDist);
+                            previous.set(to, currentNode);
+                        }
+                    }
+                }
+
+                // Reconstruir ruta
+                const path = [];
+                let current = endId;
+                
+                while (current !== null) {
+                    path.unshift(current);
+                    current = previous.get(current);
+                }
+
+                return {
+                    path,
+                    distance: distances.get(endId),
+                    found: distances.get(endId) !== Infinity
+                };
+            }
+        }
+
+        // ========================
+        // CREAR GRAFO DE ARMENIA
+        // ========================
+
+        function createArmeniaGraph() {
+            const graph = new Graph();
+
+            // Nodos principales de Armenia con coordenadas GPS reales
+            graph.addNode('centro', 4.533889, -75.681111, 'Centro');
+            graph.addNode('norte', 4.550000, -75.670000, 'Zona Norte');
+            graph.addNode('sur', 4.520000, -75.690000, 'Zona Sur');
+            graph.addNode('este', 4.540000, -75.665000, 'Zona Este');
+            graph.addNode('oeste', 4.530000, -75.700000, 'Zona Oeste');
+            graph.addNode('circunvalar', 4.545000, -75.685000, 'Av. Circunvalar');
+            graph.addNode('bolivar', 4.535000, -75.675000, 'Av. Bolívar');
+            graph.addNode('centenario', 4.525000, -75.680000, 'Av. Centenario');
+            graph.addNode('la_14', 4.530000, -75.685000, 'La 14');
+            graph.addNode('portal', 4.548000, -75.678000, 'Portal del Quindío');
+            graph.addNode('unicentro', 4.542000, -75.672000, 'Unicentro');
+            graph.addNode('fundadores', 4.537000, -75.677000, 'Fundadores');
+            graph.addNode('san_jose', 4.528000, -75.695000, 'San José');
+
+            // Conexiones con distancias (en km)
+            graph.addEdge('centro', 'norte', 2.5);
+            graph.addEdge('centro', 'sur', 2.3);
+            graph.addEdge('centro', 'este', 2.0);
+            graph.addEdge('centro', 'oeste', 2.2);
+            graph.addEdge('centro', 'bolivar', 0.8);
+            graph.addEdge('centro', 'la_14', 1.0);
+            graph.addEdge('norte', 'este', 1.5);
+            graph.addEdge('norte', 'circunvalar', 1.2);
+            graph.addEdge('norte', 'portal', 0.9);
+            graph.addEdge('norte', 'unicentro', 1.3);
+            graph.addEdge('sur', 'oeste', 1.8);
+            graph.addEdge('sur', 'centenario', 1.0);
+            graph.addEdge('sur', 'san_jose', 1.2);
+            graph.addEdge('este', 'bolivar', 1.1);
+            graph.addEdge('este', 'unicentro', 0.7);
+            graph.addEdge('oeste', 'la_14', 1.4);
+            graph.addEdge('oeste', 'san_jose', 0.9);
+            graph.addEdge('circunvalar', 'bolivar', 1.3);
+            graph.addEdge('circunvalar', 'portal', 1.0);
+            graph.addEdge('bolivar', 'fundadores', 0.6);
+            graph.addEdge('bolivar', 'unicentro', 0.8);
+            graph.addEdge('centenario', 'la_14', 0.7);
+            graph.addEdge('la_14', 'fundadores', 0.9);
+            graph.addEdge('fundadores', 'unicentro', 0.8);
+
+            return graph;
+        }
+
+        // ========================
+        // FUNCIONES AUXILIARES
+        // ========================
+
+        function getClosestNode(graph, lat, lng) {
+            let closestNode = null;
+            let minDistance = Infinity;
+
+            graph.nodes.forEach((node, nodeId) => {
+                const dist = calculateDistance(lat, lng, node.lat, node.lng);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    closestNode = nodeId;
+                }
+            });
+
+            return closestNode;
+        }
+
+        function calculateDistance(lat1, lng1, lat2, lng2) {
+            const R = 6371; // Radio de la Tierra en km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // ========================
+        // INICIALIZACIÓN
+        // ========================
+
+        let map;
+        const graph = createArmeniaGraph();
+
+        // Obtener parámetros de la URL
+        const params = new URLSearchParams(window.location.search);
+        const shipmentId = params.get('id') || 'N/A';
+        const customer = params.get('customer') || 'Cliente';
+        const originLat = parseFloat(params.get('originLat')) || 4.540000;
+        const originLng = parseFloat(params.get('originLng')) || -75.670000;
+        const originAddr = params.get('originAddr') || 'Dirección de origen';
+        const destLat = parseFloat(params.get('destLat')) || 4.520000;
+        const destLng = parseFloat(params.get('destLng')) || -75.690000;
+        const destAddr = params.get('destAddr') || 'Dirección de destino';
+
+        // Actualizar panel de información
+        document.getElementById('shipment-id').textContent = shipmentId;
+        document.getElementById('customer-name').textContent = customer;
+        document.getElementById('origin-address').textContent = originAddr;
+        document.getElementById('destination-address').textContent = destAddr;
+
+        // Inicializar mapa
+        document.addEventListener('DOMContentLoaded', function() {
+            map = L.map('map').setView([4.533889, -75.681111], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            // Calcular y mostrar ruta
+            calculateAndDisplayRoute();
+        });
+
+        function calculateAndDisplayRoute() {
+            // Encontrar nodos más cercanos
+            const startNode = getClosestNode(graph, originLat, originLng);
+            const endNode = getClosestNode(graph, destLat, destLng);
+
+            console.log('🔍 Nodo origen:', startNode);
+            console.log('🔍 Nodo destino:', endNode);
+
+            // Ejecutar Dijkstra
+            const result = graph.dijkstra(startNode, endNode);
+
+            if (!result.found) {
+                alert('No se encontró una ruta entre los puntos');
+                document.getElementById('loading').classList.add('hidden');
+                return;
+            }
+
+            console.log('✅ Ruta calculada:', result);
+
+            // Dibujar ruta en el mapa
+            const routeCoords = result.path.map(nodeId => {
+                const node = graph.nodes.get(nodeId);
+                return [node.lat, node.lng];
+            });
+
+            // Línea de ruta
+            L.polyline(routeCoords, {
+                color: '#f59e0b',
+                weight: 5,
+                opacity: 0.8
+            }).addTo(map);
+
+            // Marcador de origen
+            L.marker([originLat, originLng], {
+                icon: L.divIcon({
+                    className: 'origin-marker',
+                    html: '<div style="background: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white;">📍</div>',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map).bindPopup('<b>Origen</b><br>' + originAddr);
+
+            // Marcador de destino
+            L.marker([destLat, destLng], {
+                icon: L.divIcon({
+                    className: 'dest-marker',
+                    html: '<div style="background: #ef4444; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white;">🎯</div>',
+                    iconSize: [30, 30]
+                })
+            }).addTo(map).bindPopup('<b>Destino</b><br>' + destAddr);
+
+            // Ajustar vista del mapa
+            const bounds = L.latLngBounds(routeCoords);
+            bounds.extend([originLat, originLng]);
+            bounds.extend([destLat, destLng]);
+            map.fitBounds(bounds, { padding: [50, 50] });
+
+            // Actualizar estadísticas
+            const distanceKm = result.distance.toFixed(2);
+            const timeMinutes = Math.ceil(result.distance * 3); // Aprox. 3 min por km
+            
+            document.getElementById('route-distance').textContent = distanceKm + ' km';
+            document.getElementById('route-time').textContent = timeMinutes + ' min';
+            document.getElementById('route-nodes').textContent = result.path.length;
+
+            // Ocultar loading
+            document.getElementById('loading').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
