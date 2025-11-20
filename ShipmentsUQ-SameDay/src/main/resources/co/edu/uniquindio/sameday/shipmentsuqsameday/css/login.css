@@ -107,3 +107,30 @@
     -fx-text-fill: #1e3c72;
     -fx-underline: true;
 }
+
+/* Estilo para botón de versión web */
+.web-button {
+    -fx-background-color: linear-gradient(to bottom, #667eea, #764ba2);
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 8 15;
+    -fx-background-radius: 20px;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(three-pass-box, rgba(102, 126, 234, 0.4), 8, 0, 0, 2);
+}
+
+.web-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #5a67d8, #6b42a1);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.web-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #4c51bf, #5a3589);
+}
+
+.info-label {
+    -fx-text-fill: #666666;
+    -fx-font-size: 12px;
+}

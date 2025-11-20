@@ -19,6 +19,15 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     requires java.desktop;
     requires jdk.httpserver; 
     
+    // Spring Boot y dependencias web
+    requires spring.boot;
+    requires spring.boot.autoconfigure;
+    requires spring.web;
+    requires spring.webmvc;
+    requires spring.context;
+    requires spring.beans;
+    requires spring.core;
+    requires org.slf4j;
   
     requires okhttp3;
     requires com.google.gson;
@@ -26,12 +35,12 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     opens co.edu.uniquindio.sameday.shipmentsuqsameday to javafx.fxml;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.viewController to javafx.fxml;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.controller to javafx.fxml;
-    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model to javafx.base;
-    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums to javafx.base;
-    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces to javafx.base;
-    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto to javafx.base;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model to javafx.base, com.google.gson;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums to javafx.base, com.google.gson;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces to javafx.base, com.google.gson;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.dto to javafx.base, com.google.gson;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.mapping to javafx.base;
-    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.util to javafx.base;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.util to javafx.base, com.google.gson;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.internalController to javafx.fxml;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.repository to javafx.base;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.service to javafx.base;
@@ -50,6 +59,13 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.strategy; 
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.mapping; 
     
+    // Exportar paquetes webapp para Spring Boot
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.webapp;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.webapp.api;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.webapp.config;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.webapp to spring.core, spring.beans, spring.context;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.webapp.api to spring.core, spring.beans, spring.context, spring.web;
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.webapp.config to spring.core, spring.beans, spring.context;
 
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator to javafx.base;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator;

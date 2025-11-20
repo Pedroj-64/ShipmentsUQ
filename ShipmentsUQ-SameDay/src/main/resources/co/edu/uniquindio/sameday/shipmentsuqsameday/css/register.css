@@ -100,3 +100,30 @@
 .register-image {
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 6, 0, 0, 1);
 }
+
+/* Contenedor de términos y condiciones */
+.terms-container {
+    -fx-background-color: #F0F7FF;
+    -fx-border-color: #D0E1FF;
+    -fx-border-width: 0 0 0 2px;
+    -fx-background-radius: 0 0 0 0;
+}
+
+.terms-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 15px;
+    -fx-text-fill: #1a56a7;
+}
+
+.terms-subtitle {
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-text-fill: #2563EB;
+    -fx-padding: 0 0 5 0;
+}
+
+.terms-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #555555;
+    -fx-line-spacing: 3px;
+}

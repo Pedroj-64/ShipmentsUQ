@@ -17,7 +17,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" styleClass="root" stylesheets="@../css/register.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.RegisterViewController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" styleClass="root" stylesheets="@../css/register.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="co.edu.uniquindio.sameday.shipmentsuqsameday.viewController.RegisterViewController">
    <top>
       <HBox alignment="CENTER" styleClass="header-container" BorderPane.alignment="CENTER">
          <children>
@@ -29,12 +29,12 @@
       </HBox>
    </top>
    <center>
-      <VBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" spacing="15.0" BorderPane.alignment="CENTER">
          <children>
-            <GridPane hgap="12.0" styleClass="form-container" vgap="14.0">
+            <GridPane hgap="15.0" styleClass="form-container" vgap="12.0">
               <columnConstraints>
-                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="250.0" />
+                <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" maxWidth="140.0" minWidth="140.0" prefWidth="140.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="260.0" />
               </columnConstraints>
               <rowConstraints>
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -78,7 +78,7 @@
                   <PasswordField fx:id="txtp_password" promptText="Mínimo 8 caracteres" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                   <PasswordField fx:id="txtp_confirmPassword" promptText="Repita su contraseña" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="7" />
                   <TextField fx:id="txt_city" promptText="Ciudad de residencia" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                  <CheckBox fx:id="chb_terms" mnemonicParsing="false" styleClass="terms-checkbox" text="He leído y acepto los términos y condiciones." GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                  <CheckBox fx:id="chb_terms" mnemonicParsing="false" styleClass="terms-checkbox" text="He leído y acepto los términos y condiciones de tratamiento de datos personales." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="9" />
                </children>
                <padding>
                   <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />
@@ -106,7 +106,7 @@
          </BorderPane.margin>
       </VBox>
    </bottom>
-   <right>
+   <left>
       <VBox alignment="CENTER" styleClass="image-container" BorderPane.alignment="CENTER">
          <children>
             <ImageView fx:id="img_register" fitHeight="300.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" styleClass="register-image">
@@ -114,6 +114,26 @@
                   <Image url="@../images/register-delivery.png" />
                </image>
             </ImageView>
+         </children>
+      </VBox>
+   </left>
+   <right>
+      <VBox alignment="TOP_LEFT" spacing="12.0" styleClass="terms-container" prefWidth="250.0" BorderPane.alignment="CENTER">
+         <padding>
+            <Insets top="30.0" right="20.0" bottom="30.0" left="20.0" />
+         </padding>
+         <children>
+            <Label text="📋 Términos y Condiciones" styleClass="terms-title" wrapText="true" />
+            <Label text="MargaDev-Society" styleClass="terms-subtitle" wrapText="true" />
+            <Label wrapText="true" styleClass="terms-text">
+               <text>Al registrarte, aceptas que MargaDev-Society recopile y procese tus datos personales (nombre, correo, teléfono y ciudad) para la prestación del servicio de envíos.
+
+Tus datos serán tratados de forma confidencial, utilizados únicamente para gestionar tus pedidos y mejorar nuestro servicio.
+
+No compartiremos tu información con terceros sin tu consentimiento, excepto cuando sea requerido por ley.
+
+Tienes derecho a acceder, actualizar o eliminar tus datos en cualquier momento contactándonos.</text>
+            </Label>
          </children>
       </VBox>
    </right>

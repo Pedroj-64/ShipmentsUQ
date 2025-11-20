@@ -48,6 +48,8 @@ public class LoginViewController implements Initializable {
     private TextField txt_email;
     @FXML
     private PasswordField txt_password;
+    @FXML
+    private Button btn_webVersion;
 
     // Controlador de negocio
     private LoginController controller;
@@ -90,6 +92,7 @@ public class LoginViewController implements Initializable {
     private void initButtonListeners() {
         btn_login.setOnAction(this::handleLogin);
         btn_register.setOnAction(this::handleRegister);
+        btn_webVersion.setOnAction(this::handleOpenWebVersion);
 
         // Configurar el enlace de recuperación de contraseña
         lbl_forgotPassword.getStyleClass().add("clickable");
@@ -302,6 +305,55 @@ public class LoginViewController implements Initializable {
             showErrorMessage("Error en el formato del correo: " + e.getMessage());
         } catch (Exception e) {
             showErrorMessage("Error al procesar la solicitud: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Maneja el evento de abrir la versión web
+     * Inicia el servidor web y abre el navegador
+     * 
+     * @param event El evento de acción
+     */
+    private void handleOpenWebVersion(ActionEvent event) {
+        try {
+            showSuccessMessage("Iniciando servidor web...");
+            
+            // Iniciar servidor web en un thread separado (daemon para que no bloquee el cierre de la app)
+            Thread serverThread = new Thread(() -> {
+                try {
+                    System.out.println("=".repeat(60));
+                    System.out.println("🚀 INICIANDO SERVIDOR WEB SPRING BOOT");
+                    System.out.println("=".repeat(60));
+                    co.edu.uniquindio.sameday.shipmentsuqsameday.webapp.WebApplication.main(new String[]{});
+                } catch (Exception e) {
+                    System.err.println("❌ ERROR al iniciar servidor web: " + e.getMessage());
+                    e.printStackTrace();
+                    Platform.runLater(() -> 
+                        showErrorMessage("Error al iniciar servidor web: " + e.getMessage())
+                    );
+                }
+            });
+            serverThread.setDaemon(true);
+            serverThread.setName("SpringBootWebServer");
+            serverThread.start();
+            
+            // Esperar a que el servidor inicie
+            Thread.sleep(3000);
+            
+            // Abrir navegador con el frontend React
+            String webUrl = "http://localhost:3000";
+            co.edu.uniquindio.sameday.shipmentsuqsameday.App.getAppHostServices().showDocument(webUrl);
+            
+            System.out.println("✅ Servidor web iniciado en http://localhost:8080");
+            System.out.println("📚 API disponible en http://localhost:8080/api");
+            System.out.println("🌐 Frontend disponible en http://localhost:3000");
+            System.out.println("💡 IMPORTANTE: Ejecuta 'npm run dev' en la carpeta frontend");
+            
+            showSuccessMessage("Servidor API iniciado!\nAhora ejecuta el frontend con 'npm run dev'");
+            
+        } catch (Exception e) {
+            showErrorMessage("Error al abrir versión web: " + e.getMessage());
             e.printStackTrace();
         }
     }

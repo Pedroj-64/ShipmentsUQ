@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShipmentsUQ - API Web</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        
+        .status {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-bottom: 30px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .api-section {
+            background: #f5f5f5;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .api-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        
+        .endpoint {
+            background: white;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            transition: transform 0.2s;
+        }
+        
+        .endpoint:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .method {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 0.9em;
+        }
+        
+        .method.get { background: #61affe; color: white; }
+        .method.post { background: #49cc90; color: white; }
+        .method.put { background: #fca130; color: white; }
+        .method.delete { background: #f93e3e; color: white; }
+        
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .endpoint-desc {
+            color: #666;
+            margin-top: 5px;
+            font-size: 0.95em;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            text-align: left;
+        }
+        
+        .info-box strong {
+            color: #1976D2;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📦</div>
+        <h1>ShipmentsUQ API</h1>
+        <p class="subtitle">Sistema de Gestión de Envíos - Versión Web</p>
+        
+        <div class="status">✅ API Activa y Funcionando</div>
+        
+        <div class="info-box">
+            <strong>💡 Nota:</strong> Esta es la API REST del sistema. El frontend React está en desarrollo. 
+            Por ahora puedes probar los endpoints usando herramientas como Postman, Thunder Client, o curl.
+        </div>
+        
+        <div class="api-section">
+            <h2>🔐 Autenticación</h2>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/api/auth/login</span>
+                <div class="endpoint-desc">Iniciar sesión (usuario o repartidor)</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/api/auth/register</span>
+                <div class="endpoint-desc">Registrar nuevo usuario</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/api/auth/register/deliverer</span>
+                <div class="endpoint-desc">Registrar nuevo repartidor</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/api/auth/health</span>
+                <div class="endpoint-desc">Verificar estado del servidor</div>
+            </div>
+        </div>
+        
+        <div class="api-section">
+            <h2>📦 Envíos</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/api/shipments/user/{userId}</span>
+                <div class="endpoint-desc">Obtener envíos de un usuario</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/api/shipments/{id}</span>
+                <div class="endpoint-desc">Obtener detalles de un envío</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/api/shipments/quote</span>
+                <div class="endpoint-desc">Calcular cotización de envío</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/api/shipments/deliverer/{delivererId}</span>
+                <div class="endpoint-desc">Obtener envíos de un repartidor</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method put">PUT</span>
+                <span class="endpoint-path">/api/shipments/{id}/status</span>
+                <div class="endpoint-desc">Actualizar estado de un envío</div>
+            </div>
+        </div>
+        
+        <div class="api-section">
+            <h2>💳 Pagos</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/api/payments/history</span>
+                <div class="endpoint-desc">Historial de pagos</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/api/payments/process</span>
+                <div class="endpoint-desc">Procesar un pago</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/api/payments/methods</span>
+                <div class="endpoint-desc">Obtener métodos de pago guardados</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method delete">DELETE</span>
+                <span class="endpoint-path">/api/payments/methods/{id}</span>
+                <div class="endpoint-desc">Eliminar método de pago</div>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method put">PUT</span>
+                <span class="endpoint-path">/api/payments/methods/{id}/alias</span>
+                <div class="endpoint-desc">Actualizar alias de método de pago</div>
+            </div>
+        </div>
+        
+        <div class="info-box">
+            <strong>🌐 URL Base:</strong> <a href="http://localhost:8080/api">http://localhost:8080/api</a><br>
+            <strong>📚 Documentación Completa:</strong> Ver archivo <code>GUIA-VERSION-WEB.md</code> en el proyecto
+        </div>
+        
+        <div class="footer">
+            <p>Desarrollado por <strong>MargaDev-Society</strong></p>
+            <p>ShipmentsUQ © 2025</p>
+        </div>
+    </div>
+</body>
+</html>

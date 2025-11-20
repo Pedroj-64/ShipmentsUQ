@@ -1,0 +1,219 @@
+// ==========================================
+// MIXINS - Utilidades Reutilizables
+// ==========================================
+
+@use './variables' as *;
+
+// Responsive Breakpoints
+@mixin respond-to($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (min-width: breakpoint($breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint #{$breakpoint} no existe";
+  }
+}
+
+// Flexbox Center
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Grid Responsive
+@mixin grid($columns: 12, $gap: spacing(6)) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+}
+
+// Glassmorphism Effect
+@mixin glass($blur: 12px, $opacity: 0.1) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@mixin glass-dark($blur: 12px, $opacity: 0.1) {
+  background: rgba(0, 0, 0, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+// Smooth Scrollbar
+@mixin scrollbar($width: 8px, $track-color: color(gray-100), $thumb-color: color(gray-400)) {
+  &::-webkit-scrollbar {
+    width: $width;
+    height: $width;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $track-color;
+    border-radius: radius(base);
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $thumb-color;
+    border-radius: radius(base);
+    
+    &:hover {
+      background: darken($thumb-color, 10%);
+    }
+  }
+}
+
+// Truncate Text
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin line-clamp($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// Hover Effects
+@mixin hover-lift($distance: 4px) {
+  transition: transform transition(base), box-shadow transition(base);
+  
+  &:hover {
+    transform: translateY(-#{$distance});
+    box-shadow: shadow(lg);
+  }
+}
+
+@mixin hover-scale($scale: 1.05) {
+  transition: transform transition(base);
+  
+  &:hover {
+    transform: scale($scale);
+  }
+}
+
+@mixin hover-glow($color: color(primary)) {
+  transition: box-shadow transition(base);
+  
+  &:hover {
+    box-shadow: 0 0 20px rgba($color, 0.4);
+  }
+}
+
+// Focus Styles
+@mixin focus-ring($color: color(primary)) {
+  outline: none;
+  
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba($color, 0.3);
+  }
+}
+
+// Animations
+@mixin fade-in($duration: transition(base)) {
+  animation: fadeIn $duration ease-in-out;
+}
+
+@mixin slide-in($direction: 'up', $duration: transition(base)) {
+  @if $direction == 'up' {
+    animation: slideInUp $duration ease-out;
+  } @else if $direction == 'down' {
+    animation: slideInDown $duration ease-out;
+  } @else if $direction == 'left' {
+    animation: slideInLeft $duration ease-out;
+  } @else if $direction == 'right' {
+    animation: slideInRight $duration ease-out;
+  }
+}
+
+// Gradient Text
+@mixin gradient-text($gradient: gradient(primary)) {
+  background: $gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// Card Base
+@mixin card($padding: spacing(6)) {
+  background: color(white);
+  border-radius: radius(xl);
+  padding: $padding;
+  box-shadow: shadow(base);
+  transition: all transition(base);
+}
+
+// Button Reset
+@mixin button-reset {
+  appearance: none;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+// Absolute Center
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+// Aspect Ratio
+@mixin aspect-ratio($width: 16, $height: 9) {
+  position: relative;
+  
+  &::before {
+    content: '';
+    display: block;
+    padding-top: percentage($height / $width);
+  }
+  
+  > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Skeleton Loading
+@mixin skeleton {
+  background: linear-gradient(
+    90deg,
+    color(gray-200) 25%,
+    color(gray-100) 50%,
+    color(gray-200) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+// Disabled State
+@mixin disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}

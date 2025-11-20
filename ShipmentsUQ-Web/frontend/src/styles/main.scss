@@ -1,0 +1,389 @@
+// ==========================================
+// MAIN STYLES - ShipmentsUQ
+// ==========================================
+
+@use './variables' as *;
+@use './mixins' as *;
+@use './animations';
+@use './components';
+@use './utilities';
+
+// Importar Google Fonts
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+// Reset y Base
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: $font-family-base;
+  font-size: font-size(base);
+  line-height: 1.6;
+  color: color(gray-900);
+  background: color(gray-50);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+// Typography
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-family-display;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: spacing(4);
+  color: color(gray-900);
+}
+
+h1 {
+  font-size: font-size(5xl);
+  
+  @include respond-to(md) {
+    font-size: 3.5rem;
+  }
+}
+
+h2 {
+  font-size: font-size(4xl);
+}
+
+h3 {
+  font-size: font-size(3xl);
+}
+
+h4 {
+  font-size: font-size(2xl);
+}
+
+h5 {
+  font-size: font-size(xl);
+}
+
+h6 {
+  font-size: font-size(lg);
+}
+
+p {
+  margin-bottom: spacing(4);
+  color: color(gray-700);
+}
+
+a {
+  color: color(primary);
+  text-decoration: none;
+  transition: color transition(base);
+  
+  &:hover {
+    color: color(primary-dark);
+  }
+}
+
+// Layout Utilities
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 spacing(6);
+  
+  @include respond-to(md) {
+    padding: 0 spacing(8);
+  }
+}
+
+.section {
+  padding: spacing(12) 0;
+  
+  @include respond-to(md) {
+    padding: spacing(20) 0;
+  }
+}
+
+// Grid System
+.grid {
+  display: grid;
+  gap: spacing(6);
+  
+  &-cols-1 { grid-template-columns: repeat(1, 1fr); }
+  &-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  &-cols-3 { grid-template-columns: repeat(3, 1fr); }
+  &-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  
+  // Responsive
+  @include respond-to(md) {
+    &-md-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    &-md-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    &-md-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  }
+  
+  @include respond-to(lg) {
+    &-lg-cols-2 { grid-template-columns: repeat(2, 1fr); }
+    &-lg-cols-3 { grid-template-columns: repeat(3, 1fr); }
+    &-lg-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  }
+}
+
+// Flex Utilities
+.flex {
+  display: flex;
+  
+  &-center { @include flex-center; }
+  &-between { @include flex-between; }
+  &-column { @include flex-column; }
+  
+  &-wrap { flex-wrap: wrap; }
+  &-nowrap { flex-wrap: nowrap; }
+  
+  &-1 { flex: 1; }
+}
+
+// Spacing Utilities
+@each $key, $value in $spacing {
+  .m-#{$key} { margin: $value; }
+  .mt-#{$key} { margin-top: $value; }
+  .mb-#{$key} { margin-bottom: $value; }
+  .ml-#{$key} { margin-left: $value; }
+  .mr-#{$key} { margin-right: $value; }
+  .mx-#{$key} { margin-left: $value; margin-right: $value; }
+  .my-#{$key} { margin-top: $value; margin-bottom: $value; }
+  
+  .p-#{$key} { padding: $value; }
+  .pt-#{$key} { padding-top: $value; }
+  .pb-#{$key} { padding-bottom: $value; }
+  .pl-#{$key} { padding-left: $value; }
+  .pr-#{$key} { padding-right: $value; }
+  .px-#{$key} { padding-left: $value; padding-right: $value; }
+  .py-#{$key} { padding-top: $value; padding-bottom: $value; }
+  
+  .gap-#{$key} { gap: $value; }
+}
+
+// Text Utilities
+.text {
+  &-center { text-align: center; }
+  &-left { text-align: left; }
+  &-right { text-align: right; }
+  
+  @each $key, $value in $font-sizes {
+    &-#{$key} { font-size: $value; }
+  }
+  
+  &-bold { font-weight: 700; }
+  &-semibold { font-weight: 600; }
+  &-medium { font-weight: 500; }
+  &-normal { font-weight: 400; }
+  &-light { font-weight: 300; }
+  
+  &-gradient {
+    @include gradient-text;
+  }
+  
+  &-truncate {
+    @include truncate;
+  }
+}
+
+// Color Utilities
+@each $name, $value in $colors {
+  .text-#{$name} { color: $value; }
+  .bg-#{$name} { background-color: $value; }
+}
+
+// Border Radius
+@each $key, $value in $radius {
+  .rounded-#{$key} { border-radius: $value; }
+}
+
+// Shadow Utilities
+@each $key, $value in $shadows {
+  .shadow-#{$key} { box-shadow: $value; }
+}
+
+// Animation Utilities
+.animate {
+  &-fade-in { animation: fadeIn 0.3s ease-out; }
+  &-slide-up { animation: slideInUp 0.3s ease-out; }
+  &-slide-down { animation: slideInDown 0.3s ease-out; }
+  &-slide-left { animation: slideInLeft 0.3s ease-out; }
+  &-slide-right { animation: slideInRight 0.3s ease-out; }
+  &-scale-in { animation: scaleIn 0.3s ease-out; }
+  &-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+  &-spin { animation: spin 1s linear infinite; }
+  &-bounce { animation: bounce 1s infinite; }
+  &-float { animation: float 3s ease-in-out infinite; }
+}
+
+// Hover Effects
+.hover {
+  &-lift {
+    @include hover-lift;
+  }
+  
+  &-scale {
+    @include hover-scale;
+  }
+  
+  &-glow {
+    @include hover-glow;
+  }
+}
+
+// Visibility
+.hidden { display: none; }
+.invisible { visibility: hidden; }
+
+// Display
+.block { display: block; }
+.inline-block { display: inline-block; }
+.inline { display: inline; }
+
+// Position
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+
+// Width
+.w-full { width: 100%; }
+.w-auto { width: auto; }
+.h-full { height: 100%; }
+.h-auto { height: auto; }
+
+// Min/Max
+.min-h-screen { min-height: 100vh; }
+.max-w-screen { max-width: 100vw; }
+
+// Overflow
+.overflow-hidden { overflow: hidden; }
+.overflow-auto { overflow: auto; }
+.overflow-scroll { overflow: scroll; }
+
+// Scrollbar personalizado
+body {
+  @include scrollbar(10px, color(gray-100), color(gray-400));
+}
+
+// Custom Components Styles
+
+// Glassmorphism Card
+.glass-card {
+  @include glass(16px, 0.08);
+  padding: spacing(8);
+  border-radius: radius(2xl);
+  
+  &:hover {
+    @include glass(20px, 0.12);
+    transform: translateY(-4px);
+    transition: all transition(smooth);
+  }
+}
+
+// Gradient Border Card
+.gradient-border-card {
+  position: relative;
+  background: color(white);
+  padding: spacing(8);
+  border-radius: radius(2xl);
+  
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 2px;
+    background: gradient(primary);
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
+
+// Feature Card
+.feature-card {
+  @include card(spacing(8));
+  text-align: center;
+  transition: all transition(smooth);
+  
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: shadow(2xl);
+  }
+  
+  .icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto spacing(4);
+    @include flex-center;
+    border-radius: radius(xl);
+    background: gradient(primary);
+    color: color(white);
+    font-size: font-size(3xl);
+  }
+}
+
+// Stats Card
+.stat-card {
+  @include card(spacing(6));
+  
+  .stat-value {
+    font-size: font-size(4xl);
+    font-weight: 700;
+    @include gradient-text;
+    margin-bottom: spacing(2);
+  }
+  
+  .stat-label {
+    font-size: font-size(sm);
+    color: color(gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+// Navigation transitions
+.nav-link {
+  position: relative;
+  padding: spacing(2) spacing(4);
+  color: color(gray-700);
+  font-weight: 500;
+  transition: color transition(base);
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: gradient(primary);
+    transform: translateX(-50%);
+    transition: width transition(base);
+  }
+  
+  &:hover,
+  &.active {
+    color: color(primary);
+    
+    &::after {
+      width: 100%;
+    }
+  }
+}
+
+// Print styles
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
