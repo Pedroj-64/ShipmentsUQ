@@ -64,6 +64,15 @@
             <!-- Enlace para recuperar contraseña -->
             <Label fx:id="lbl_forgotPassword" styleClass="link-label" text="¿Olvidaste tu contraseña?" textAlignment="CENTER" />
             
+            <!-- Botón para versión web -->
+            <VBox alignment="CENTER" spacing="5.0">
+               <padding>
+                  <Insets top="15.0" />
+               </padding>
+               <Label text="¿Prefieres usar la versión web?" styleClass="info-label" />
+               <Button fx:id="btn_webVersion" mnemonicParsing="false" styleClass="web-button" text="🌐 Abrir Versión Web" />
+            </VBox>
+            
             <!-- Etiqueta para mensajes (errores o éxito) -->
             <Label fx:id="lbl_message" styleClass="error-label" text="" textAlignment="CENTER" />
          </children>

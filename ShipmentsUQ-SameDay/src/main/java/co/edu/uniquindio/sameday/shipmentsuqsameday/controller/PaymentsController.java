@@ -276,4 +276,67 @@ public class PaymentsController {
             return null;
         }
     }
+    
+    /**
+     * Elimina un método de pago guardado del usuario actual
+     * @param paymentMethodId ID del método de pago a eliminar
+     * @return true si se eliminó correctamente, false en caso contrario
+     */
+    public boolean deletePaymentMethod(UUID paymentMethodId) {
+        try {
+            if (currentUser == null || paymentMethodId == null) {
+                return false;
+            }
+            
+            // Buscar y eliminar el método de pago de la lista del usuario
+            boolean removed = currentUser.getPaymentMethods()
+                    .removeIf(method -> method.getId().equals(paymentMethodId));
+            
+            if (removed) {
+                // Actualizar usuario en el servicio (esto persistirá los cambios)
+                UserDashboardController.setCurrentUser(currentUser);
+                return true;
+            }
+            
+            return false;
+        } catch (Exception e) {
+            System.err.println("Error al eliminar método de pago: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Actualiza el alias de un método de pago guardado
+     * @param paymentMethodId ID del método de pago a actualizar
+     * @param newAlias Nuevo alias para el método de pago
+     * @return true si se actualizó correctamente, false en caso contrario
+     */
+    public boolean updatePaymentMethodAlias(UUID paymentMethodId, String newAlias) {
+        try {
+            if (currentUser == null || paymentMethodId == null || newAlias == null || newAlias.trim().isEmpty()) {
+                return false;
+            }
+            
+            // Buscar el método de pago en la lista del usuario
+            Optional<UserPaymentMethod> methodOpt = currentUser.getPaymentMethods().stream()
+                    .filter(method -> method.getId().equals(paymentMethodId))
+                    .findFirst();
+            
+            if (methodOpt.isPresent()) {
+                UserPaymentMethod method = methodOpt.get();
+                method.setAlias(newAlias.trim());
+                
+                // Actualizar usuario en el servicio (esto persistirá los cambios)
+                UserDashboardController.setCurrentUser(currentUser);
+                return true;
+            }
+            
+            return false;
+        } catch (Exception e) {
+            System.err.println("Error al actualizar alias del método de pago: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

@@ -107,9 +107,11 @@
                     <Label fx:id="lbl_paymentMethodDetails" styleClass="payment-method-details" />
                 </VBox>
                 
-                <!-- Botón para agregar nuevo método de pago -->
-                <HBox alignment="CENTER_RIGHT">
-                    <Button fx:id="btn_addPaymentMethod" text="Agregar Nuevo Método" styleClass="add-payment-method-button" />
+                <!-- Botones para gestionar métodos de pago -->
+                <HBox alignment="CENTER" spacing="8">
+                    <Button fx:id="btn_addPaymentMethod" text=" Agregar" styleClass="add-payment-method-button" />
+                    <Button fx:id="btn_editPaymentMethod" text=" Editar Alias" styleClass="edit-payment-method-button" />
+                    <Button fx:id="btn_deletePaymentMethod" text="Eliminar" styleClass="delete-payment-method-button" />
                 </HBox>
             </VBox>
             

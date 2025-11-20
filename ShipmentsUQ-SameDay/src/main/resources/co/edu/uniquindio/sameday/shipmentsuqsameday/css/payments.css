@@ -440,25 +440,71 @@
 
 /* Botón para agregar nuevo método de pago */
 .add-payment-method-button {
-    -fx-background-color: #e6f0ff;
-    background-color: #e6f0ff;
-    -fx-text-fill: #1a56a7;
-    color: #1a56a7;
-    -fx-border-color: #c0d6f7;
-    border-color: #c0d6f7;
+    -fx-background-color: #27ae60;
+    background-color: #27ae60;
+    -fx-text-fill: white;
+    color: white;
+    -fx-border-color: #229954;
+    border-color: #229954;
     -fx-border-radius: 4px;
     border-radius: 4px;
     -fx-padding: 5px 10px;
     padding: 5px 10px;
-    -fx-font-size: 12px;
-    font-size: 12px;
+    -fx-font-size: 11px;
+    font-size: 11px;
     -fx-cursor: hand;
     cursor: pointer;
 }
 
 .add-payment-method-button:hover {
-    -fx-background-color: #d4e6ff;
-    background-color: #d4e6ff;
+    -fx-background-color: #229954;
+    background-color: #229954;
+}
+
+/* Botón para editar alias de método de pago */
+.edit-payment-method-button {
+    -fx-background-color: #3498db;
+    background-color: #3498db;
+    -fx-text-fill: white;
+    color: white;
+    -fx-border-color: #2980b9;
+    border-color: #2980b9;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-padding: 5px 10px;
+    padding: 5px 10px;
+    -fx-font-size: 11px;
+    font-size: 11px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.edit-payment-method-button:hover {
+    -fx-background-color: #2980b9;
+    background-color: #2980b9;
+}
+
+/* Botón para eliminar método de pago */
+.delete-payment-method-button {
+    -fx-background-color: #e74c3c;
+    background-color: #e74c3c;
+    -fx-text-fill: white;
+    color: white;
+    -fx-border-color: #c0392b;
+    border-color: #c0392b;
+    -fx-border-radius: 4px;
+    border-radius: 4px;
+    -fx-padding: 5px 10px;
+    padding: 5px 10px;
+    -fx-font-size: 11px;
+    font-size: 11px;
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+.delete-payment-method-button:hover {
+    -fx-background-color: #c0392b;
+    background-color: #c0392b;
 }
 
 /* Estilos para los mensajes de estado */

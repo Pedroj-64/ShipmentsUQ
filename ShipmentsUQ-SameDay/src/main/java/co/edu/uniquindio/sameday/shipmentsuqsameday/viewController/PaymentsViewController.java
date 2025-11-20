@@ -57,6 +57,8 @@ public class PaymentsViewController implements Initializable {
     @FXML private ComboBox<UserPaymentMethodDTO> cmb_savedPaymentMethods;
     @FXML private Label lbl_paymentMethodDetails;
     @FXML private Button btn_addPaymentMethod;
+    @FXML private Button btn_editPaymentMethod;
+    @FXML private Button btn_deletePaymentMethod;
     @FXML private Button btn_pay;
     @FXML private Button btn_clear;
     @FXML private DatePicker dp_filterDate;
@@ -389,6 +391,12 @@ public class PaymentsViewController implements Initializable {
         // Botón para abrir ventana de agregar método de pago
         btn_addPaymentMethod.setOnAction(e -> openAddPaymentMethodWindow());
         
+        // Botón para editar alias de método de pago
+        btn_editPaymentMethod.setOnAction(e -> editSelectedPaymentMethodAlias());
+        
+        // Botón para eliminar método de pago
+        btn_deletePaymentMethod.setOnAction(e -> deleteSelectedPaymentMethod());
+        
         // Botón para realizar el pago
         btn_pay.setOnAction(e -> processPayment());
         
@@ -450,6 +458,84 @@ public class PaymentsViewController implements Initializable {
         }
         
         lbl_paymentMethodDetails.setText(details.toString());
+    }
+    
+    /**
+     * Elimina el método de pago seleccionado
+     */
+    private void deleteSelectedPaymentMethod() {
+        UserPaymentMethodDTO selected = cmb_savedPaymentMethods.getValue();
+        if (selected == null) {
+            showAlert("Error", "Ningún método seleccionado", 
+                    "Por favor seleccione un método de pago para eliminar", Alert.AlertType.WARNING);
+            return;
+        }
+        
+        // Confirmar eliminación
+        Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmAlert.setTitle("Confirmar eliminación");
+        confirmAlert.setHeaderText("¿Está seguro de eliminar este método de pago?");
+        confirmAlert.setContentText("Método: " + selected.getAlias());
+        
+        Optional<ButtonType> result = confirmAlert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            boolean success = controller.deletePaymentMethod(selected.getId());
+            
+            if (success) {
+                showAlert("Éxito", "Método eliminado", 
+                        "El método de pago ha sido eliminado correctamente", Alert.AlertType.INFORMATION);
+                loadPaymentMethods(); // Recargar lista
+                cmb_savedPaymentMethods.setValue(null);
+                lbl_paymentMethodDetails.setText("");
+                vbox_paymentMethodInfo.setVisible(false);
+            } else {
+                showAlert("Error", "Error al eliminar", 
+                        "No se pudo eliminar el método de pago", Alert.AlertType.ERROR);
+            }
+        }
+    }
+    
+    /**
+     * Abre un diálogo para editar el alias del método de pago seleccionado
+     */
+    private void editSelectedPaymentMethodAlias() {
+        UserPaymentMethodDTO selected = cmb_savedPaymentMethods.getValue();
+        if (selected == null) {
+            showAlert("Error", "Ningún método seleccionado", 
+                    "Por favor seleccione un método de pago para editar", Alert.AlertType.WARNING);
+            return;
+        }
+        
+        // Crear diálogo para ingresar nuevo alias
+        TextInputDialog dialog = new TextInputDialog(selected.getAlias());
+        dialog.setTitle("Editar Alias");
+        dialog.setHeaderText("Editar alias del método de pago");
+        dialog.setContentText("Nuevo alias:");
+        
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(newAlias -> {
+            if (newAlias.trim().isEmpty()) {
+                showAlert("Error", "Alias inválido", 
+                        "El alias no puede estar vacío", Alert.AlertType.WARNING);
+                return;
+            }
+            
+            boolean success = controller.updatePaymentMethodAlias(selected.getId(), newAlias);
+            
+            if (success) {
+                showAlert("Éxito", "Alias actualizado", 
+                        "El alias del método de pago ha sido actualizado correctamente", Alert.AlertType.INFORMATION);
+                loadPaymentMethods(); // Recargar lista
+                // Reseleccionar el método actualizado
+                savedPaymentMethods.stream()
+                        .filter(m -> m.getId().equals(selected.getId()))
+                        .findFirst()
+                        .ifPresent(cmb_savedPaymentMethods::setValue);
+            } else {
+                showAlert("Error", "Error al actualizar", 
+                        "No se pudo actualizar el alias del método de pago", Alert.AlertType.ERROR);
+            }
+        });
     }
     
     /**
