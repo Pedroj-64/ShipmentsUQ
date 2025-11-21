@@ -195,6 +195,9 @@ public class DataManager {
             });
         }
         
+        // Migración automática: sincronizar coordenadas Grid↔GPS en direcciones y repartidores
+        migrateCoordinates();
+        
         userRepository.loadEntities(appState.getUsers());
         delivererRepository.loadEntities(appState.getDeliverers());
         shipmentRepository.loadEntities(appState.getShipments());
@@ -204,6 +207,50 @@ public class DataManager {
         incidentRepository.loadEntities(appState.getIncidents());
         
         System.out.println("Después de cargar - Usuarios en repositorio: " + userRepository.findAll().size());
+    }
+    
+    /**
+     * Migra las coordenadas antiguas: convierte Grid↔GPS automáticamente
+     */
+    private void migrateCoordinates() {
+        System.out.println("[MIGRATION] Iniciando migración de coordenadas...");
+        int migrated = 0;
+        boolean needsSave = false;
+        
+        // Migrar direcciones
+        if (appState.getUsers() != null) {
+            for (co.edu.uniquindio.sameday.shipmentsuqsameday.model.User user : appState.getUsers()) {
+                if (user.getAddresses() != null) {
+                    for (co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address addr : user.getAddresses()) {
+                        if (!addr.hasGpsCoordinates() && (addr.getCoordX() != 0.0 || addr.getCoordY() != 0.0)) {
+                            addr.syncCoordinates();
+                            migrated++;
+                            needsSave = true;
+                            System.out.println("[MIGRATION] Dirección: " + addr.getStreet() + 
+                                             " → GPS (" + addr.getGpsLatitude() + "," + addr.getGpsLongitude() + ")");
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Migrar repartidores
+        if (appState.getDeliverers() != null) {
+            for (co.edu.uniquindio.sameday.shipmentsuqsameday.model.Deliverer d : appState.getDeliverers()) {
+                if (!d.hasRealCoordinates() && (d.getCurrentX() != 0.0 || d.getCurrentY() != 0.0)) {
+                    d.syncCoordinates();
+                    migrated++;
+                    needsSave = true;
+                }
+            }
+        }
+        
+        System.out.println("[MIGRATION] Migración completada: " + migrated + " elementos procesados");
+        
+        // NO guardar aquí - se guardará después de cargar los repositorios
+        if (needsSave) {
+            System.out.println("[MIGRATION] Los cambios se guardarán al cerrar la aplicación");
+        }
     }
     
     /**

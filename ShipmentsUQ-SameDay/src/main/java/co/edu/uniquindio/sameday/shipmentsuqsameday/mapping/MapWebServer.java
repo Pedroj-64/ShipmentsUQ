@@ -56,6 +56,7 @@ public class MapWebServer {
             // Rutas
             server.createContext("/", new StaticFileHandler());
             server.createContext("/api/coordinates", new CoordinatesHandler());
+            server.createContext("/api/tracking", new co.edu.uniquindio.sameday.shipmentsuqsameday.controller.TrackingApiController());
             
             server.setExecutor(null); // Usa el executor por defecto
             server.start();

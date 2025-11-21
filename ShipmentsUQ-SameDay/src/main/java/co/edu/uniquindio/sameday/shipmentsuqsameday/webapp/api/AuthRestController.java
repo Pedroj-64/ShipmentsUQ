@@ -108,7 +108,9 @@ public class AuthRestController {
                     request.getPassword(),
                     request.getCity(),
                     request.getDocument(),
-                    request.getZone()
+                    request.getZone(),
+                    request.getLatitude(),
+                    request.getLongitude()
             );
             
             Map<String, Object> response = new HashMap<>();
@@ -174,11 +176,17 @@ public class AuthRestController {
     public static class RegisterDelivererRequest extends RegisterUserRequest {
         private String document;
         private String zone;
+        private Double latitude;
+        private Double longitude;
         
         public String getDocument() { return document; }
         public void setDocument(String document) { this.document = document; }
         public String getZone() { return zone; }
         public void setZone(String zone) { this.zone = zone; }
+        public Double getLatitude() { return latitude; }
+        public void setLatitude(Double latitude) { this.latitude = latitude; }
+        public Double getLongitude() { return longitude; }
+        public void setLongitude(Double longitude) { this.longitude = longitude; }
     }
     
     // Métodos helper para crear respuestas

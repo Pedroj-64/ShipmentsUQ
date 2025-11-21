@@ -145,7 +145,19 @@ public class DeliverySimulator {
         
         System.out.println("[DeliverySimulator] Iniciando simulación para envío: " + shipment.getId());
         
-        // 1. Calcular ruta óptima
+        // Asegurar que el repartidor tiene coordenadas GPS sincronizadas
+        if (!deliverer.hasRealCoordinates()) {
+            System.out.println("[DeliverySimulator] ⚠️ Repartidor sin coordenadas GPS, sincronizando desde Grid...");
+            deliverer.syncCoordinates();
+        }
+        
+        // Asegurar que el destino tiene coordenadas GPS sincronizadas
+        if (!shipment.getDestination().hasGpsCoordinates()) {
+            System.out.println("[DeliverySimulator] ⚠️ Destino sin coordenadas GPS, sincronizando desde Grid...");
+            shipment.getDestination().syncCoordinates();
+        }
+        
+        // 1. Calcular ruta óptima usando coordenadas GPS
         Coordinates origin = new Coordinates(
             deliverer.getRealLatitude(), 
             deliverer.getRealLongitude()
@@ -154,6 +166,14 @@ public class DeliverySimulator {
             shipment.getDestination().getGpsLatitude(),
             shipment.getDestination().getGpsLongitude()
         );
+        
+        System.out.println("[DeliverySimulator] Calculando ruta:");
+        System.out.println("  Origen (Repartidor " + deliverer.getName() + "): " + 
+                         origin.getLatitude() + ", " + origin.getLongitude() +
+                         " (Grid: " + deliverer.getCurrentX() + "," + deliverer.getCurrentY() + ")");
+        System.out.println("  Destino (" + shipment.getDestination().getStreet() + "): " + 
+                         destination.getLatitude() + ", " + destination.getLongitude() +
+                         " (Grid: " + shipment.getDestination().getCoordX() + "," + shipment.getDestination().getCoordY() + ")");
         
         Route route = routeService.calculateOptimalRoute(origin, destination);
         

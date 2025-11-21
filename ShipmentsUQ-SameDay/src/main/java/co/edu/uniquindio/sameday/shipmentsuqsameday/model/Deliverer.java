@@ -2,6 +2,7 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.model;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.enums.DelivererStatus;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IGridCoordinate;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.strategy.GridCoordinateStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -76,12 +77,18 @@ public class Deliverer implements Serializable, IGridCoordinate {
     
     /**
      * Actualiza las coordenadas reales GPS del repartidor
-     * @param latitude latitud
-     * @param longitude longitud
+     * Automáticamente convierte GPS → Grid para mantener ambos sistemas sincronizados
+     * @param latitude latitud GPS
+     * @param longitude longitud GPS
      */
     public void updateRealPosition(double latitude, double longitude) {
         this.realLatitude = latitude;
         this.realLongitude = longitude;
+        
+        // Conversión automática GPS → Grid
+        double[] gridCoords = GridCoordinateStrategy.convertRealToGrid(latitude, longitude);
+        this.currentX = gridCoords[0];
+        this.currentY = gridCoords[1];
     }
     
     /**
@@ -93,13 +100,36 @@ public class Deliverer implements Serializable, IGridCoordinate {
     }
     
     /**
-     * Sincroniza las coordenadas: convierte las reales a grid si existen
-     * Útil para mantener compatibilidad con el sistema existente
+     * Sincroniza las coordenadas: convierte entre Grid y GPS según cuál esté disponible
+     * Útil para mantener compatibilidad con ambos sistemas
      */
     public void syncCoordinates() {
         if (hasRealCoordinates()) {
-            // Aquí se puede llamar al conversor si se necesita
-            // Por ahora solo es un placeholder para futura implementación
+            // GPS existe → Convertir a Grid
+            double[] gridCoords = GridCoordinateStrategy.convertRealToGrid(realLatitude, realLongitude);
+            this.currentX = gridCoords[0];
+            this.currentY = gridCoords[1];
+        } else if (currentX != 0.0 || currentY != 0.0) {
+            // Grid existe → Convertir a GPS
+            double[] gpsCoords = GridCoordinateStrategy.convertGridToReal(currentX, currentY);
+            this.realLatitude = gpsCoords[0];
+            this.realLongitude = gpsCoords[1];
         }
+    }
+    
+    /**
+     * Actualiza la posición usando coordenadas Grid
+     * Automáticamente convierte Grid → GPS para mantener ambos sistemas sincronizados
+     * @param x coordenada X del Grid
+     * @param y coordenada Y del Grid
+     */
+    public void updateGridPosition(double x, double y) {
+        this.currentX = x;
+        this.currentY = y;
+        
+        // Conversión automática Grid → GPS
+        double[] gpsCoords = GridCoordinateStrategy.convertGridToReal(x, y);
+        this.realLatitude = gpsCoords[0];
+        this.realLongitude = gpsCoords[1];
     }
 }

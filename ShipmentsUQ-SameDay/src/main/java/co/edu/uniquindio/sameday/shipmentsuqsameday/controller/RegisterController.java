@@ -112,11 +112,14 @@ public class RegisterController {
      * @param city Ciudad de residencia del repartidor
      * @param document Número de documento del repartidor
      * @param zone Zona de trabajo del repartidor
+     * @param latitude Latitud GPS de ubicación inicial (opcional)
+     * @param longitude Longitud GPS de ubicación inicial (opcional)
      * @return El repartidor creado si el registro es exitoso
      * @throws IllegalArgumentException Si los datos son inválidos o el repartidor ya existe
      */
     public Deliverer registerDeliverer(String name, String email, String phone, String password, 
-                                       String city, String document, String zone) {
+                                       String city, String document, String zone,
+                                       Double latitude, Double longitude) {
         // Validar datos comunes
         validateUserData(name, email, phone, password, city);
         
@@ -134,6 +137,10 @@ public class RegisterController {
             throw new IllegalArgumentException("El número de teléfono ya está registrado");
         }
         
+        // Usar coordenadas proporcionadas o valores por defecto (Centro Armenia)
+        double lat = (latitude != null) ? latitude : 4.533889;
+        double lng = (longitude != null) ? longitude : -75.681111;
+        
         // Crear nuevo repartidor
         Deliverer newDeliverer = Deliverer.builder()
                 .id(UUID.randomUUID())
@@ -146,11 +153,14 @@ public class RegisterController {
                 .shipmentHistory(new ArrayList<>())
                 .totalDeliveries(0)
                 .averageRating(0.0)
-                .currentX(4.533889) // Coordenadas por defecto Armenia, Quindío
-                .currentY(-75.681111)
-                .realLatitude(4.533889)
-                .realLongitude(-75.681111)
+                .currentX(lat)
+                .currentY(lng)
+                .realLatitude(lat)
+                .realLongitude(lng)
                 .build();
+        
+        // Sincronizar coordenadas para asegurar que Grid y GPS estén alineados
+        newDeliverer.syncCoordinates();
         
         return delivererService.getRepository().save(newDeliverer);
     }

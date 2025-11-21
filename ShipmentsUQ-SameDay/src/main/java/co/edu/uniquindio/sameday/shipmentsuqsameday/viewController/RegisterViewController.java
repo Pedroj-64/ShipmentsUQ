@@ -1,6 +1,11 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.viewController;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.FileWriter;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ResourceBundle;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.controller.RegisterController;
@@ -12,13 +17,18 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
+import javafx.util.Pair;
 
 /**
  * Controlador de vista para la pantalla de registro de usuarios.
@@ -55,6 +65,10 @@ public class RegisterViewController implements Initializable {
     @FXML
     private Label lbl_zone;
     @FXML
+    private Label lbl_location;
+    @FXML
+    private Label lbl_locationStatus;
+    @FXML
     private Label lbl_userType;
     @FXML
     private Label lbl_status;
@@ -77,6 +91,8 @@ public class RegisterViewController implements Initializable {
     @FXML
     private TextField txt_zone;
     @FXML
+    private Button btn_selectLocation;
+    @FXML
     private RadioButton rb_user;
     @FXML
     private RadioButton rb_deliverer;
@@ -85,6 +101,10 @@ public class RegisterViewController implements Initializable {
 
     // Controlador de negocio
     private RegisterController controller;
+    
+    // Coordenadas GPS seleccionadas
+    private Double selectedLat = null;
+    private Double selectedLng = null;
 
     /**
      * Inicializa el controlador de vista.
@@ -119,6 +139,7 @@ public class RegisterViewController implements Initializable {
     private void initButtonListeners() {
         btn_register.setOnAction(this::handleRegister);
         btn_cancel.setOnAction(this::handleCancel);
+        btn_selectLocation.setOnAction(this::handleSelectLocation);
     }
 
     /**
@@ -170,6 +191,11 @@ public class RegisterViewController implements Initializable {
         lbl_zone.setManaged(true);
         txt_zone.setVisible(true);
         txt_zone.setManaged(true);
+        
+        lbl_location.setVisible(true);
+        lbl_location.setManaged(true);
+        btn_selectLocation.getParent().setVisible(true);
+        btn_selectLocation.getParent().setManaged(true);
     }
 
     /**
@@ -187,6 +213,14 @@ public class RegisterViewController implements Initializable {
         txt_zone.setVisible(false);
         txt_zone.setManaged(false);
         txt_zone.clear();
+        
+        lbl_location.setVisible(false);
+        lbl_location.setManaged(false);
+        btn_selectLocation.getParent().setVisible(false);
+        btn_selectLocation.getParent().setManaged(false);
+        selectedLat = null;
+        selectedLng = null;
+        lbl_locationStatus.setText("No seleccionada");
     }
 
     /**
@@ -221,6 +255,11 @@ public class RegisterViewController implements Initializable {
                 showErrorStatus("Por favor complete el documento y zona de trabajo");
                 return;
             }
+            
+            if (selectedLat == null || selectedLng == null) {
+                showErrorStatus("Por favor seleccione su ubicación inicial en el mapa");
+                return;
+            }
         }
 
         // Validar que las contraseñas coincidan
@@ -240,7 +279,8 @@ public class RegisterViewController implements Initializable {
                 // Registrar repartidor
                 String document = txt_document.getText().trim();
                 String zone = txt_zone.getText().trim();
-                controller.registerDeliverer(name, email, phone, password, city, document, zone);
+                controller.registerDeliverer(name, email, phone, password, city, document, zone, 
+                                            selectedLat, selectedLng);
                 
                 // Mostrar mensaje de éxito
                 showSuccessStatus("Repartidor registrado exitosamente");
@@ -321,5 +361,206 @@ public class RegisterViewController implements Initializable {
     private void clearStatus() {
         lbl_status.setText("");
         lbl_status.setVisible(false);
+    }
+    
+    /**
+     * Maneja el evento de seleccionar ubicación en el mapa
+     * 
+     * @param event El evento de acción
+     */
+    private void handleSelectLocation(ActionEvent event) {
+        try {
+            // Crear archivo HTML temporal para selección de ubicación
+            Path tempFile = Files.createTempFile("location_picker_", ".html");
+            String htmlContent = generateLocationPickerHtml();
+            
+            try (FileWriter writer = new FileWriter(tempFile.toFile())) {
+                writer.write(htmlContent);
+            }
+            
+            // Abrir en el navegador
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                Desktop.getDesktop().browse(tempFile.toUri());
+                
+                // Iniciar thread para monitorear el archivo de coordenadas
+                startLocationMonitoring();
+            } else {
+                showErrorStatus("No se puede abrir el navegador en este sistema");
+            }
+            
+        } catch (Exception e) {
+            showErrorStatus("Error al abrir selector de ubicación: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Genera el HTML para el selector de ubicación con mapa
+     */
+    private String generateLocationPickerHtml() {
+        return """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Seleccionar Ubicación Inicial</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+        #map { flex: 1; }
+        .info-panel { position: absolute; top: 20px; right: 20px; background: white; padding: 20px; border-radius: 12px; 
+                      box-shadow: 0 4px 20px rgba(0,0,0,0.15); z-index: 1000; max-width: 350px; }
+        .info-panel h2 { font-size: 20px; margin-bottom: 15px; color: #1f2937; }
+        .coordinates { background: #fef3c7; padding: 15px; border-radius: 8px; margin: 15px 0; }
+        .coordinates p { margin: 5px 0; color: #92400e; }
+        .btn-confirm { background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 8px; 
+                       font-size: 16px; font-weight: 600; cursor: pointer; width: 100%; }
+        .btn-confirm:hover { background: #059669; }
+        .btn-confirm:disabled { background: #9ca3af; cursor: not-allowed; }
+        .instructions { color: #6b7280; font-size: 14px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div class="info-panel">
+        <h2>📍 Selecciona tu Ubicación</h2>
+        <p class="instructions">Haz clic en el mapa para seleccionar tu ubicación inicial como repartidor</p>
+        <div class="coordinates">
+            <p><strong>Latitud:</strong> <span id="lat">-</span></p>
+            <p><strong>Longitud:</strong> <span id="lng">-</span></p>
+        </div>
+        <button id="btn-confirm" class="btn-confirm" disabled>Confirmar Ubicación</button>
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicializar mapa centrado en Armenia, Quindío
+        const map = L.map('map').setView([4.533889, -75.681111], 14);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 19
+        }).addTo(map);
+        
+        let selectedMarker = null;
+        let selectedLat = null;
+        let selectedLng = null;
+        
+        // Manejar clic en el mapa
+        map.on('click', function(e) {
+            selectedLat = e.latlng.lat;
+            selectedLng = e.latlng.lng;
+            
+            // Actualizar coordenadas en UI
+            document.getElementById('lat').textContent = selectedLat.toFixed(6);
+            document.getElementById('lng').textContent = selectedLng.toFixed(6);
+            document.getElementById('btn-confirm').disabled = false;
+            
+            // Remover marcador anterior si existe
+            if (selectedMarker) {
+                map.removeLayer(selectedMarker);
+            }
+            
+            // Agregar nuevo marcador
+            selectedMarker = L.marker([selectedLat, selectedLng], {
+                icon: L.divIcon({
+                    className: 'custom-marker',
+                    html: '<div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🚴</div>',
+                    iconSize: [40, 40]
+                })
+            }).addTo(map).bindPopup('<b>Tu ubicación inicial</b>').openPopup();
+        });
+        
+        // Confirmar ubicación
+        document.getElementById('btn-confirm').addEventListener('click', function() {
+            if (selectedLat && selectedLng) {
+                // Cambiar el título de la página para que Java pueda leerlo
+                document.title = 'COORDS:' + selectedLat.toFixed(6) + ',' + selectedLng.toFixed(6);
+                
+                // Guardar en localStorage como respaldo
+                localStorage.setItem('shipmentsuq_deliverer_location', JSON.stringify({
+                    lat: selectedLat,
+                    lng: selectedLng,
+                    timestamp: Date.now()
+                }));
+                
+                // Mostrar mensaje de confirmación
+                alert('✅ Ubicación confirmada correctamente\\n\\nLatitud: ' + selectedLat.toFixed(6) + '\\nLongitud: ' + selectedLng.toFixed(6) + '\\n\\nPuedes cerrar esta ventana ahora.');
+                
+                // Cerrar automáticamente después de 2 segundos
+                setTimeout(() => {
+                    window.close();
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
+                """;
+    }
+    
+    /**
+     * Inicia el monitoreo para verificar si se seleccionó una ubicación
+     */
+    private void startLocationMonitoring() {
+        Platform.runLater(() -> {
+            lbl_locationStatus.setText("Esperando selección...");
+            
+            // Mostrar diálogo modal para ingresar coordenadas después de seleccionar
+            Dialog<Pair<Double, Double>> dialog = new Dialog<>();
+            dialog.setTitle("Ubicación Seleccionada");
+            dialog.setHeaderText("Ingresa las coordenadas que aparecen en el mapa");
+            
+            // Botones
+            ButtonType confirmButtonType = new ButtonType("Confirmar", ButtonBar.ButtonData.OK_DONE);
+            dialog.getDialogPane().getButtonTypes().addAll(confirmButtonType, ButtonType.CANCEL);
+            
+            // Campos de entrada
+            GridPane grid = new GridPane();
+            grid.setHgap(10);
+            grid.setVgap(10);
+            
+            TextField latField = new TextField();
+            latField.setPromptText("Ejemplo: 4.533889");
+            TextField lngField = new TextField();
+            lngField.setPromptText("Ejemplo: -75.681111");
+            
+            grid.add(new Label("Latitud:"), 0, 0);
+            grid.add(latField, 1, 0);
+            grid.add(new Label("Longitud:"), 0, 1);
+            grid.add(lngField, 1, 1);
+            
+            dialog.getDialogPane().setContent(grid);
+            
+            // Solicitar foco en el primer campo
+            Platform.runLater(() -> latField.requestFocus());
+            
+            // Convertir resultado cuando se presiona confirmar
+            dialog.setResultConverter(dialogButton -> {
+                if (dialogButton == confirmButtonType) {
+                    try {
+                        double lat = Double.parseDouble(latField.getText());
+                        double lng = Double.parseDouble(lngField.getText());
+                        return new Pair<>(lat, lng);
+                    } catch (NumberFormatException e) {
+                        return null;
+                    }
+                }
+                return null;
+            });
+            
+            // Mostrar diálogo y procesar resultado
+            dialog.showAndWait().ifPresent(coords -> {
+                if (coords != null) {
+                    selectedLat = coords.getKey();
+                    selectedLng = coords.getValue();
+                    
+                    lbl_locationStatus.setText(String.format("✓ Lat: %.6f, Lng: %.6f", 
+                        selectedLat, selectedLng));
+                    lbl_locationStatus.setStyle("-fx-text-fill: green;");
+                }
+            });
+        });
     }
 }

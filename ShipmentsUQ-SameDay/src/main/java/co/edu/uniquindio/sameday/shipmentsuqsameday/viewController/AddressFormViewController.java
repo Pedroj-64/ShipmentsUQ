@@ -229,20 +229,17 @@ public class AddressFormViewController implements Initializable {
                 return;
             }
             
-            // Intentar guardar la dirección
+            // Intentar guardar la dirección con conversión automática Grid↔GPS
             boolean success = controller.saveAddress(alias, street, zone, city, zipCode, 
-                                                     complement, coordX, coordY, isDefault);
-            
-            // Si se guardó exitosamente y hay coordenadas GPS, actualizarlas
-            if (success && gpsLat != null && gpsLng != null) {
-                // Obtener la dirección recién guardada para agregarle las coordenadas GPS
-                // Nota: Necesitamos acceso a la dirección guardada para poder actualizarla
-                // Por ahora, las coordenadas GPS se perderán si no las guardamos en el método saveAddress
-                System.out.println("[WARN] Coordenadas GPS no persistidas en Address (requiere modificar AddressFormController)");
-            }
+                                                     complement, coordX, coordY, isDefault, gpsLat, gpsLng);
             
             if (success) {
-                String coordSystemMsg = usingRealCoordinates ? " (con coordenadas GPS)" : "";
+                String coordSystemMsg;
+                if (gpsLat != null && gpsLng != null) {
+                    coordSystemMsg = " (GPS → Grid automático)";
+                } else {
+                    coordSystemMsg = " (Grid → GPS automático)";
+                }
                 updateStatusMessage("Dirección guardada correctamente" + coordSystemMsg, false);
                 
                 // Si hay un controlador padre, actualizar su lista de direcciones
@@ -555,28 +552,40 @@ public class AddressFormViewController implements Initializable {
                             txt_street.setText(street);
                             txt_street.positionCaret(street.length());
                             fieldsUpdated++;
-                            System.out.println("  [OK] Calle actualizada: " + street);
+                            System.out.println("  [OK] Calle actualizada: " + street + 
+                                             " | Visible: " + txt_street.isVisible() + 
+                                             " | Disabled: " + txt_street.isDisabled() +
+                                             " | Valor actual: '" + txt_street.getText() + "'");
                         }
                         
                         if (neighbourhood != null && !neighbourhood.trim().isEmpty()) {
                             txt_zone.setText(neighbourhood);
                             txt_zone.positionCaret(neighbourhood.length());
                             fieldsUpdated++;
-                            System.out.println("  [OK] Barrio actualizado: " + neighbourhood);
+                            System.out.println("  [OK] Barrio actualizado: " + neighbourhood +
+                                             " | Visible: " + txt_zone.isVisible() + 
+                                             " | Disabled: " + txt_zone.isDisabled() +
+                                             " | Valor actual: '" + txt_zone.getText() + "'");
                         }
                         
                         if (city != null && !city.trim().isEmpty()) {
                             txt_city.setText(city);
                             txt_city.positionCaret(city.length());
                             fieldsUpdated++;
-                            System.out.println("  [OK] Ciudad actualizada: " + city);
+                            System.out.println("  [OK] Ciudad actualizada: " + city +
+                                             " | Visible: " + txt_city.isVisible() + 
+                                             " | Disabled: " + txt_city.isDisabled() +
+                                             " | Valor actual: '" + txt_city.getText() + "'");
                         }
                         
                         if (postcode != null && !postcode.trim().isEmpty()) {
                             txt_zipCode.setText(postcode);
                             txt_zipCode.positionCaret(postcode.length());
                             fieldsUpdated++;
-                            System.out.println("  [OK] Código Postal actualizado: " + postcode);
+                            System.out.println("  [OK] Código Postal actualizado: " + postcode +
+                                             " | Visible: " + txt_zipCode.isVisible() + 
+                                             " | Disabled: " + txt_zipCode.isDisabled() +
+                                             " | Valor actual: '" + txt_zipCode.getText() + "'");
                         }
                         
                         // Construir dirección legible

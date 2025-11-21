@@ -72,12 +72,13 @@ public class DataInitializer {
                 .zone("Centro")
                 .averageRating(5.0)
                 .totalDeliveries(0)
-                .currentX(0.0)
-                .currentY(0.0)
+                .currentX(50.0)  // Centro de Armenia (Grid 50,50)
+                .currentY(50.0)  // Centro de Armenia (Grid 50,50)
                 .build();
             
+            defaultDeliverer.syncCoordinates(); // Convertir Grid → GPS automáticamente
             delivererRepository.save(defaultDeliverer);
-            System.out.println("Repartidor por defecto creado en posición (0,0)");
+            System.out.println("Repartidor por defecto creado en posición (50,50) - Centro de Armenia");
         } else {
             System.out.println("Ya existe al menos un repartidor en el sistema");
         }
@@ -159,7 +160,7 @@ public class DataInitializer {
             return;
         }
         
-        // Repartidor 1 - Posición (0,0) para pruebas
+        // Repartidor 1 - Posición en centro de Armenia (Grid: 50,50 = Armenia centro)
         Deliverer deliverer1 = Deliverer.builder()
                 .id(UUID.randomUUID())
                 .name("Juan Pérez")
@@ -169,12 +170,13 @@ public class DataInitializer {
                 .zone("Centro")
                 .averageRating(4.8)
                 .totalDeliveries(57)
-                .currentX(0.0)  // Posición inicial en coordenada X para pruebas
-                .currentY(0.0)  // Posición inicial en coordenada Y para pruebas
+                .currentX(48.0)  // Armenia centro-oeste (Grid 50=centro)
+                .currentY(52.0)  // Armenia centro-norte (Grid 50=centro)
                 .build();
+        deliverer1.syncCoordinates(); // Convertir Grid → GPS automáticamente
         delivererRepository.save(deliverer1);
         
-        // Repartidor 2 - Posición (5,10) para pruebas
+        // Repartidor 2 - Posición en norte de Armenia
         Deliverer deliverer2 = Deliverer.builder()
                 .id(UUID.randomUUID())
                 .name("Ana Gómez")
@@ -184,9 +186,10 @@ public class DataInitializer {
                 .zone("Norte")
                 .averageRating(4.6)
                 .totalDeliveries(42)
-                .currentX(5.0)
-                .currentY(10.0)
+                .currentX(52.0)  // Armenia este (Grid 50=centro)
+                .currentY(55.0)  // Armenia norte (Grid 50=centro)
                 .build();
+        deliverer2.syncCoordinates(); // Convertir Grid → GPS automáticamente
         delivererRepository.save(deliverer2);
         
         System.out.println("Repartidores de prueba creados: " + delivererRepository.findAll().size());

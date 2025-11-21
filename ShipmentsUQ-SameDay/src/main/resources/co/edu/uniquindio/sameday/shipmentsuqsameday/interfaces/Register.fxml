@@ -47,6 +47,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
                   <Label fx:id="lbl_userType" styleClass="form-label" text="Tipo de registro:" />
@@ -66,19 +67,26 @@
                   <Label fx:id="lbl_phone" styleClass="form-label" text="Teléfono:" GridPane.rowIndex="3" />
                   <Label fx:id="lbl_document" styleClass="form-label" text="Documento:" GridPane.rowIndex="4" managed="false" visible="false" />
                   <Label fx:id="lbl_zone" styleClass="form-label" text="Zona de trabajo:" GridPane.rowIndex="5" managed="false" visible="false" />
-                  <Label fx:id="lbl_password" styleClass="form-label" text="Contraseña:" GridPane.rowIndex="6" />
-                  <Label fx:id="lbl_confirmPassword" styleClass="form-label" text="Confirmar contraseña:" GridPane.rowIndex="7" />
-                  <Label fx:id="lbl_city" styleClass="form-label" text="Ciudad:" GridPane.rowIndex="8" />
+                  <Label fx:id="lbl_location" styleClass="form-label" text="Ubicación inicial:" GridPane.rowIndex="6" managed="false" visible="false" />
+                  <Label fx:id="lbl_password" styleClass="form-label" text="Contraseña:" GridPane.rowIndex="7" />
+                  <Label fx:id="lbl_confirmPassword" styleClass="form-label" text="Confirmar contraseña:" GridPane.rowIndex="8" />
+                  <Label fx:id="lbl_city" styleClass="form-label" text="Ciudad:" GridPane.rowIndex="9" />
                   
                   <TextField fx:id="txt_name" promptText="Ingrese su nombre completo" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                   <TextField fx:id="txt_email" promptText="ejemplo@correo.com" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <TextField fx:id="txt_phone" promptText="+57 300 123 4567" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <TextField fx:id="txt_document" promptText="Número de documento" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="4" managed="false" visible="false" />
                   <TextField fx:id="txt_zone" promptText="Ej: Norte, Sur, Centro" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="5" managed="false" visible="false" />
-                  <PasswordField fx:id="txtp_password" promptText="Mínimo 8 caracteres" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                  <PasswordField fx:id="txtp_confirmPassword" promptText="Repita su contraseña" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                  <TextField fx:id="txt_city" promptText="Ciudad de residencia" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                  <CheckBox fx:id="chb_terms" mnemonicParsing="false" styleClass="terms-checkbox" text="He leído y acepto los términos y condiciones de tratamiento de datos personales." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                  <HBox spacing="10.0" alignment="CENTER_LEFT" GridPane.columnIndex="1" GridPane.rowIndex="6" managed="false" visible="false">
+                     <children>
+                        <Button fx:id="btn_selectLocation" styleClass="secondary-button" text="📍 Seleccionar en Mapa" />
+                        <Label fx:id="lbl_locationStatus" text="No seleccionada" styleClass="info-label" />
+                     </children>
+                  </HBox>
+                  <PasswordField fx:id="txtp_password" promptText="Mínimo 8 caracteres" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                  <PasswordField fx:id="txtp_confirmPassword" promptText="Repita su contraseña" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                  <TextField fx:id="txt_city" promptText="Ciudad de residencia" styleClass="form-field" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                  <CheckBox fx:id="chb_terms" mnemonicParsing="false" styleClass="terms-checkbox" text="He leído y acepto los términos y condiciones de tratamiento de datos personales." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="10" />
                </children>
                <padding>
                   <Insets bottom="10.0" left="25.0" right="25.0" top="10.0" />

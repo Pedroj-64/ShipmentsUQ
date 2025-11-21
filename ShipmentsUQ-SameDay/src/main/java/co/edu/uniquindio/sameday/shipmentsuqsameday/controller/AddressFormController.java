@@ -3,6 +3,7 @@ package co.edu.uniquindio.sameday.shipmentsuqsameday.controller;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.User;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.service.UserService;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.strategy.GridCoordinateStrategy;
 import co.edu.uniquindio.sameday.shipmentsuqsameday.App;
 
 import java.util.Optional;
@@ -87,6 +88,17 @@ public class AddressFormController {
     public boolean saveAddress(String alias, String street, String zone, String city, 
                             String zipCode, String complement, double coordX, double coordY, 
                             boolean isDefault) throws Exception {
+        return saveAddress(alias, street, zone, city, zipCode, complement, coordX, coordY, isDefault, null, null);
+    }
+    
+    /**
+     * Guarda una dirección con conversión automática entre Grid y GPS
+     * @param gpsLat Latitud GPS (opcional, si es null se calcula desde Grid)
+     * @param gpsLng Longitud GPS (opcional, si es null se calcula desde Grid)
+     */
+    public boolean saveAddress(String alias, String street, String zone, String city, 
+                            String zipCode, String complement, double coordX, double coordY, 
+                            boolean isDefault, Double gpsLat, Double gpsLng) throws Exception {
         System.out.println("DEBUG: Iniciando saveAddress()");
                             
         if (currentUserId == null) {
@@ -124,6 +136,21 @@ public class AddressFormController {
                 address.setCoordY(coordY);
                 address.setDefault(isDefault);
                 
+                // Conversión automática de coordenadas
+                if (gpsLat != null && gpsLng != null) {
+                    // Usuario usó GPS → Convertir a Grid
+                    double[] gridCoords = GridCoordinateStrategy.convertRealToGrid(gpsLat, gpsLng);
+                    address.setCoordX(gridCoords[0]);
+                    address.setCoordY(gridCoords[1]);
+                    address.setGpsCoordinates(gpsLat, gpsLng);
+                    System.out.println("[INFO] Dirección guardada: GPS (" + gpsLat + "," + gpsLng + ") → Grid (" + gridCoords[0] + "," + gridCoords[1] + ")");
+                } else {
+                    // Usuario usó Grid → Convertir a GPS
+                    double[] gpsCoords = GridCoordinateStrategy.convertGridToReal(coordX, coordY);
+                    address.setGpsCoordinates(gpsCoords[0], gpsCoords[1]);
+                    System.out.println("[INFO] Dirección guardada: Grid (" + coordX + "," + coordY + ") → GPS (" + gpsCoords[0] + "," + gpsCoords[1] + ")");
+                }
+                
                 System.out.println("DEBUG: Actualizando dirección existente con ID: " + address.getId());
             } else {
                 // Crear nueva dirección
@@ -139,6 +166,21 @@ public class AddressFormController {
                     .coordY(coordY)
                     .isDefault(isDefault)
                     .build();
+                
+                // Conversión automática de coordenadas
+                if (gpsLat != null && gpsLng != null) {
+                    // Usuario usó GPS → Convertir a Grid
+                    double[] gridCoords = GridCoordinateStrategy.convertRealToGrid(gpsLat, gpsLng);
+                    address.setCoordX(gridCoords[0]);
+                    address.setCoordY(gridCoords[1]);
+                    address.setGpsCoordinates(gpsLat, gpsLng);
+                    System.out.println("[INFO] Dirección creada: GPS (" + gpsLat + "," + gpsLng + ") → Grid (" + gridCoords[0] + "," + gridCoords[1] + ")");
+                } else {
+                    // Usuario usó Grid → Convertir a GPS
+                    double[] gpsCoords = GridCoordinateStrategy.convertGridToReal(coordX, coordY);
+                    address.setGpsCoordinates(gpsCoords[0], gpsCoords[1]);
+                    System.out.println("[INFO] Dirección creada: Grid (" + coordX + "," + coordY + ") → GPS (" + gpsCoords[0] + "," + gpsCoords[1] + ")");
+                }
                 
                 // Añadir la nueva dirección a la lista del usuario
                 user.getAddresses().add(address);

@@ -338,16 +338,46 @@
         let map;
         const graph = createArmeniaGraph();
 
-        // Obtener parámetros de la URL
-        const params = new URLSearchParams(window.location.search);
-        const shipmentId = params.get('id') || 'N/A';
-        const customer = params.get('customer') || 'Cliente';
-        const originLat = parseFloat(params.get('originLat')) || 4.540000;
-        const originLng = parseFloat(params.get('originLng')) || -75.670000;
-        const originAddr = params.get('originAddr') || 'Dirección de origen';
-        const destLat = parseFloat(params.get('destLat')) || 4.520000;
-        const destLng = parseFloat(params.get('destLng')) || -75.690000;
-        const destAddr = params.get('destAddr') || 'Dirección de destino';
+        // Obtener datos - primero intentar desde window.ROUTE_DATA (inyectado), luego desde URL
+        let shipmentId, customer, delivererName, delivererLat, delivererLng, originLat, originLng, originAddr, destLat, destLng, destAddr;
+        
+        if (window.ROUTE_DATA) {
+            // Datos inyectados directamente en el HTML
+            console.log('📋 Datos recibidos desde window.ROUTE_DATA (inyectados)');
+            shipmentId = window.ROUTE_DATA.shipmentId;
+            customer = window.ROUTE_DATA.customer;
+            delivererName = window.ROUTE_DATA.delivererName;
+            delivererLat = window.ROUTE_DATA.delivererLat;
+            delivererLng = window.ROUTE_DATA.delivererLng;
+            originLat = window.ROUTE_DATA.originLat;
+            originLng = window.ROUTE_DATA.originLng;
+            originAddr = window.ROUTE_DATA.originAddr;
+            destLat = window.ROUTE_DATA.destLat;
+            destLng = window.ROUTE_DATA.destLng;
+            destAddr = window.ROUTE_DATA.destAddr;
+        } else {
+            // Fallback: leer desde URL parameters
+            console.log('📋 Datos recibidos desde URL parameters');
+            const params = new URLSearchParams(window.location.search);
+            shipmentId = params.get('id') || 'N/A';
+            customer = params.get('customer') || 'Cliente';
+            delivererName = params.get('delivererName') || 'Repartidor';
+            delivererLat = parseFloat(params.get('delivererLat')) || 4.533889;
+            delivererLng = parseFloat(params.get('delivererLng')) || -75.681111;
+            originLat = parseFloat(params.get('originLat')) || 4.540000;
+            originLng = parseFloat(params.get('originLng')) || -75.670000;
+            originAddr = params.get('originAddr') || 'Dirección de origen';
+            destLat = parseFloat(params.get('destLat')) || 4.520000;
+            destLng = parseFloat(params.get('destLng')) || -75.690000;
+            destAddr = params.get('destAddr') || 'Dirección de destino';
+        }
+
+        console.log('📦 Datos procesados:');
+        console.log('  - Envío:', shipmentId);
+        console.log('  - Cliente:', customer);
+        console.log('  - Repartidor:', delivererName, '→', delivererLat, delivererLng);
+        console.log('  - Origen GPS:', originLat, originLng);
+        console.log('  - Destino GPS:', destLat, destLng);
 
         // Actualizar panel de información
         document.getElementById('shipment-id').textContent = shipmentId;
@@ -368,72 +398,211 @@
             calculateAndDisplayRoute();
         });
 
-        function calculateAndDisplayRoute() {
-            // Encontrar nodos más cercanos
-            const startNode = getClosestNode(graph, originLat, originLng);
-            const endNode = getClosestNode(graph, destLat, destLng);
-
-            console.log('🔍 Nodo origen:', startNode);
-            console.log('🔍 Nodo destino:', endNode);
-
-            // Ejecutar Dijkstra
-            const result = graph.dijkstra(startNode, endNode);
-
-            if (!result.found) {
-                alert('No se encontró una ruta entre los puntos');
-                document.getElementById('loading').classList.add('hidden');
-                return;
-            }
-
-            console.log('✅ Ruta calculada:', result);
-
-            // Dibujar ruta en el mapa
-            const routeCoords = result.path.map(nodeId => {
-                const node = graph.nodes.get(nodeId);
-                return [node.lat, node.lng];
-            });
-
-            // Línea de ruta
-            L.polyline(routeCoords, {
-                color: '#f59e0b',
+        function drawDirectRoutes() {
+            console.log('📍 Dibujando rutas directas (instantáneo)...');
+            
+            // Segmento 1: Repartidor → Origen (azul punteado)
+            L.polyline([
+                [delivererLat, delivererLng],
+                [originLat, originLng]
+            ], {
+                color: '#3b82f6',
                 weight: 5,
+                opacity: 0.7,
+                dashArray: '10, 5'
+            }).addTo(map).bindPopup('<b>Segmento 1:</b> Ir a recoger');
+            
+            // Segmento 2: Origen → Destino (naranja sólido)
+            L.polyline([
+                [originLat, originLng],
+                [destLat, destLng]
+            ], {
+                color: '#f59e0b',
+                weight: 6,
                 opacity: 0.8
-            }).addTo(map);
+            }).addTo(map).bindPopup('<b>Segmento 2:</b> Entregar');
+            
+            // Marcadores
+            drawMarkers();
+            
+            // Calcular distancias con fórmula de Haversine
+            const dist1 = calculateDistance(delivererLat, delivererLng, originLat, originLng);
+            const dist2 = calculateDistance(originLat, originLng, destLat, destLng);
+            const totalDist = dist1 + dist2;
+            
+            document.getElementById('route-distance').textContent = totalDist.toFixed(2) + ' km';
+            document.getElementById('route-time').textContent = Math.ceil(totalDist * 3) + ' min';
+            document.getElementById('route-nodes').textContent = '4 puntos';
+            
+            // Ajustar vista
+            map.fitBounds([
+                [delivererLat, delivererLng],
+                [originLat, originLng],
+                [destLat, destLng]
+            ], { padding: [80, 80] });
+            
+            // Ocultar loading INMEDIATAMENTE
+            document.getElementById('loading').classList.add('hidden');
+            
+            console.log('✅ Rutas directas dibujadas (instantáneo)');
+        }
+        
+        function drawMarkers() {
+            // Repartidor
+            L.marker([delivererLat, delivererLng], {
+                icon: L.divIcon({
+                    className: 'deliverer-marker',
+                    html: '<div style="background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">🚴</div>',
+                    iconSize: [40, 40]
+                })
+            }).addTo(map).bindPopup('<b>Repartidor</b><br>' + delivererName);
 
-            // Marcador de origen
+            // Origen
             L.marker([originLat, originLng], {
                 icon: L.divIcon({
                     className: 'origin-marker',
-                    html: '<div style="background: #10b981; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white;">📍</div>',
-                    iconSize: [30, 30]
+                    html: '<div style="background: #10b981; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">📍</div>',
+                    iconSize: [35, 35]
                 })
             }).addTo(map).bindPopup('<b>Origen</b><br>' + originAddr);
 
-            // Marcador de destino
+            // Destino
             L.marker([destLat, destLng], {
                 icon: L.divIcon({
                     className: 'dest-marker',
-                    html: '<div style="background: #ef4444; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid white;">🎯</div>',
-                    iconSize: [30, 30]
+                    html: '<div style="background: #ef4444; color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid white; box-shadow: 0 2px 6px rgba(0,0,0,0.2);">🎯</div>',
+                    iconSize: [35, 35]
                 })
             }).addTo(map).bindPopup('<b>Destino</b><br>' + destAddr);
+        }
 
-            // Ajustar vista del mapa
-            const bounds = L.latLngBounds(routeCoords);
-            bounds.extend([originLat, originLng]);
-            bounds.extend([destLat, destLng]);
-            map.fitBounds(bounds, { padding: [50, 50] });
-
-            // Actualizar estadísticas
-            const distanceKm = result.distance.toFixed(2);
-            const timeMinutes = Math.ceil(result.distance * 3); // Aprox. 3 min por km
+        function calculateAndDisplayRoute() {
+            console.log('🚀 Iniciando cálculo de ruta...');
             
-            document.getElementById('route-distance').textContent = distanceKm + ' km';
-            document.getElementById('route-time').textContent = timeMinutes + ' min';
-            document.getElementById('route-nodes').textContent = result.path.length;
-
-            // Ocultar loading
-            document.getElementById('loading').classList.add('hidden');
+            // PASO 1: Mostrar ruta directa INMEDIATAMENTE (sin esperar nada)
+            drawDirectRoutes();
+            
+            // PASO 2: Intentar mejorar con OSRM en segundo plano (no bloquear UI)
+            setTimeout(() => {
+                tryOSRMEnhancement();
+            }, 100); // 100ms después para no bloquear el render inicial
+        }
+        
+        async function tryOSRMEnhancement() {
+            console.log('🌐 Intentando mejorar ruta con OSRM (en segundo plano)...');
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => {
+                console.log('⏱️ OSRM timeout (1s) - manteniendo ruta directa');
+                controller.abort();
+            }, 1000); // Solo 1 segundo de espera
+            
+            try {
+                // Solicitud simplificada a OSRM
+                const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${delivererLng},${delivererLat};${originLng},${originLat};${destLng},${destLat}?overview=simplified&geometries=geojson`;
+                
+                const response = await fetch(osrmUrl, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                if (!data.routes || data.routes.length === 0) throw new Error('Sin rutas');
+                
+                const route = data.routes[0];
+                console.log('✅ OSRM respondió - mejorando visualización');
+                
+                // Obtener coordenadas (viene como [lng, lat], convertir a [lat, lng])
+                const fullRouteCoords = route.geometry.coordinates.map(coord => [coord[1], coord[0]]);
+                
+                // Separar en dos segmentos basado en los legs
+                const legs = route.legs || [];
+                let segment1Coords = [];
+                let segment2Coords = [];
+                
+                if (legs.length >= 2) {
+                    const leg1Distance = legs[0].distance || 0;
+                    const leg2Distance = legs[1].distance || 0;
+                    const totalDistance = leg1Distance + leg2Distance;
+                    
+                    if (totalDistance > 0) {
+                        const splitRatio = leg1Distance / totalDistance;
+                        const splitIndex = Math.round(fullRouteCoords.length * splitRatio);
+                        
+                        segment1Coords = fullRouteCoords.slice(0, splitIndex + 1);
+                        segment2Coords = fullRouteCoords.slice(splitIndex);
+                    } else {
+                        segment1Coords = fullRouteCoords;
+                    }
+                } else {
+                    segment1Coords = fullRouteCoords;
+                }
+                
+                // Limpiar mapa y redibujar con rutas OSRM
+                map.eachLayer(layer => {
+                    if (layer instanceof L.Polyline || layer instanceof L.Marker) {
+                        map.removeLayer(layer);
+                    }
+                });
+                
+                // Re-agregar tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 19
+                }).addTo(map);
+                
+                // Dibujar segmento 1 (Repartidor → Origen) con OSRM
+                if (segment1Coords.length > 0) {
+                    L.polyline(segment1Coords, {
+                        color: '#3b82f6',
+                        weight: 5,
+                        opacity: 0.8,
+                        lineJoin: 'round',
+                        lineCap: 'round',
+                        dashArray: '10, 5'
+                    }).addTo(map).bindPopup('<b>Ruta real:</b> Ir a recoger');
+                }
+                
+                // Dibujar segmento 2 (Origen → Destino) con OSRM
+                if (segment2Coords.length > 0) {
+                    L.polyline(segment2Coords, {
+                        color: '#f59e0b',
+                        weight: 6,
+                        opacity: 0.9,
+                        lineJoin: 'round',
+                        lineCap: 'round'
+                    }).addTo(map).bindPopup('<b>Ruta real:</b> Entregar');
+                }
+                
+                // Re-dibujar marcadores
+                drawMarkers();
+                
+                // Actualizar estadísticas con datos reales
+                const distanceKm = (route.distance / 1000).toFixed(2);
+                const timeMinutes = Math.ceil(route.duration / 60);
+                const allCoords = segment2Coords.length > 0 ? [...segment1Coords, ...segment2Coords] : fullRouteCoords;
+                
+                document.getElementById('route-distance').textContent = distanceKm + ' km (real)';
+                document.getElementById('route-time').textContent = timeMinutes + ' min (real)';
+                document.getElementById('route-nodes').textContent = allCoords.length + ' puntos';
+                
+                // Ajustar vista
+                const bounds = L.latLngBounds(allCoords);
+                bounds.extend([delivererLat, delivererLng]);
+                bounds.extend([originLat, originLng]);
+                bounds.extend([destLat, destLng]);
+                map.fitBounds(bounds, { padding: [80, 80] });
+                
+                console.log('✅ Ruta mejorada con calles reales aplicada');
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('⏱️ OSRM muy lento - manteniendo ruta directa');
+                } else {
+                    console.log('⚠️ OSRM no disponible:', error.message, '- manteniendo ruta directa');
+                }
+                // No hacer nada - la ruta directa ya está mostrada
+            }
         }
     </script>
 </body>

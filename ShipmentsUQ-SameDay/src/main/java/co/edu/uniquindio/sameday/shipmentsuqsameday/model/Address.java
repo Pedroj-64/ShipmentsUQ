@@ -1,6 +1,7 @@
 package co.edu.uniquindio.sameday.shipmentsuqsameday.model;
 
 import co.edu.uniquindio.sameday.shipmentsuqsameday.model.interfaces.IGridCoordinate;
+import co.edu.uniquindio.sameday.shipmentsuqsameday.model.strategy.GridCoordinateStrategy;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -116,5 +117,22 @@ public class Address implements Serializable, IGridCoordinate {
     public void setGpsCoordinates(double latitude, double longitude) {
         this.gpsLatitude = latitude;
         this.gpsLongitude = longitude;
+    }
+    
+    /**
+     * Sincroniza las coordenadas: convierte entre Grid y GPS según cuál esté disponible
+     */
+    public void syncCoordinates() {
+        if (hasGpsCoordinates()) {
+            // GPS existe → Convertir a Grid
+            double[] gridCoords = GridCoordinateStrategy.convertRealToGrid(gpsLatitude, gpsLongitude);
+            this.coordX = gridCoords[0];
+            this.coordY = gridCoords[1];
+        } else if (coordX != 0.0 || coordY != 0.0) {
+            // Grid existe → Convertir a GPS
+            double[] gpsCoords = GridCoordinateStrategy.convertGridToReal(coordX, coordY);
+            this.gpsLatitude = gpsCoords[0];
+            this.gpsLongitude = gpsCoords[1];
+        }
     }
 }

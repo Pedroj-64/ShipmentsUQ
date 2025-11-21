@@ -42,49 +42,144 @@ function initMap() {
     console.log('✅ Mapa inicializado - Modo: Tracking (Solo Lectura)');
 }
 
-// Cargar datos de tracking
+// Cargar datos de tracking desde el backend
 async function loadTrackingData() {
-    console.log('🔄 Cargando datos de tracking...');
+    console.log('🔄 Cargando datos de tracking desde API...');
 
     try {
-        // En producción, esto vendría de una API
-        // Por ahora, usamos datos simulados
+        // Llamar al API REST para obtener envíos activos
+        const response = await fetch('/api/tracking/active');
         
-        // Simular ubicación del repartidor (en movimiento)
-        const baseTime = Date.now();
-        const offset = (baseTime % 60000) / 60000; // Ciclo de 1 minuto
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
         
-        // Ruta simulada: repartidor moviéndose de origen a destino
-        const origin = { lat: 4.540000, lng: -75.670000 }; // Origen del pedido
-        const destination = { lat: 4.520000, lng: -75.690000 }; // Destino (cliente)
+        const data = await response.json();
         
-        // Posición actual del repartidor (interpolación)
+        if (!data.success) {
+            throw new Error(data.error || 'Error desconocido');
+        }
+        
+        console.log(`✅ Datos recibidos: ${data.count} envíos activos`);
+        
+        if (data.count === 0) {
+            console.warn('⚠️ No hay envíos activos en este momento');
+            showNoShipmentsMessage();
+            return;
+        }
+        
+        // Usar el primer envío activo (o podrías filtrar por un ID específico)
+        const shipment = data.shipments[0];
+        
+        console.log('📦 Envío:', shipment.shipmentId);
+        console.log('🚴 Repartidor:', shipment.deliverer.name);
+        console.log('📍 Total de envíos activos:', data.count);
+        
+        // Extraer ubicaciones
         const deliverer = {
-            lat: origin.lat + (destination.lat - origin.lat) * offset,
-            lng: origin.lng + (destination.lng - destination.lng) * offset
+            lat: shipment.deliverer.currentLocation.lat,
+            lng: shipment.deliverer.currentLocation.lng,
+            name: shipment.deliverer.name
         };
-
+        
+        console.log('🚴 Ubicación del repartidor:', deliverer.lat.toFixed(6), deliverer.lng.toFixed(6));
+        
+        const origin = shipment.origin ? {
+            lat: shipment.origin.location.lat,
+            lng: shipment.origin.location.lng,
+            address: `${shipment.origin.street}, ${shipment.origin.city}`
+        } : null;
+        
+        if (origin) {
+            console.log('📦 Origen:', origin.address, '→', origin.lat.toFixed(6), origin.lng.toFixed(6));
+        }
+        
+        const destination = {
+            lat: shipment.destination.location.lat,
+            lng: shipment.destination.location.lng,
+            address: `${shipment.destination.street}, ${shipment.destination.city}`
+        };
+        
+        console.log('🏠 Destino:', destination.address, '→', destination.lat.toFixed(6), destination.lng.toFixed(6));
+        
+        // Validar si las coordenadas son iguales (problema común)
+        if (origin && Math.abs(origin.lat - destination.lat) < 0.0001 && Math.abs(origin.lng - destination.lng) < 0.0001) {
+            console.error('⚠️ PROBLEMA: Origen y Destino tienen las MISMAS coordenadas!');
+        }
+        if (Math.abs(deliverer.lat - destination.lat) < 0.0001 && Math.abs(deliverer.lng - destination.lng) < 0.0001) {
+            console.error('⚠️ PROBLEMA: Repartidor y Destino tienen las MISMAS coordenadas!');
+        }
+        
         // Actualizar marcadores
-        updateDelivererMarker(deliverer.lat, deliverer.lng);
-        updateOriginMarker(origin.lat, origin.lng);
-        updateDestinationMarker(destination.lat, destination.lng);
+        updateDelivererMarker(deliverer.lat, deliverer.lng, deliverer.name);
+        if (origin) {
+            updateOriginMarker(origin.lat, origin.lng, origin.address);
+        }
+        updateDestinationMarker(destination.lat, destination.lng, destination.address);
         
         // Dibujar ruta
-        drawRoute(origin, destination, deliverer);
+        if (origin) {
+            drawRoute(origin, destination, deliverer);
+        } else {
+            drawRouteWithoutOrigin(destination, deliverer);
+        }
         
-        // Actualizar UI
-        updateTrackingInfo(deliverer, origin, destination);
+        // Actualizar UI con datos reales
+        updateTrackingInfo(deliverer, origin, destination, shipment);
         
         // Ajustar zoom para ver todo
         fitMapToBounds();
 
     } catch (error) {
         console.error('❌ Error al cargar datos de tracking:', error);
+        showErrorMessage(error.message);
     }
 }
 
+// Mostrar mensaje cuando no hay envíos activos
+function showNoShipmentsMessage() {
+    document.getElementById('delivery-status').textContent = '📭 No hay envíos en tránsito';
+    document.getElementById('deliverer-name').textContent = 'Sin asignar';
+    document.getElementById('deliverer-coords').textContent = 'N/A';
+    document.getElementById('eta-time').textContent = '--';
+    document.getElementById('origin-address').textContent = 'Sin datos';
+    document.getElementById('destination-address').textContent = 'Sin datos';
+}
+
+// Mostrar mensaje de error
+function showErrorMessage(message) {
+    document.getElementById('delivery-status').textContent = '❌ Error al cargar datos';
+    document.getElementById('deliverer-coords').textContent = message;
+}
+
+// Dibujar ruta sin origen
+function drawRouteWithoutOrigin(destination, deliverer) {
+    if (routeLine) {
+        map.removeLayer(routeLine);
+    }
+
+    // Ruta directa (repartidor → destino)
+    routeLine = L.polyline([
+        [deliverer.lat, deliverer.lng],
+        [destination.lat, destination.lng]
+    ], {
+        color: '#3b82f6',
+        weight: 4,
+        opacity: 0.8,
+        dashArray: '10, 10'
+    }).addTo(map);
+
+    // Círculo de progreso
+    L.circle([deliverer.lat, deliverer.lng], {
+        color: '#3b82f6',
+        fillColor: '#dbeafe',
+        fillOpacity: 0.2,
+        radius: 200
+    }).addTo(map);
+}
+
 // Actualizar marcador del repartidor
-function updateDelivererMarker(lat, lng) {
+function updateDelivererMarker(lat, lng, name = 'Repartidor') {
     if (delivererMarker) {
         map.removeLayer(delivererMarker);
     }
@@ -121,18 +216,18 @@ function updateDelivererMarker(lat, lng) {
                         font-weight: bold;
                         white-space: nowrap;
                         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-                    ">Tu Repartidor</div>
+                    ">${name}</div>
                 </div>
             `,
             iconSize: [50, 50],
             iconAnchor: [25, 25]
         }),
-        zIndexOffset: 1000 // Asegurar que esté al frente
+        zIndexOffset: 1000
     }).addTo(map);
 
     delivererMarker.bindPopup(`
         <div style="text-align: center;">
-            <strong style="color: #1e40af; font-size: 14px;">🚴 Tu Repartidor</strong><br>
+            <strong style="color: #1e40af; font-size: 14px;">🚴 ${name}</strong><br>
             <span style="color: #10b981; font-size: 12px;">● En servicio</span><br>
             <hr style="margin: 8px 0; border: none; border-top: 1px solid #e2e8f0;">
             <span style="font-size: 11px; color: #64748b; font-family: monospace;">
@@ -146,7 +241,7 @@ function updateDelivererMarker(lat, lng) {
 }
 
 // Actualizar marcador de origen
-function updateOriginMarker(lat, lng) {
+function updateOriginMarker(lat, lng, address = '') {
     if (originMarker) {
         map.removeLayer(originMarker);
     }
@@ -176,14 +271,14 @@ function updateOriginMarker(lat, lng) {
 
     originMarker.bindPopup(`
         <strong style="color: #10b981;">📦 Origen (Recogida)</strong><br>
-        <span style="font-size: 12px;">Punto de partida del pedido</span>
+        <span style="font-size: 12px;">${address || 'Punto de partida'}</span>
     `);
 
     originCoords = { lat, lng };
 }
 
 // Actualizar marcador de destino
-function updateDestinationMarker(lat, lng) {
+function updateDestinationMarker(lat, lng, address = '') {
     if (destinationMarker) {
         map.removeLayer(destinationMarker);
     }
@@ -213,7 +308,7 @@ function updateDestinationMarker(lat, lng) {
 
     destinationMarker.bindPopup(`
         <strong style="color: #ef4444;">🏠 Destino (Tu Dirección)</strong><br>
-        <span style="font-size: 12px;">Ubicación de entrega</span>
+        <span style="font-size: 12px;">${address || 'Ubicación de entrega'}</span>
     `);
 
     destinationCoords = { lat, lng };
@@ -256,30 +351,54 @@ function drawRoute(origin, destination, deliverer) {
 }
 
 // Actualizar información de tracking
-function updateTrackingInfo(deliverer, origin, destination) {
+function updateTrackingInfo(deliverer, origin, destination, shipment) {
+    // Actualizar nombre del repartidor
+    document.getElementById('deliverer-name').textContent = deliverer.name || 'Repartidor';
+
+    // Actualizar coordenadas del repartidor
+    document.getElementById('deliverer-coords').textContent = 
+        `📍 Lat: ${deliverer.lat.toFixed(6)}, Lng: ${deliverer.lng.toFixed(6)}`;
+
+    // Actualizar direcciones
+    if (origin) {
+        document.getElementById('origin-address').textContent = origin.address || 'Sin especificar';
+    } else {
+        document.getElementById('origin-address').textContent = 'Sin origen definido';
+    }
+    
+    document.getElementById('destination-address').textContent = destination.address || 'Sin especificar';
+
     // Calcular distancia restante
     const remainingDistance = calculateDistance(
         deliverer.lat, deliverer.lng,
         destination.lat, destination.lng
     );
 
-    // Calcular ETA (30 km/h promedio)
-    const etaMinutes = Math.ceil((remainingDistance / 30) * 60);
-
-    // Actualizar coordenadas del repartidor
-    document.getElementById('deliverer-coords').textContent = 
-        `📍 Lat: ${deliverer.lat.toFixed(6)}, Lng: ${deliverer.lng.toFixed(6)}`;
+    // Calcular ETA (30 km/h promedio para repartidores urbanos)
+    let etaMinutes = Math.ceil((remainingDistance / 30) * 60);
+    
+    // Si hay simulación activa, usar su ETA
+    if (shipment && shipment.simulation && shipment.simulation.active) {
+        console.log('📊 Usando ETA de simulación');
+        // Usar datos de simulación si están disponibles
+        if (shipment.simulation.remainingDistance !== undefined) {
+            const simDistance = shipment.simulation.remainingDistance;
+            etaMinutes = Math.ceil((simDistance / 30) * 60);
+        }
+    }
 
     // Actualizar ETA
-    document.getElementById('eta-time').textContent = 
-        etaMinutes > 0 ? `${etaMinutes} min` : '¡Llegando!';
-
-    // Actualizar estado
-    if (etaMinutes <= 2) {
+    if (etaMinutes <= 0 || remainingDistance < 0.1) {
+        document.getElementById('eta-time').textContent = '¡Llegando!';
+        document.getElementById('delivery-status').textContent = '🎉 ¡El repartidor ha llegado!';
+    } else if (etaMinutes <= 2) {
+        document.getElementById('eta-time').textContent = `${etaMinutes} min`;
         document.getElementById('delivery-status').textContent = '🎉 ¡El repartidor está muy cerca!';
     } else if (etaMinutes <= 5) {
+        document.getElementById('eta-time').textContent = `${etaMinutes} min`;
         document.getElementById('delivery-status').textContent = '🚴 Llegando pronto';
     } else {
+        document.getElementById('eta-time').textContent = `${etaMinutes} min`;
         document.getElementById('delivery-status').textContent = '🚴 En camino a tu ubicación';
     }
 

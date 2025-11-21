@@ -310,6 +310,16 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 return null;
             }
             
+            // Sincronizar coordenadas GPS de todos los repartidores antes de calcular distancias
+            System.out.println("[INFO] Sincronizando coordenadas de " + availableDeliverers.size() + " repartidores...");
+            for (Deliverer d : availableDeliverers) {
+                if (!d.hasRealCoordinates()) {
+                    d.syncCoordinates();
+                    System.out.println("  - " + d.getName() + ": Grid (" + d.getCurrentX() + "," + d.getCurrentY() + 
+                                     ") → GPS (" + d.getRealLatitude() + "," + d.getRealLongitude() + ")");
+                }
+            }
+            
             // Usar MapCoordinateIntegrationService (Facade Pattern) para encontrar el más cercano
             Optional<Deliverer> nearest = integrationService.findNearestDeliverer(
                 availableDeliverers, 
@@ -321,6 +331,8 @@ public class ShipmentService implements Service<Shipment, ShipmentRepository> {
                 Deliverer deliverer = nearest.get();
                 String location = integrationService.getDelivererLocation(deliverer);
                 System.out.println("[SUCCESS] Repartidor asignado (GPS): " + deliverer.getName() + " en " + location);
+                System.out.println("  - Coordenadas Grid: (" + deliverer.getCurrentX() + "," + deliverer.getCurrentY() + ")");
+                System.out.println("  - Coordenadas GPS: (" + deliverer.getRealLatitude() + "," + deliverer.getRealLongitude() + ")");
                 return deliverer;
             } else {
                 System.err.println("[ERROR] No se pudo encontrar repartidor cercano con GPS");

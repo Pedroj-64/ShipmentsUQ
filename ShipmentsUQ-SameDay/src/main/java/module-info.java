@@ -31,6 +31,11 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
   
     requires okhttp3;
     requires com.google.gson;
+    
+    // Librerías para Adapter pattern (generación de reportes)
+    requires org.apache.pdfbox;
+    requires org.apache.poi.poi;
+    requires org.apache.poi.ooxml;
 
     opens co.edu.uniquindio.sameday.shipmentsuqsameday to javafx.fxml;
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.viewController to javafx.fxml;
@@ -70,6 +75,12 @@ module co.edu.uniquindio.sameday.shipmentsuqsameday {
     opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator to javafx.base;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.decorator;
     
+    // Exportar patrones estructurales
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.adapter to javafx.base;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.adapter;
+    
+    opens co.edu.uniquindio.sameday.shipmentsuqsameday.model.composite to javafx.base, com.google.gson;
+    exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.composite;
 
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing;
     exports co.edu.uniquindio.sameday.shipmentsuqsameday.model.routing.strategy;

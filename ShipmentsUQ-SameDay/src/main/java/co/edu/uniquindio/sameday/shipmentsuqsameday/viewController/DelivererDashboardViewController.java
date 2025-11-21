@@ -19,7 +19,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.VBox;
 import java.awt.Desktop;
-import java.net.URI;
 
 /**
  * Controlador de vista para el dashboard del repartidor.
@@ -235,13 +234,21 @@ public class DelivererDashboardViewController implements Initializable {
     private double[] getGPSCoordinates(co.edu.uniquindio.sameday.shipmentsuqsameday.model.Address address) {
         if (address == null) return null;
         
-        // Verificar si tiene coordenadas GPS reales
+        // Sincronizar coordenadas si no tiene GPS
+        if (!address.hasGpsCoordinates()) {
+            System.out.println("⚠️ Dirección sin GPS, sincronizando desde Grid (" + 
+                             address.getCoordX() + "," + address.getCoordY() + ")...");
+            address.syncCoordinates();
+        }
+        
+        // Verificar si tiene coordenadas GPS después de sincronizar
         if (address.hasGpsCoordinates()) {
             return new double[]{address.getGpsLatitude(), address.getGpsLongitude()};
         }
         
-        // Si no tiene GPS, usar coordenadas del grid (aproximación)
-        return new double[]{address.getX(), address.getY()};
+        // Si aún no tiene GPS (no debería pasar), retornar null
+        System.err.println("❌ Error: No se pudieron obtener coordenadas GPS para: " + address.getFullAddress());
+        return null;
     }
 
     /**
@@ -264,36 +271,52 @@ public class DelivererDashboardViewController implements Initializable {
                 return;
             }
             
+            // Obtener coordenadas del repartidor
+            Deliverer deliverer = selectedShipment.getDeliverer();
+            if (deliverer != null && !deliverer.hasRealCoordinates()) {
+                deliverer.syncCoordinates();
+            }
+            double[] delivererCoords = deliverer != null && deliverer.hasRealCoordinates() 
+                ? new double[]{deliverer.getRealLatitude(), deliverer.getRealLongitude()}
+                : originCoords; // Si no hay repartidor, usar origen como posición inicial
+            
             // Obtener direcciones completas
             String originAddr = selectedShipment.getOrigin().getFullAddress();
             String destAddr = selectedShipment.getDestination().getFullAddress();
             String customerName = selectedShipment.getUser() != null ? selectedShipment.getUser().getName() : "Cliente";
-            
-            // Construir ruta al archivo HTML local con el mapa Dijkstra
-            String htmlPath = getClass().getResource("/co/edu/uniquindio/sameday/shipmentsuqsameday/webapp/route-map.html").toExternalForm();
-            
-            // Construir URL con parámetros
-            String routeUrl = String.format(
-                "%s?id=%s&customer=%s&originLat=%f&originLng=%f&originAddr=%s&destLat=%f&destLng=%f&destAddr=%s",
-                htmlPath,
-                selectedShipment.getId().toString(),
-                java.net.URLEncoder.encode(customerName, "UTF-8"),
-                originCoords[0], originCoords[1],
-                java.net.URLEncoder.encode(originAddr, "UTF-8"),
-                destCoords[0], destCoords[1],
-                java.net.URLEncoder.encode(destAddr, "UTF-8")
-            );
+            String delivererName = deliverer != null ? deliverer.getName() : "Repartidor";
             
             System.out.println("🗺️ Abriendo ruta con algoritmo Dijkstra en navegador...");
             System.out.println("📦 Envío ID: " + selectedShipment.getId());
+            System.out.println("🚴 Repartidor: " + delivererName + " (" + delivererCoords[0] + ", " + delivererCoords[1] + ")");
             System.out.println("📍 Origen: " + originAddr + " (" + originCoords[0] + ", " + originCoords[1] + ")");
             System.out.println("🎯 Destino: " + destAddr + " (" + destCoords[0] + ", " + destCoords[1] + ")");
+            
+            // Crear HTML temporal con los datos embebidos (evita problemas con query params en file://)
+            String htmlContent = generateRouteMapHtml(
+                selectedShipment.getId().toString(),
+                customerName,
+                delivererName,
+                delivererCoords[0], delivererCoords[1],
+                originCoords[0], originCoords[1], originAddr,
+                destCoords[0], destCoords[1], destAddr
+            );
+            
+            // Guardar HTML temporal
+            java.io.File tempFile = java.io.File.createTempFile("route-map-", ".html");
+            tempFile.deleteOnExit();
+            try (java.io.FileWriter writer = new java.io.FileWriter(tempFile)) {
+                writer.write(htmlContent);
+            }
+            
+            String routeUrl = tempFile.toURI().toString();
+            System.out.println("🔗 Archivo temporal: " + routeUrl);
             
             // Abrir en el navegador predeterminado
             if (Desktop.isDesktopSupported()) {
                 Desktop desktop = Desktop.getDesktop();
                 if (desktop.isSupported(Desktop.Action.BROWSE)) {
-                    desktop.browse(new URI(routeUrl));
+                    desktop.browse(tempFile.toURI());
                     AppUtils.showAlert("Ruta Calculada", "La ruta óptima se ha calculado y abierto en tu navegador", javafx.scene.control.Alert.AlertType.INFORMATION);
                 } else {
                     AppUtils.showWarning("No soportado", "No se puede abrir el navegador automáticamente");
@@ -348,6 +371,52 @@ public class DelivererDashboardViewController implements Initializable {
         listView_shipments.getSelectionModel().clearSelection();
     }
 
+    /**
+     * Genera HTML con datos embebidos para el mapa de ruta
+     */
+    private String generateRouteMapHtml(String shipmentId, String customerName, String delivererName,
+                                       double delivererLat, double delivererLng,
+                                       double originLat, double originLng, String originAddr,
+                                       double destLat, double destLng, String destAddr) throws Exception {
+        // Leer el HTML template
+        String templatePath = "/co/edu/uniquindio/sameday/shipmentsuqsameday/webapp/route-map.html";
+        java.io.InputStream is = getClass().getResourceAsStream(templatePath);
+        String template = new String(is.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+        
+        // Inyectar datos directamente en el JavaScript usando Locale.US para puntos decimales
+        String dataScript = String.format(
+            java.util.Locale.US,
+            "<script>\n" +
+            "window.ROUTE_DATA = {\n" +
+            "  shipmentId: '%s',\n" +
+            "  customer: '%s',\n" +
+            "  delivererName: '%s',\n" +
+            "  delivererLat: %.8f,\n" +
+            "  delivererLng: %.8f,\n" +
+            "  originLat: %.8f,\n" +
+            "  originLng: %.8f,\n" +
+            "  originAddr: '%s',\n" +
+            "  destLat: %.8f,\n" +
+            "  destLng: %.8f,\n" +
+            "  destAddr: '%s'\n" +
+            "};\n" +
+            "</script>",
+            shipmentId,
+            customerName.replace("'", "\\'"),
+            delivererName.replace("'", "\\'"),
+            delivererLat, delivererLng,
+            originLat, originLng,
+            originAddr.replace("'", "\\'"),
+            destLat, destLng,
+            destAddr.replace("'", "\\'")
+        );
+        
+        // Insertar el script antes del </head>
+        template = template.replace("</head>", dataScript + "\n</head>");
+        
+        return template;
+    }
+    
     /**
      * Maneja el evento de cerrar sesión
      */
